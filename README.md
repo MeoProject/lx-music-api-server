@@ -1,6 +1,10 @@
 # lx-music-api-server-python
 
-LX Music非官方测试接口服务器的Python实现（需自行写源）
+LX Music非官方解析服务器的Python实现  
+
+原仓库：[lx-music-api-server](https://github.com/lxmusics/lx-music-api-server)  
+您可以在原仓库中找到对应的可用源脚本  
+
 
 ## 还在开发中
 **主开发是高一住校学生，只有周末有时间回复，也欢迎所有人来贡献代码，我们在这里万分感谢**  
