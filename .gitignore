@@ -1,0 +1,31 @@
+# Git Ignore for lx-music-api-server
+
+# python
+*.pyc
+*.pyo
+*.pyd
+*.pyz
+*/__pycache__/*
+__pycache__/
+*.egg-info
+*.egg
+
+# nodejs
+*.node
+node_modules/
+
+# npm
+*.tgz
+*.tar.gz
+*.zip
+*.tar
+
+# project
+cache.db
+data.db
+logs
+config.json
+*.log
+
+# VSCode
+.history

@@ -1,0 +1,5 @@
+flask[async]
+pycryptodome
+ujson
+requests
+colorlog
