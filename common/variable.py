@@ -11,7 +11,7 @@
 import os
 
 
-debug_mode = False
+debug_mode = True
 log_length_limit = 400
 running = True
 config = {}

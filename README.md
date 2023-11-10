@@ -16,7 +16,6 @@ LX Music非官方测试接口服务器的Python实现（需自行写源）
 
 ```bash
 git clone https://github.com/lxmusics/lx-music-api-server-python.git # clone本项目
-cd python # 后期可能会有nodejs版
 python -m pip install -r ./requirements.txt # 安装依赖
 python main.py # 启动服务
 ```
