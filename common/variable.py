@@ -11,11 +11,9 @@
 import os
 
 
-debug_mode = True
-log_length_limit = 50000000
+debug_mode = False
+log_length_limit = 400
 running = True
 config = {}
-pool_data = None
-pool_cache = None
 workdir = os.getcwd()
 banList_suggest = 0
