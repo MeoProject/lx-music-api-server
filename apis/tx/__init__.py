@@ -55,12 +55,32 @@ def signRequest(data):
 
 
 async def url(songId, quality):
+    infoReqBody = {
+        "comm": {
+            "ct": '19',
+            "cv": '1859',
+            "uin": '0',
+        },
+        "req": {
+            "module": 'music.pf_song_detail_svr',
+            "method": 'get_song_detail_yqq',
+            "param": {
+                "song_type": 0,
+                "song_mid": songId,
+            },
+        },
+    }
+    infoRequest = signRequest(infoReqBody)
+    infoBody = jsobject(infoRequest.json())
+    if (infoBody.code != 0 or infoBody.req.code != 0):
+        raise FailedException("获取音乐信息失败")
+    strMediaMid = infoBody.req.data.track_info.file.media_mid
     requestBody = {
         'req_0': {
             'module': 'vkey.GetVkeyServer',
             'method': 'CgiGetVkey',
             'param': {
-                'filename': [f"{tools.fileInfo[quality]['h']}{songId}{tools.fileInfo[quality]['e']}"],
+                'filename': [f"{tools.fileInfo[quality]['h']}{strMediaMid}{tools.fileInfo[quality]['e']}"],
                 'guid': tools.guid,
                 'songmid': [songId],
                 'songtype': [0],
