@@ -32,15 +32,15 @@ jobs:
         if: matrix.os == 'windows-latest'
         env: 
           actions: T
-        run: pyinstaller -F --name lx-music-api-server_${{ github.sha }} main.py
+        run: pyinstaller -F --name lx-music-api-server_${{ github.sha }}_win_${{ matrix.os }} main.py
       - name: Build Linux Executable
         if: matrix.os == 'ubuntu-latest'
         env: 
           actions: E
-        run: pyinstaller -F --name lx-music-api-server_${{ github.sha }} main.py
+        run: pyinstaller -F --name lx-music-api-server_${{ github.sha }}_linux_${{ matrix.os }} main.py
 
       - name: Upload
         uses: actions/upload-artifact@v2
         with:
-          name: lx-music-api-server
+          name: lx-music-api-server-
           path: ./dist
