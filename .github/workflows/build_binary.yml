@@ -29,10 +29,7 @@ jobs:
       - name: Build EXE
         env: 
           actions: T
-        run: pyinstaller -F main.py
-
-      - name: Rename
-        run: Rename-Item ./dist/main.exe ./dist/lx-music-api-server_$(git rev-parse --short HEAD).exe
+        run: pyinstaller -F --name lx-music-api-server_${{ github.sha }} main.py
       
       - name: Upload
         uses: actions/upload-artifact@v2
