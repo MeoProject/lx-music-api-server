@@ -9,7 +9,7 @@ on:
     branches: [main]
 
 jobs:
-  build-exe:
+  Build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
