@@ -39,6 +39,7 @@ tools = jsobject({
     "loginuin": config.read_config("module.tx.user.uin"),
     "guid": config.read_config("module.tx.vkeyserver.guid"),
     "uin": config.read_config("module.tx.vkeyserver.uin"),
+    "cdnaddr": config.read_config("module.tx.cdnaddr") if config.read_config("module.tx.cdnaddr") else 'http://ws.stream.qqmusic.qq.com/',
 })
 
 
@@ -81,4 +82,4 @@ async def url(songId, quality):
     # js const { purl } = data.req_0.data.midurlinfo[0]
     if (not body.req_0.data.midurlinfo[0]['purl']):
         raise FailedException('failed')
-    return 'http://ws.stream.qqmusic.qq.com/' + body.req_0.data.midurlinfo[0]['purl']
+    return tools.cdnaddr + body.req_0.data.midurlinfo[0]['purl']

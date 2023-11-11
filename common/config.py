@@ -141,7 +141,8 @@ default = {
                 "qqmusic_key": "",
                 "uin": "",
                 "_uin-desc": "key对应的QQ号"
-            }
+            },
+            "cdnaddr": "http://ws.stream.qqmusic.qq.com/",
         },
         "wy": {
             "desc": "网易云音乐相关配置",
@@ -360,21 +361,25 @@ def push_to_list(key, obj):
 
 
 def read_config(key):
-    config = variable.config
-    keys = key.split('.')
-    value = config
-    for k in keys:
-        if isinstance(value, dict):
-            if k not in value and keys.index(k) != len(keys) - 1:
-                value[k] = {}
-            elif k not in value and keys.index(k) == len(keys) - 1:
+    try:
+        config = variable.config
+        keys = key.split('.')
+        value = config
+        for k in keys:
+            if isinstance(value, dict):
+                if k not in value and keys.index(k) != len(keys) - 1:
+                    value[k] = {}
+                elif k not in value and keys.index(k) == len(keys) - 1:
+                    value = None
+                value = value[k]
+            else:
                 value = None
-            value = value[k]
-        else:
-            value = None
-            break
+                break
 
-    return value
+        return value
+    except:
+        logger.warning(f'配置文件{key}不存在')
+        return None
 
 
 def initConfig():
