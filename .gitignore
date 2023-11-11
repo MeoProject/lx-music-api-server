@@ -10,16 +10,6 @@ __pycache__/
 *.egg-info
 *.egg
 
-# nodejs
-*.node
-node_modules/
-
-# npm
-*.tgz
-*.tar.gz
-*.zip
-*.tar
-
 # project
 cache.db
 data.db
