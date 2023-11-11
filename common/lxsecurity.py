@@ -37,7 +37,3 @@ def checklxmheader(lxm, url):
         return True
     except:
         return False
-
-exports = {
-    
-}

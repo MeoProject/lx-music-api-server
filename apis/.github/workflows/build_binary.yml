@@ -1,0 +1,39 @@
+# this workflow using github actions to build a binary exe file for windows users
+
+name: build Windows exe
+
+on: 
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-exe:
+    runs-on: windows-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+      
+      - name: setup python 3.11
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.11'
+      
+      - name: install pyinstaller
+        run: python -m pip install pyinstaller
+      
+      - name: install dependencies
+        run: python -m pip install -r ./requirements.txt
+      
+      - name: build exe
+        run: pyinstaller -F main.py
+
+      - name: rename
+        run: Rename-Item ./dist/main.exe ./dist/lx-music-api-server_$(git rev-parse --short HEAD).exe
+      
+      - name: upload
+        uses: actions/upload-artifact@v2
+        with:
+          name: lx-music-api-server
+          path: ./dist

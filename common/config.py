@@ -14,14 +14,16 @@ import os
 import traceback
 import sys
 import sqlite3
-from .utils import unique_list, readfile
+from .utils import readfile
 from . import variable
 from .log import log
-# from dbutils.pooled_db import PooledDB
 import threading
+
+logger = log('config_manager')
 
 # 创建线程本地存储对象
 local_data = threading.local()
+
 
 def get_data_connection():
     # 检查线程本地存储对象是否存在连接对象，如果不存在则创建一个新的连接对象
@@ -29,16 +31,16 @@ def get_data_connection():
         local_data.connection = sqlite3.connect('data.db')
     return local_data.connection
 
+
 # 创建线程本地存储对象
 local_cache = threading.local()
+
 
 def get_cache_connection():
     # 检查线程本地存储对象是否存在连接对象，如果不存在则创建一个新的连接对象
     if not hasattr(local_cache, 'connection'):
         local_cache.connection = sqlite3.connect('cache.db')
     return local_cache.connection
-
-logger = log('config_manager')
 
 
 class ConfigReadException(Exception):
@@ -395,8 +397,11 @@ def initConfig():
     cursor = conn.cursor()
 
     # 创建一个表来存储缓存数据
-    cursor.execute(readfile(variable.workdir +
-                   '/common/sql/create_cache_db.sql'))
+    cursor.execute('''CREATE TABLE IF NOT EXISTS cache
+(id INTEGER PRIMARY KEY AUTOINCREMENT,
+module TEXT NOT NULL,
+key TEXT NOT NULL,
+data TEXT NOT NULL)''')
 
     conn.close()
 
@@ -405,8 +410,9 @@ def initConfig():
     # 创建一个游标对象
     cursor2 = conn2.cursor()
 
-    cursor2.execute(readfile(variable.workdir +
-                    '/common/sql/create_data_db.sql'))
+    cursor2.execute('''CREATE TABLE IF NOT EXISTS data
+(key TEXT PRIMARY KEY,
+value TEXT)''')
 
     conn2.close()
 
@@ -416,7 +422,7 @@ def initConfig():
     if (load_data() == {}):
         write_data('banList', [])
         write_data('requestTime', {})
-        logger.debug('数据库内容为空，已写入默认值')
+        logger.info('数据库内容为空，已写入默认值')
 
 
 def ban_ip(ip_addr, ban_time=-1):

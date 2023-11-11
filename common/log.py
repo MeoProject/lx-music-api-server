@@ -11,6 +11,10 @@
 import logging
 import colorlog
 import os
+import traceback
+from pygments import highlight
+from pygments.lexers import PythonLexer
+from pygments.formatters import TerminalFormatter
 from .utils import sanitize_filename
 from .variable import debug_mode, log_length_limit
 
@@ -18,6 +22,13 @@ try:
     os.mkdir("logs")
 except:
     pass
+
+def highlight_error(error):
+    # 对堆栈跟踪进行语法高亮
+    highlighted_traceback = highlight(error, PythonLexer(), TerminalFormatter())
+
+    # 返回语法高亮后的堆栈跟踪字符串
+    return str(highlighted_traceback)
 
 class flaskLogHelper(logging.Handler):
     # werkzeug日志转接器
@@ -45,7 +56,7 @@ class log:
             datefmt='%Y-%m-%d %H:%M:%S',
             log_colors={
                 'DEBUG': 'cyan',
-                'INFO': 'green',
+                'INFO': 'white',
                 'WARNING': 'yellow',
                 'ERROR': 'red',
                 'CRITICAL': 'red,bg_white',
@@ -120,7 +131,10 @@ class log:
         self._logger.warning(message)
 
     def error(self, message):
-        self._logger.error(message)
+        if (message.startswith('Traceback')):
+            self._logger.error('\n' + highlight_error(message))
+        else:
+            self._logger.error(message)
 
     def critical(self, message):
         self._logger.critical(message)

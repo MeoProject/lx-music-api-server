@@ -3,3 +3,4 @@ pycryptodome
 ujson
 requests
 colorlog
+pygments

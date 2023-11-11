@@ -8,8 +8,8 @@
 # This file is part of the "lx-music-api-server" project.
 # Do not edit except you konw what you are doing.
 
-from common.utils import require
 from common.exceptions import FailedException
+from common.utils import require
 from common import log
 from common import config
 from . import kw
@@ -59,8 +59,15 @@ async def SongURL(source, songId, quality):
                 'data': c['url'],
             }
     except:
-        traceback.print_exc()
-    func = require('apis.' + source).url
+        logger.error(traceback.format_exc())
+    try:
+        func = require('apis.' + source).url
+    except:
+        return {
+            'code': 1,
+            'msg': '未知的源: ' + source,
+            'data': None,
+        }
     try:
         url = await func(songId, quality)
         logger.debug(f'获取{source}_{songId}_{quality}成功，URL：{url}')

@@ -10,6 +10,7 @@
 
 import platform
 import binascii
+import builtins
 import base64
 import zlib
 import re
@@ -50,6 +51,9 @@ def require(module):
             _module = getattr(_module, m)
             index += 1
     return _module
+
+def add_to_global_namespace(key, data):
+    setattr(builtins, key, data)
 
 def sanitize_filename(filename):
     if platform.system() == 'Windows' or platform.system() == 'Cygwin':
@@ -129,3 +133,4 @@ class jsobject(dict):
     def __getattr__(self, UNUSED):
         return None
 
+add_to_global_namespace('require', require)

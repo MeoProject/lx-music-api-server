@@ -29,8 +29,6 @@ from common import utils
 from common import lxsecurity
 from apis import SongURL
 
-require = utils.require
-
 @app.route('/')
 def index():
     return utils.format_dict_json({"code": 0, "msg": "success", "data": None}), 200
@@ -64,16 +62,20 @@ def _404(_):
 
 @app.before_request
 def check():
+    # nginx proxy header
     if (request.headers.get("X-Real-IP")):
         request.remote_addr = request.headers.get("X-Real-IP")
+    # check ip
     if (config.check_ip_banned(request.remote_addr)):
         return utils.format_dict_json({"code": 1, "msg": "您的IP已被封禁", "data": None}), 403
+    # update request time
     config.updateRequestTime(request.remote_addr)
+    # check host
     if (config.read_config("security.allowed_host.enable")):
         if request.remote_host.split(":")[0] not in config.read_config("security.allowed_host.list"):
             if config.read_config("security.allowed_host.blacklist.enable"):
                 config.ban_ip(request.remote_addr, int(config.read_config("security.allowed_host.blacklist.length")))
             return utils.format_dict_json({'code': 6, 'msg': '未找到您所请求的资源', 'data': None}), 404
     
-
+# run
 app.run(host=config.read_config('common.host'), port=config.read_config('common.port'))

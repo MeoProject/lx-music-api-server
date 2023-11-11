@@ -10,6 +10,11 @@ __pycache__/
 *.egg-info
 *.egg
 
+# pyinstaller
+*.spec
+dist
+build
+
 # project
 cache.db
 data.db
