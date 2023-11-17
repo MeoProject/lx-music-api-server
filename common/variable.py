@@ -11,9 +11,11 @@
 import os
 
 
-debug_mode = True
+debug_mode = False
 log_length_limit = 400
 running = True
 config = {}
 workdir = os.getcwd()
 banList_suggest = 0
+iscn = True
+fake_ip = None

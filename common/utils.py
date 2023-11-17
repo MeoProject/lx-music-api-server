@@ -134,3 +134,4 @@ class jsobject(dict):
         return None
 
 add_to_global_namespace('require', require)
+

@@ -22,6 +22,7 @@ import time
 import pickle
 from . import config
 from . import utils
+from . import variable
 
 def is_valid_utf8(text):
     # 判断是否为有效的utf-8字符串
@@ -90,6 +91,9 @@ def request(url, options = {}):
         except:
             options['headers'] = {}
             options['headers']['User-Agent'] = random.choice(ua_list)
+    # 检查是否在国内
+    if ((not variable.iscn) and (not options["headers"].get("X-Forwarded-For"))):
+        options["headers"]["X-Forwarded-For"] = variable.fakeip
     # 获取请求主函数
     try:
         reqattr = getattr(requests, method.lower())
@@ -197,3 +201,12 @@ async def asyncrequest(url, options={}):
     return req
     
 """
+
+def checkcn():
+    req = request("https://mips.kugou.com/check/iscn?&format=json")
+    body = utils.jsobject(req.json())
+    variable.iscn = bool(body.flag)
+    if (not variable.iscn):
+        variable.fakeip = "1.0.2.114"
+        logger.info("您在非中国大陆服务器上启动了项目，已自动开启ip伪装")
+        logger.warning("此方式无法解决咪咕音乐的链接获取问题，您可以配置代理，服务器地址可在下方链接中找到\nhttps://hidemy.io/cn/proxy-list/?country=CN#list")

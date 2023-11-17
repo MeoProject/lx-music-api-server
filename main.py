@@ -27,7 +27,9 @@ logger = log.log("main")
 
 from common import utils
 from common import lxsecurity
+from common import Httpx
 from apis import SongURL
+Httpx.checkcn()
 
 @app.route('/')
 def index():
