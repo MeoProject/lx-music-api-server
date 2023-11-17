@@ -43,14 +43,15 @@ tools = jsobject({
 })
 
 
-def signRequest(data):
+def signRequest(data, cache = False):
     data = json.dumps(data)
     s = sign(data)
     headers = {}
     return Httpx.request('https://u.y.qq.com/cgi-bin/musics.fcg?format=json&sign=' + s, {
         'method': 'POST',
         'body': data,
-        'headers': headers
+        'headers': headers,
+        "cache": (86400 * 30) if cache else "no-cache"
     })
 
 
@@ -70,7 +71,7 @@ async def url(songId, quality):
             },
         },
     }
-    infoRequest = signRequest(infoReqBody)
+    infoRequest = signRequest(infoReqBody, True)
     infoBody = jsobject(infoRequest.json())
     if (infoBody.code != 0 or infoBody.req.code != 0):
         raise FailedException("获取音乐信息失败")

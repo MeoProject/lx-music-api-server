@@ -64,7 +64,8 @@ def getKey(hash_):
     return utils.md5(hash_.lower() + tools.pidversec + tools.appid + tools.mid + tools.userid)
 
 async def url(songId, quality):
-    inforeq = Httpx.request("https://m.kugou.com/app/i/getSongInfo.php?cmd=playInfo&hash=" + songId)
+    songId = songId.lower()
+    inforeq = Httpx.request("https://m.kugou.com/app/i/getSongInfo.php?cmd=playInfo&hash=" + songId, {"cache": 86400 * 15})
     body_ = jsobject(inforeq.json())
     thash = body_.extra[tools.qualityHashMap[quality]]
     albumid = body_.albumid
@@ -116,7 +117,7 @@ async def url(songId, quality):
     if body.status == 3:
         raise FailedException('该歌曲在酷狗没有版权，请换源播放')
     elif body.status == 2:
-        raise FailedException('链接获取失败，请检查账号信息是否过期或本歌曲为数字专辑')
+        raise FailedException('链接获取失败，请检查账号是否有会员或数字专辑是否购买')
     elif body.status != 1:
         raise FailedException('链接获取失败，可能是数字专辑或者api失效')
     return body.url[0]

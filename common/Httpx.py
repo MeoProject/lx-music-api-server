@@ -18,6 +18,10 @@ import ujson as json
 from .log import log
 import re
 import binascii
+import time
+import pickle
+from . import config
+from . import utils
 
 def is_valid_utf8(text):
     # 判断是否为有效的utf-8字符串
@@ -56,6 +60,20 @@ def request(url, options = {}):
     
      @ return: requests.Response类型的响应数据
     '''
+    # 缓存读取
+    cache_key = utils.md5(f'{url}{options}')
+    if options.get("cache") and options["cache"] != "no-cache":
+        cache = config.getCache("httpx", cache_key)
+        if cache:
+            logger.debug(f"请求 {url} 有可用缓存")
+            return pickle.loads(utils.from_base64(cache["data"]))
+    if "cache" in list(options.keys()):
+        cache_info = options.get("cache")
+        options.pop("cache")
+    else:
+        cache_info = None
+    
+
     # 获取请求方法，没有则默认为GET请求
     try:
         method = options['method']
@@ -90,25 +108,19 @@ def request(url, options = {}):
             options['headers']['Content-Type'] = 'application/x-www-form-urlencoded'
     # 进行请求
     try:
+        logger.info("-----start----- " + url)
         req = reqattr(url, **options)
     except Exception as e:
         logger.error(f'HTTP Request runs into an Error: {traceback.format_exc()}')
         raise e
     # 请求后记录
     logger.debug(f'Request to {url} succeed with code {req.status_code}')
-    # 记录响应数据
-    try:
-        logger.debug(json.loads(req.content.decode("utf-8")))
-    except:
-        try:
-            logger.debug(json.loads(zlib.decompress(req.content).decode("utf-8")))
-        except zlib.error:
-            if is_valid_utf8(req.text) and is_plain_text(req.text):
-                logger.debug(req.text)
-            else:
-                logger.debug(binascii.hexlify(req.content))
-        except:
-            logger.debug(zlib.decompress(req.content).decode("utf-8") if is_valid_utf8(zlib.decompress(req.content).decode("utf-8")) and is_plain_text(zlib.decompress(req.content).decode("utf-8")) else binascii.hexlify(zlib.decompress(req.content)))
+    # 缓存写入
+    if (cache_info and cache_info != "no-cache"):
+        cache_data = pickle.dumps(req)
+        expire_time = (cache_info if isinstance(cache_info, int) else 3600) + int(time.time())
+        config.updateCache("httpx", cache_key, {"expire": True, "time": expire_time, "data": utils.to_base64(cache_data)})
+        logger.debug("缓存已更新: " + url)
     # 返回请求
     return req
 
