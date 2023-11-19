@@ -15,11 +15,11 @@ import random
 import traceback
 import zlib
 import ujson as json
-from .log import log
 import re
 import binascii
 import time
 import pickle
+from . import log
 from . import config
 from . import utils
 from . import variable
@@ -47,7 +47,7 @@ def convert_dict_to_form_string(dic):
 ua_list = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36 Edg/112.0.1722.39||Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Edg/114.0.1788.0||Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Edg/114.0.1788.0  uacq||Mozilla/5.0 (Windows NT 10.0; WOW64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.5666.197 Safari/537.36||Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36 uacq||Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36'.split('||')
 
 # 日志记录器
-logger = log('http_utils')
+logger = log.log('http_utils')
 
 def request(url, options = {}):
     '''
@@ -115,10 +115,11 @@ def request(url, options = {}):
         logger.info("-----start----- " + url)
         req = reqattr(url, **options)
     except Exception as e:
-        logger.error(f'HTTP Request runs into an Error: {traceback.format_exc()}')
+        logger.error(f'HTTP Request runs into an Error: {log.highlight_error(traceback.format_exc())}')
         raise e
     # 请求后记录
     logger.debug(f'Request to {url} succeed with code {req.status_code}')
+    logger.debug(req.text)
     # 缓存写入
     if (cache_info and cache_info != "no-cache"):
         cache_data = pickle.dumps(req)
@@ -128,79 +129,6 @@ def request(url, options = {}):
     # 返回请求
     return req
 
-"""
-async def asyncrequest(url, options={}):
-    '''
-     - Asynchronous HTTP request function used for sending network requests
-     - url: URL address to be requested (required)
-     - options: Configuration parameters for the request (optional, defaults to GET request)
-       - method: Request method
-       - headers: Request headers
-       - body: Request body (can also use the native 'data' parameter of the 'requests' library)
-       - form: Submitted form data
-    
-     @ return: aiohttp.ClientResponse type response data
-    '''
-    # Get the request method, defaulting to GET if not provided
-    try:
-        method = options['method']
-        options.pop('method')
-    except KeyError:
-        method = 'GET'
-    # Get the User-Agent, choose randomly from ua_list if not present
-    try:
-        d_lower = {k.lower(): v for k, v in options['headers'].items()}
-        useragent = d_lower['user-agent']
-    except KeyError:
-        try:
-            options['headers']['User-Agent'] = random.choice(ua_list)
-        except:
-            options['headers'] = {}
-            options['headers']['User-Agent'] = random.choice(ua_list)
-    # Get the request function
-    try:
-        reqattr = getattr(aiohttp.ClientSession(), method.lower())
-    except AttributeError:
-        raise AttributeError('Unsupported method: ' + method)
-    # Log before the request
-    logger.debug(f'HTTP Request: {url}\noptions: {options}')
-    # Convert body/form parameter to native 'data' parameter and add 'Content-Type' header for form requests
-    if method in ['POST', 'PUT']:
-        if options.get('body'):
-            options['data'] = options['body']
-            options.pop('body')
-        if options.get('form'):
-            options['data'] = convert_dict_to_form_string(options['form'])
-            options.pop('form')
-            options['headers']['Content-Type'] = 'application/x-www-form-urlencoded'
-    # Send the request
-    try:
-        async with reqattr(url, **options) as req:
-            res = await req.read()
-    except Exception as e:
-        logger.error(f'HTTP Request runs into an Error: {traceback.format_exc()}')
-        raise e
-    # Log after the request
-    logger.debug(f'Request to {url} succeed with code {req.status}')
-    # Log the response data
-    try:
-        logger.debug(json.loads(res.decode("utf-8")))
-    except:
-        try:
-            logger.debug(json.loads(zlib.decompress(res).decode("utf-8")))
-        except zlib.error:
-            if is_valid_utf8(req.text) and is_plain_text(req.text):
-                logger.debug(req.text)
-            else:
-                logger.debug(binascii.hexlify(res))
-        except:
-            logger.debug(
-                zlib.decompress(res).decode("utf-8") if is_valid_utf8(zlib.decompress(res).decode("utf-8")) and is_plain_text(
-                    zlib.decompress(res).decode("utf-8")) else binascii.hexlify(zlib.decompress(res)))
-    # Return the response
-    return req
-    
-"""
 
 def checkcn():
     req = request("https://mips.kugou.com/check/iscn?&format=json")
