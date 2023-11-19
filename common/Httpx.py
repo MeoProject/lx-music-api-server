@@ -119,7 +119,6 @@ def request(url, options = {}):
         raise e
     # 请求后记录
     logger.debug(f'Request to {url} succeed with code {req.status_code}')
-    logger.debug(req.text)
     # 缓存写入
     if (cache_info and cache_info != "no-cache"):
         cache_data = pickle.dumps(req)
