@@ -34,6 +34,14 @@ tools = jsobject({
             "e": '.flac',
             'h': 'RS01',
         },
+        "dolby": {
+            "e": ".flac",
+            "h": "Q000",
+        },
+        "master": {
+            "e": ".flac",
+            "h": "AI00",
+        }
     },
     "key": config.read_config("module.tx.user.qqmusic_key"),
     "loginuin": config.read_config("module.tx.user.uin"),

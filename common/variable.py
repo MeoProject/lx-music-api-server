@@ -11,8 +11,8 @@
 import os
 
 
-debug_mode = False
-log_length_limit = 400
+debug_mode = True
+log_length_limit = 100000
 running = True
 config = {}
 workdir = os.getcwd()

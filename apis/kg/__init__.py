@@ -73,9 +73,10 @@ async def url(songId, quality):
     if (not thash):
         raise FailedException('获取歌曲信息失败')
     if (not albumid):
-        albumid = 0
+        albumid = ""
     if (not albumaudioid):
-        albumaudioid = 0
+        albumaudioid = ""
+    thash = thash.lower()
     params = {
         'album_id': albumid,
         'userid': tools.userid,
@@ -103,6 +104,8 @@ async def url(songId, quality):
     if (tools.version == 'v5'):
         params['quality'] = tools.qualityMap[quality]
         # print(params.quality)
+    if (tools.version == "v4"):
+        params['version'] = tools.clientver
     headers = jsobject({
             'User-Agent': 'Android712-AndroidPhone-8983-18-0-NetMusic-wifi',
             'KG-THash': '3e5ec6b',

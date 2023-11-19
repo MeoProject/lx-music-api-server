@@ -49,6 +49,8 @@ sourceExpirationTime = {
 
 
 async def SongURL(source, songId, quality):
+    if (source == "kg"):
+        songId = songId.lower()
     try:
         c = config.getCache('urls', f'{source}_{songId}_{quality}')
         if c:
