@@ -1,0 +1,10 @@
+version: '1'
+name: 'lx-music'
+services:
+  api:
+    build: .
+    restart: always
+    ports:
+      - "9763:9763"
+    volumes:
+      - .:/app
