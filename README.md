@@ -15,8 +15,7 @@
 
 
 ## 还在开发中
-**主开发是高一住校学生，只有周末有时间回复，也欢迎所有人来贡献代码，我们在这里万分感谢**  
-**由于项目不够完善，更新后可能会导致config模块报错，之后有时间再修，目前的解决方法是删掉config.json然后让项目重新创建，账号配置自己备份吧**  
+**主开发是高一住校学生，只有周末有时间回复，也欢迎所有人来贡献代码，我们在这里万分感谢**   
 
 ## 使用此项目导致的封号等情况与开发者无关
 
@@ -77,10 +76,12 @@ helloplhm-qwq+outlook.com
 folltoshe+foxmail.com  
 (请将`+`替换成`@`)
 
-## Stargazers over time
+## Star 趋势图
 
 [![Stargazers over time](https://starchart.cc/lxmusics/lx-music-api-server-python.svg)](https://starchart.cc/lxmusics/lx-music-api-server-python)
 
 ## 贡献者
 
-[![contrib-image](https://contrib.rocks/image?repo=lxmusics/lx-music-api-server-python)](https://github.com/lxmusics/lx-music-api-server-python/graphs/contributors)
+<a href="https://github.com/lxmusics/lx-music-api-server-python/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=lxmusics/lx-music-api-server-python" />
+</a>
