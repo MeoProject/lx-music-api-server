@@ -29,6 +29,7 @@ from common import utils
 from common import lxsecurity
 from common import Httpx
 from apis import SongURL
+import traceback
 Httpx.checkcn()
 
 @app.route('/')
@@ -50,7 +51,11 @@ async def handle(method, source, songId, quality):
         return utils.format_dict_json({"code": 1, "msg": "lxm请求头验证失败", "data": None}), 403
     
     if method == 'url':
-        return utils.format_dict_json(await SongURL(source, songId, quality))
+        try:
+            return utils.format_dict_json(await SongURL(source, songId, quality))
+        except Exception as e:
+            logger.error(traceback.format_exc())
+            return utils.format_dict_json({'code': 4, 'msg': '内部服务器错误', 'data': None}), 500
     else:
         return utils.format_dict_json({'code': 6, 'msg': '未知的请求类型: ' + method, 'data': None}), 400
 
