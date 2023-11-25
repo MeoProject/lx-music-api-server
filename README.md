@@ -1,6 +1,14 @@
-# lx-music-api-server-python
+<div align="center">
 
-LX Music非官方解析服务器的Python实现  
+![lx-music-api-server-python](https://socialify.git.ci/lxmusics/lx-music-api-server-python/image?description=1&font=Inter&forks=1&issues=1&language=1&name=1&owner=1&pulls=1&stargazers=1&theme=Auto) 
+
+![GitHub repo size](https://img.shields.io/github/repo-size/lxmusics/lx-music-api-server-python?style=for-the-badge)
+![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/lxmusics/lx-music-api-server-python/build_binary.yml?style=for-the-badge)
+![GitHub release (with filter)](https://img.shields.io/github/v/release/lxmusics/lx-music-api-server-python?style=for-the-badge)
+![GitHub all releases](https://img.shields.io/github/downloads/lxmusics/lx-music-api-server-python/total?style=for-the-badge&color=violet)
+![GitHub License](https://img.shields.io/github/license/lxmusics/lx-music-api-server-python?style=for-the-badge)
+
+</div>
 
 原仓库：[lx-music-api-server](https://github.com/lxmusics/lx-music-api-server)  
 您可以在原仓库中找到对应的可用源脚本  
@@ -26,7 +34,7 @@ python main.py # 启动服务
 
 对于release的部署和上方类似，这里不再赘述  
 
-### 返回码说明
+## 返回码说明
 
 接口返回值中`body.code`字段值中的代码含义
 
@@ -49,7 +57,7 @@ python main.py # 启动服务
 | 429  |请求过于频繁                       |
 | 500  |服务器内部错误（对应body.code 4）  |
 
-### 项目协议
+## 项目协议
 
 本项目基于 [MIT](https://github.com/lxmusics/lx-music-api-server/blob/main/LICENSE) 许可证发行，以下协议是对于MIT原协议的补充，如有冲突，以以下协议为准。
 
@@ -68,3 +76,11 @@ python main.py # 启动服务
 helloplhm-qwq+outlook.com  
 folltoshe+foxmail.com  
 (请将`+`替换成`@`)
+
+## Stargazers over time
+
+[![Stargazers over time](https://starchart.cc/lxmusics/lx-music-api-server-python.svg)](https://starchart.cc/lxmusics/lx-music-api-server-python)
+
+## 贡献者
+
+[![contrib-image](https://contrib.rocks/image?repo=lxmusics/lx-music-api-server-python)](https://github.com/lxmusics/lx-music-api-server-python/graphs/contributors)
