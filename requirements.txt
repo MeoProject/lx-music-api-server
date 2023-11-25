@@ -4,3 +4,4 @@ ujson
 requests
 colorlog
 pygments
+xmltodict

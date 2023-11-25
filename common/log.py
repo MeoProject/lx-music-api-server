@@ -14,7 +14,7 @@ import os
 from pygments import highlight
 from pygments.lexers import PythonLexer
 from pygments.formatters import TerminalFormatter
-from .utils import sanitize_filename
+from .utils import sanitize_filename, add_to_global_namespace
 from .variable import debug_mode, log_length_limit
 
 try:
@@ -127,6 +127,8 @@ class log:
         self._logger.info(message)
 
     def warning(self, message):
+        if (message.startswith('Traceback')):
+            self._logger.error('\n' + highlight_error(message))
         self._logger.warning(message)
 
     def error(self, message):
@@ -150,3 +152,10 @@ class log:
         
     def addHandler(self, handler):
         self._logger.addHandler(handler)
+
+printlogger = log('print')
+
+def logprint(*args, sep = ' ', end = '', file = None, flush = None):
+    printlogger.info(sep.join(str(arg) for arg in args), allow_hidden = False)
+
+add_to_global_namespace('print', logprint)

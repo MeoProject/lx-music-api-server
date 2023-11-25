@@ -9,7 +9,7 @@
 # Do not edit except you know what you are doing.
 
 # import aiohttp
-import asyncio
+# import asyncio
 import requests
 import random
 import traceback
@@ -25,13 +25,19 @@ from . import utils
 from . import variable
 
 def is_valid_utf8(text):
-    # 判断是否为有效的utf-8字符串
-    if "\ufffe" in text:
-        return False
     try:
-        text.encode('utf-8').decode('utf-8')
-        return True
-    except UnicodeDecodeError:
+        if isinstance(text, bytes):
+            text = text.decode('utf-8')
+        # 判断是否为有效的utf-8字符串
+        if "\ufffe" in text:
+            return False
+        try:
+            text.encode('utf-8').decode('utf-8')
+            return True
+        except UnicodeDecodeError:
+            return False
+    except:
+        logger.error(traceback.format_exc())
         return False
 
 def is_plain_text(text):
@@ -43,6 +49,19 @@ def convert_dict_to_form_string(dic):
     # 将字典转换为表单字符串
     return '&'.join([f'{k}={v}' for k, v in dic.items()])
 
+def log_plaintext(text):
+    if (text.startswith('{') and text.endswith('}')):
+        try:
+            text = json.loads(text)
+        except:
+            pass
+    elif (text.startswith('<xml') and text.endswith('>')): # xml data
+        try:
+            text = f'xml: {utils.load_xml(text)}'
+        except:
+            pass
+    return text
+
 # 内置的UA列表
 ua_list = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36 Edg/112.0.1722.39||Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Edg/114.0.1788.0||Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Edg/114.0.1788.0  uacq||Mozilla/5.0 (Windows NT 10.0; WOW64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.5666.197 Safari/537.36||Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36 uacq||Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36'.split('||')
 
@@ -51,18 +70,27 @@ logger = log.log('http_utils')
 
 def request(url, options = {}):
     '''
-     - Http请求主函数, 用于发送网络请求
-     - url: 需要请求的URL地址(必填)
-     - options: 请求的配置参数(可选, 留空时为GET请求, 总体与nodejs的请求的options填写差不多)
-       - method: 请求方法
-       - headers: 请求头
-       - body: 请求体(也可使用python原生requests库的data参数)
-       - form: 提交的表单数据
+    Http请求主函数, 用于发送网络请求
+    - url: 需要请求的URL地址(必填)
+    - options: 请求的配置参数(可选, 留空时为GET请求, 总体与nodejs的请求的options填写差不多)
+        - method: 请求方法
+        - headers: 请求头
+        - body: 请求体(也可使用python原生requests库的data参数)
+        - form: 提交的表单数据
+        - cache: 缓存设置
+                - no-cache: 不缓存
+                - <int>: 缓存可用秒数
+        - cache-ignore: <list> 缓存忽略关键字
     
-     @ return: requests.Response类型的响应数据
+    @ return: requests.Response类型的响应数据
     '''
     # 缓存读取
-    cache_key = utils.md5(f'{url}{options}')
+    cache_key = f'{url}{options}'
+    if (isinstance(options.get('cache-ignore'), list)):
+        for i in options.get('cache-ignore'):
+            cache_key = cache_key.replace(str(i), '')
+        options.pop('cache-ignore')
+    cache_key = utils.md5(cache_key)
     if options.get("cache") and options["cache"] != "no-cache":
         cache = config.getCache("httpx", cache_key)
         if cache:
@@ -119,6 +147,20 @@ def request(url, options = {}):
         raise e
     # 请求后记录
     logger.debug(f'Request to {url} succeed with code {req.status_code}')
+    if (req.content.startswith(b'\x78\x9c')): # zlib header
+        try:
+            decompressed = zlib.decompress(req.content)
+            if (is_valid_utf8(decompressed)):
+                logger.debug(log_plaintext(decompressed.decode("utf-8")))
+            else:
+                logger.debug('response is not text binary, ignore logging it')
+        except:
+            logger.debug('response is not text binary, ignore logging it')
+    else:
+        if (is_valid_utf8(req.content)):
+            logger.debug(log_plaintext(req.content.decode("utf-8")))
+        else:
+            logger.debug('response is not text binary, ignore logging it')
     # 缓存写入
     if (cache_info and cache_info != "no-cache"):
         cache_data = pickle.dumps(req)
@@ -130,10 +172,14 @@ def request(url, options = {}):
 
 
 def checkcn():
-    req = request("https://mips.kugou.com/check/iscn?&format=json")
-    body = utils.jsobject(req.json())
-    variable.iscn = bool(body.flag)
-    if (not variable.iscn):
-        variable.fakeip = "1.0.2.114"
-        logger.info("您在非中国大陆服务器上启动了项目，已自动开启ip伪装")
-        logger.warning("此方式无法解决咪咕音乐的链接获取问题，您可以配置代理，服务器地址可在下方链接中找到\nhttps://hidemy.io/cn/proxy-list/?country=CN#list")
+    try:
+        req = request("https://mips.kugou.com/check/iscn?&format=json")
+        body = utils.jsobject(req.json())
+        variable.iscn = bool(body.flag)
+        if (not variable.iscn):
+            variable.fakeip = "1.0.2.114"
+            logger.info("您在非中国大陆服务器上启动了项目，已自动开启ip伪装")
+            logger.warning("此方式无法解决咪咕音乐的链接获取问题，您可以配置代理，服务器地址可在下方链接中找到\nhttps://hidemy.io/cn/proxy-list/?country=CN#list")
+    except Exception as e:
+        logger.warning('检查服务器位置失败，已忽略')
+        logger.warning(traceback.format_exc())

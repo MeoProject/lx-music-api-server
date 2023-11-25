@@ -15,6 +15,7 @@ import base64
 import zlib
 import re
 import ujson as json
+import xmltodict
 from urllib.parse import quote
 from hashlib import md5 as _md5
 from flask import Response
@@ -132,6 +133,12 @@ class jsobject(dict):
 
     def __getattr__(self, UNUSED):
         return None
+
+def dump_xml(data):
+    return xmltodict.unparse(data)
+
+def load_xml(data):
+    return xmltodict.parse(data)
 
 add_to_global_namespace('require', require)
 
