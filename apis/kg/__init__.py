@@ -11,6 +11,7 @@ from common.exceptions import FailedException
 from common import utils
 from common import config
 from common import Httpx
+import ujson as json
 import time
 
 jsobject = utils.jsobject
@@ -36,10 +37,10 @@ tools = jsobject({
     "extra_params": config.read_config("module.kg.tracker.extra_params"),
     "appid": config.read_config("module.kg.client.appid"),
     'qualityHashMap': {
-        '128k': '128hash',
-        '320k': '320hash',
-        'flac': 'sqhash',
-        'flac24bit': 'highhash',
+        '128k': 'hash_128',
+        '320k': 'hash_320',
+        'flac': 'hash_flac',
+        'flac24bit': 'hash_high',
     },
     'qualityMap': {
         '128k': '128',
@@ -63,13 +64,49 @@ def getKey(hash_):
     # print(hash_ + tools.pidversec + tools.appid + tools.mid + tools.userid)
     return utils.md5(hash_.lower() + tools.pidversec + tools.appid + tools.mid + tools.userid)
 
+async def getMusicInfo(hash_):
+    tn = int(time.time())
+    url = "http://gateway.kugou.com/v3/album_audio/audio"
+    options = {
+        "method": "POST",
+        "headers": {
+            "KG-THash": "13a3164",
+            "KG-RC": "1",
+            "KG-Fake": "0",
+            "KG-RF": "00869891",
+            "User-Agent": "Android712-AndroidPhone-11451-376-0-FeeCacheUpdate-wifi",
+            "x-router": "kmr.service.kugou.com",
+        },
+        "data": {
+            "area_code": "1",
+            "show_privilege": "1",
+            "show_album_info": "1",
+            "is_publish": "",
+            "appid": 1005,
+            "clientver": 11451,
+            "mid": tools.mid,
+            "dfid": "-",
+            "clienttime": tn,
+            "key": 'OIwlieks28dk2k092lksi2UIkp',
+            "fields": "audio_info,album_info,album_audio_id",
+            "data": [
+                {
+                    "hash": hash_
+                }
+            ]
+        },
+        'cache': 86400 * 15,
+        'cache-ignore': [tn]
+    }
+    options['body'] = json.dumps(options['data']).replace(', ', ',').replace(': ', ':')
+    return Httpx.request(url, dict(options)).json()['data'][0][0]
+
 async def url(songId, quality):
     songId = songId.lower()
-    inforeq = Httpx.request("https://m.kugou.com/app/i/getSongInfo.php?cmd=playInfo&hash=" + songId, {"cache": 86400 * 15})
-    body_ = jsobject(inforeq.json())
-    thash = body_.extra[tools.qualityHashMap[quality]]
-    albumid = body_.albumid
-    albumaudioid = body_.album_audio_id
+    body_ = await getMusicInfo(songId)
+    thash = body_['audio_info'][tools.qualityHashMap[quality]]
+    albumid = body_['album_info']['album_id'] if (body_.get('album_info') and body_['album_info'].get('album_id')) else None
+    albumaudioid = body_['album_audio_id'] if (body_.get('album_audio_id')) else None
     if (not thash):
         raise FailedException('获取歌曲信息失败')
     if (not albumid):
