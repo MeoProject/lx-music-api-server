@@ -53,6 +53,10 @@ default = {
         "_host-desc": "服务器启动时所使用的HOST地址",
         "port": "9763",
         "_port_desc": "服务器启动时所使用的端口",
+        "debug_mode": False,
+        "_debug_mode-desc": "是否开启调试模式",
+        "log_length_limit": 500,
+        "_log_length_limit-desc": "单条日志长度限制",
     },
     "security": {
         "key": {
@@ -359,6 +363,64 @@ def push_to_list(key, obj):
 
     save_data(config)
 
+def write_config(key, value):
+    config = None
+    with open('config.json', 'r', encoding='utf-8') as f:
+        config = json.load(f)
+
+    keys = key.split('.')
+    current = config
+    for k in keys[:-1]:
+        if k not in current:
+            current[k] = {}
+        current = current[k]
+
+    current[keys[-1]] = value
+    variable.config = config
+    with open('config.json', 'w', encoding='utf-8') as f:
+        json.dump(config, f, indent=2, ensure_ascii=False)
+        f.close()
+
+def read_default_config(key):
+    try:
+        config = default
+        keys = key.split('.')
+        value = config
+        for k in keys:
+            if isinstance(value, dict):
+                if k not in value and keys.index(k) != len(keys) - 1:
+                    value[k] = {}
+                elif k not in value and keys.index(k) == len(keys) - 1:
+                    value = None
+                value = value[k]
+            else:
+                value = None
+                break
+
+        return value
+    except:
+        logger.warning(f'配置文件{key}不存在')
+        return None
+
+def _read_config(key):
+    try:
+        config = variable.config
+        keys = key.split('.')
+        value = config
+        for k in keys:
+            if isinstance(value, dict):
+                if k not in value and keys.index(k) != len(keys) - 1:
+                    value[k] = None
+                elif k not in value and keys.index(k) == len(keys) - 1:
+                    value = None
+                value = value[k]
+            else:
+                value = None
+                break
+
+        return value
+    except (KeyError, TypeError):
+        return None
 
 def read_config(key):
     try:
@@ -378,9 +440,33 @@ def read_config(key):
 
         return value
     except:
-        logger.warning(f'配置文件{key}不存在')
-        return None
+        default_value = read_default_config(key)
+        if (isinstance(default_value, type(None))):
+            logger.warning(f'配置文件{key}不存在')
+        else:
+            for i in range(len(keys)):
+                tk = '.'.join(keys[:(i + 1)])
+                tkvalue = _read_config(tk)
+                logger.debug(f'configfix: 读取配置文件{tk}的值：{tkvalue}')
+                if ((tkvalue is None) or (tkvalue == {})):
+                    write_config(tk, read_default_config(tk))
+                    logger.info(f'配置文件{tk}不存在，已创建')
+                    return default_value
 
+
+def write_data(key, value):
+    config = load_data()
+
+    keys = key.split('.')
+    current = config
+    for k in keys[:-1]:
+        if k not in current:
+            current[k] = {}
+        current = current[k]
+
+    current[keys[-1]] = value
+
+    save_data(config)
 
 def initConfig():
     try:
@@ -396,6 +482,8 @@ def initConfig():
     except FileNotFoundError:
         variable.config = handle_default_config()
     # print(variable.config)
+    variable.log_length_limit = read_config('common.log_length_limit')
+    variable.debug_mode = read_config('common.debug_mode')
     logger.debug("配置文件加载成功")
     conn = sqlite3.connect('cache.db')
 
@@ -429,7 +517,7 @@ value TEXT)''')
         write_data('banList', [])
         write_data('requestTime', {})
         logger.info('数据库内容为空，已写入默认值')
-
+    
 
 def ban_ip(ip_addr, ban_time=-1):
     if read_config('security.banlist.enable'):
