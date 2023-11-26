@@ -16,7 +16,6 @@ import traceback
 import zlib
 import ujson as json
 import re
-import binascii
 import time
 import pickle
 from . import log

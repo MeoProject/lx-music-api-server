@@ -14,7 +14,6 @@ import os
 import traceback
 import sys
 import sqlite3
-from .utils import readfile
 from . import variable
 from .log import log
 import threading
@@ -473,6 +472,12 @@ def initConfig():
         with open("./config.json", "r", encoding="utf-8") as f:
             try:
                 variable.config = json.loads(f.read())
+                if (not isinstance(variable.config, dict)):
+                    logger.warning('配置文件并不是一个有效的字典，使用默认值')
+                    variable.config = default
+                    with open("./config.json", "w", encoding="utf-8") as f:
+                        f.write(json.dumps(variable.config, indent=2, ensure_ascii=False))
+                        f.close()
             except:
                 if os.path.getsize("./config.json") != 0:
                     logger.error("配置文件加载失败，请检查是否遵循JSON语法规范")
