@@ -56,6 +56,14 @@ default = {
         "_debug_mode-desc": "是否开启调试模式",
         "log_length_limit": 500,
         "_log_length_limit-desc": "单条日志长度限制",
+        "fakeip": "1.0.1.114",
+        "_fakeip-desc": "服务器在海外时的IP伪装值",
+        "proxy": {
+            "enable": False,
+            "http_addr": "http://127.0.0.1:7890",
+            "https_addr": "https://127.0.0.1:7890",
+        },
+        "_proxy-desc": "代理配置，HTTP与HTTPS协议需分开配置",
     },
     "security": {
         "key": {
@@ -522,7 +530,16 @@ value TEXT)''')
         write_data('banList', [])
         write_data('requestTime', {})
         logger.info('数据库内容为空，已写入默认值')
-    
+
+    # 处理代理配置
+    if (read_config('common.proxy.enable')):
+        if (read_config('common.proxy.http_value')):
+            os.environ['http_proxy'] = read_config('common.proxy.http_value')
+            logger.info('HTTP协议代理地址: ' + read_config('common.proxy.http_value'))
+        if (read_config('common.proxy.https_value')):
+            os.environ['https_proxy'] = read_config('common.proxy.https_value')
+            logger.info('HTTPS协议代理地址: ' + read_config('common.proxy.https_value'))
+        logger.info('代理功能已开启，请确保代理地址正确，否则无法连接网络')
 
 def ban_ip(ip_addr, ban_time=-1):
     if read_config('security.banlist.enable'):

@@ -176,7 +176,7 @@ def checkcn():
         body = utils.jsobject(req.json())
         variable.iscn = bool(body.flag)
         if (not variable.iscn):
-            variable.fakeip = "1.0.2.114"
+            variable.fakeip = config.read_config('common.fakeip')
             logger.info("您在非中国大陆服务器上启动了项目，已自动开启ip伪装")
             logger.warning("此方式无法解决咪咕音乐的链接获取问题，您可以配置代理，服务器地址可在下方链接中找到\nhttps://hidemy.io/cn/proxy-list/?country=CN#list")
     except Exception as e:
