@@ -574,8 +574,10 @@ def check_ip_banned(ip_addr):
                 return False
         return False
     else:
-        variable.banList_suggest += 1
-        logger.warning('黑名单功能已被关闭，我们墙裂建议你开启这个功能以防止恶意请求')
+        if (variable.banList_suggest <= 10):
+            variable.banList_suggest += 1
+            logger.warning('黑名单功能已被关闭，我们墙裂建议你开启这个功能以防止恶意请求')
+        return False
 
 
 initConfig()
