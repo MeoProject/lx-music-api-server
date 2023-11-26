@@ -66,6 +66,11 @@ default = {
         "_proxy-desc": "代理配置，HTTP与HTTPS协议需分开配置",
     },
     "security": {
+        "rate_limit": {
+            "global": 0,
+            "ip": 0,
+            "desc": "请求速率限制，global为全局，ip为单个ip，填入的值为至少间隔多久才能进行一次请求，单位：秒，不限制请填为0"
+        }
         "key": {
             "enable": False,
             "_enable-desc": "是否开启请求key，开启后只有请求头中包含key，且值一样时可以访问API",

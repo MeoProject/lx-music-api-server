@@ -30,6 +30,7 @@ from common import lxsecurity
 from common import Httpx
 from apis import SongURL
 import traceback
+import time
 Httpx.checkcn()
 
 @app.route('/')
@@ -75,7 +76,21 @@ def check():
     # check ip
     if (config.check_ip_banned(request.remote_addr)):
         return utils.format_dict_json({"code": 1, "msg": "您的IP已被封禁", "data": None}), 403
+    # check global rate limit
+    if (
+        (config.getRequestTime('global') - time.time())
+        <
+        (config.read_config("security.rate_limit.global"))
+        ):
+        return utils.format_dict_json({"code": 5, "msg": "全局限速", "data": None}), 429
+    if (
+        (config.getRequestTime(request.remote_addr) - time.time())
+        <
+        (config.read_config("security.rate_limit.ip"))
+        ):
+        return utils.format_dict_json({"code": 5, "msg": "IP限速", "data": None}), 429
     # update request time
+    config.updateRequestTime('global')
     config.updateRequestTime(request.remote_addr)
     # check host
     if (config.read_config("security.allowed_host.enable")):
