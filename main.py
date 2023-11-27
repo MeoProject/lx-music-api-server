@@ -78,13 +78,13 @@ def check():
         return utils.format_dict_json({"code": 1, "msg": "您的IP已被封禁", "data": None}), 403
     # check global rate limit
     if (
-        (config.getRequestTime('global') - time.time())
+        (time.time() - config.getRequestTime('global'))
         <
         (config.read_config("security.rate_limit.global"))
         ):
         return utils.format_dict_json({"code": 5, "msg": "全局限速", "data": None}), 429
     if (
-        (config.getRequestTime(request.remote_addr) - time.time())
+        (time.time() - config.getRequestTime(request.remote_addr))
         <
         (config.read_config("security.rate_limit.ip"))
         ):
