@@ -1,25 +1,26 @@
 <div align="center">
 
-![lx-music-api-server-python](https://socialify.git.ci/lxmusics/lx-music-api-server-python/image?description=1&font=Inter&forks=1&issues=1&language=1&name=1&owner=1&pulls=1&stargazers=1&theme=Auto) 
+![lx-music-api-server-python](https://socialify.git.ci/lxmusics/lx-music-api-server-python/image?description=1&font=Inter&forks=1&issues=1&language=1&name=1&owner=1&pulls=1&stargazers=1&theme=Auto)
 
 ![GitHub repo size](https://img.shields.io/github/repo-size/lxmusics/lx-music-api-server-python?style=for-the-badge)
-![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/lxmusics/lx-music-api-server-python/build_binary.yml?style=for-the-badge)
-![GitHub release (with filter)](https://img.shields.io/github/v/release/lxmusics/lx-music-api-server-python?style=for-the-badge)
-![GitHub all releases](https://img.shields.io/github/downloads/lxmusics/lx-music-api-server-python/total?style=for-the-badge&color=violet)
-![GitHub License](https://img.shields.io/github/license/lxmusics/lx-music-api-server-python?style=for-the-badge)
-
+[![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/lxmusics/lx-music-api-server-python/build_binary.yml?style=for-the-badge)](https://github.com/lxmusics/lx-music-api-server-python/actions/workflows/build_binary.yml)
+[![GitHub release (with filter)](https://img.shields.io/github/v/release/lxmusics/lx-music-api-server-python?style=for-the-badge)](https://github.com/lxmusics/lx-music-api-server-python/releases)
+[![GitHub all releases](https://img.shields.io/github/downloads/lxmusics/lx-music-api-server-python/total?style=for-the-badge&color=violet)](https://github.com/lxmusics/lx-music-api-server-python/releases)
+[![GitHub License](https://img.shields.io/github/license/lxmusics/lx-music-api-server-python?style=for-the-badge)
+]((https://github.com/lxmusics/lx-music-api-server/blob/main/LICENSE))
 </div>
 
 原仓库：[lx-music-api-server](https://github.com/lxmusics/lx-music-api-server)  
 您可以在原仓库中找到对应的可用源脚本  
 
-
 ## 还在开发中
-**主开发是高一住校学生，只有周末有时间回复，也欢迎所有人来贡献代码，我们在这里万分感谢**   
+
+**主开发是高一住校学生，只有周末有时间回复，也欢迎所有人来贡献代码，我们在这里万分感谢**
 
 ## 使用此项目导致的封号等情况与开发者无关
 
 ## 部署方法
+
 环境要求：Python 3.8+  
 没有其他限制，能用Python理论上就能跑起来  
 
