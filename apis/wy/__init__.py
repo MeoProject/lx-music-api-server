@@ -19,9 +19,9 @@ tools = {
         '320k': 'exhigh',
         'flac': 'lossless',
         'flac24bit': 'hires',
-        "jyeffect": "jyeffect",
-        "jysky": "jysky",
-        "jymaster": "jymaster",
+        "dolby": "jyeffect",
+        "sky": "jysky",
+        "master": "jymaster",
     },
     'cookie': config.read_config('module.wy.user.cookie'),
 }
@@ -43,4 +43,7 @@ async def url(songId, quality):
     body = json.loads(req.text)
     if (not body.get("data") or (not body.get("data")) or (not body.get("data")[0].get("url"))):
         raise FailedException("failed")
+    if (config.read_config('module.wy.reject_unmatched_quality')):
+        if (body['data'][0]['level'] != tools['qualityMap'][quality]):
+            raise FailedException("reject unmatched quality")
     return body["data"][0]["url"].split("?")[0]

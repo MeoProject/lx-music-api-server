@@ -165,7 +165,9 @@ default = {
             "user": {
                 "desc": "账号cookie数据，可以通过浏览器获取，需要vip账号来获取会员歌曲，如果没有请留为空值",
                 "cookie": ""
-            }
+            },
+            "reject_unmatcher_quality": True,
+            "_reject_unmatcher_quality-desc": "是否拒绝不匹配的音质（默认拒绝），网易云API在当前环境无法获取该音质时会自动将低音质，开启此功能将拒绝被降级的音质返回",
         },
         "mg": {
             "desc": "咪咕音乐相关配置",
