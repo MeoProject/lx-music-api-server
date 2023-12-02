@@ -30,8 +30,8 @@ def highlight_error(error):
     # 返回语法高亮后的堆栈跟踪字符串
     return str(highlighted_traceback)
 
-class flaskLogHelper(logging.Handler):
-    # werkzeug日志转接器
+class LogHelper(logging.Handler):
+    # 日志转接器
     def __init__(self, custom_logger):
         super().__init__()
         self.custom_logger = custom_logger

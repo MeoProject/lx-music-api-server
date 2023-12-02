@@ -192,6 +192,7 @@ def handle_default_config():
             logger.info('首次启动或配置文件被删除，已创建默认配置文件')
             logger.info(
                 f'\n建议您到{variable.workdir + os.path.sep}config.json修改配置后重新启动服务器')
+        return default
 
 
 class ConfigReadException(Exception):

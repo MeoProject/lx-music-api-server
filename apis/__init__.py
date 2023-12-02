@@ -48,7 +48,7 @@ sourceExpirationTime = {
 }
 
 
-async def SongURL(source, songId, quality):
+async def handle_api_request(command, source, songId, quality):
     if (source == "kg"):
         songId = songId.lower()
     try:
@@ -63,11 +63,11 @@ async def SongURL(source, songId, quality):
     except:
         logger.error(traceback.format_exc())
     try:
-        func = require('apis.' + source).url
+        func = require('apis.' + source + '.' + command)
     except:
         return {
             'code': 1,
-            'msg': '未知的源: ' + source,
+            'msg': '未知的源或命令',
             'data': None,
         }
     try:
