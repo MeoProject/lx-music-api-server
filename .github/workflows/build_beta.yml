@@ -1,6 +1,6 @@
 # this workflow using github actions to build a binary exe file for windows users
 
-name: build Windows exe
+name: build beta
 
 on: 
   push:
