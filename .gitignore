@@ -26,3 +26,11 @@ config.json
 
 # VSCode
 .history
+
+# Vim
+*.swp
+*.swp~
+
+# GVim
+*.un~
+*.un
