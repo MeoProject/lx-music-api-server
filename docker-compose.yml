@@ -1,10 +1,15 @@
-version: '1'
-name: 'lx-music'
+version: "3.8"
 services:
-  api:
+  lx:
+    container_name: lx-server
     build: .
-    restart: always
     ports:
       - "9763:9763"
     volumes:
       - .:/app
+    environment:
+        TZ: 'Asia/Shanghai'
+    restart: always
+networks:
+  default:
+    
