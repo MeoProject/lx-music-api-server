@@ -17,10 +17,11 @@ from pygments.formatters import TerminalFormatter
 from .utils import sanitize_filename, add_to_global_namespace
 from .variable import debug_mode, log_length_limit
 
-try:
-    os.mkdir("logs")
-except:
-    pass
+if not os.path.exists("logs"):
+    try:
+        os.mkdir("logs")
+    except:
+        pass
 
 def highlight_error(error):
     # 对堆栈跟踪进行语法高亮

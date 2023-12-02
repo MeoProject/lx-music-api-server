@@ -27,12 +27,10 @@ def checklxmheader(lxm, url):
         arr, outsideversion = tuple([cop.split(']')[0] + ']', cop.split(']')[1]])
         arr = json.loads(arr)
         version = re.findall("\\d+", version)[0]
-        if (not outsideversion.startswith(version)):
+
+        if not outsideversion.startswith(version):
             return False
-        if (
-        (not (version) in ("".join(arr))) and
-        (not (retvalue) in "".join(arr))
-        ):
+        if (not (version) in ("".join(arr))) and (not (retvalue) in "".join(arr)):
             return False
         return True
     except:
