@@ -1,4 +1,4 @@
-flask[async]
+aiohttp
 pycryptodome
 ujson
 requests
