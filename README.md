@@ -19,7 +19,7 @@
 
 ## 使用此项目导致的封号等情况与开发者无关
 
-## 部署方法
+## 手动部署方法
 
 环境要求：Python 3.8+  
 没有其他限制，能用Python理论上就能跑起来  
@@ -33,6 +33,20 @@ python main.py # 启动服务
 ```
 
 对于release的部署和上方类似，这里不再赘述  
+
+## Docker部署（目录映射搞不懂，最好有个宝塔面板啥的）
+
+环境要求:Docker
+最低版本要求不知道，最新的bug会少知道这就行
+
+```bash
+sudo apt-get update
+sudo apt-get install -y docker.io
+docker run -p 9763:9763 -d ikun0014/lx-music-api-server-python:latest
+```
+
+配置文件填写需要到容器目录里的/app目录填写config.json
+小小白还是回去手动部署得了
 
 ## 返回码说明
 
