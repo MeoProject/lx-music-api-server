@@ -8,7 +8,7 @@
 # This file is part of the "lx-music-api-server" project.
 # Do not edit except you know what you are doing.
 
-# import aiohttp
+import aiohttp
 # import asyncio
 import requests
 import random
@@ -182,3 +182,58 @@ def checkcn():
     except Exception as e:
         logger.warning('检查服务器位置失败，已忽略')
         logger.warning(traceback.format_exc())
+
+async def asyncrequest(url, options = {}):
+    '''
+    Http请求主函数, 用于发送网络请求
+    - url: 需要请求的URL地址(必填)
+    - options: 请求的配置参数(可选, 留空时为GET请求, 总体与nodejs的请求的options填写差不多)
+        - method: 请求方法
+        - headers: 请求头
+        - body: 请求体(也可使用python原生requests库的data参数)
+        - form: 提交的表单数据
+        - cache: 缓存设置
+                - no-cache: 不缓存
+                - <int>: 缓存可用秒数
+        - cache-ignore: <list> 缓存忽略关键字
+    
+    @ return: requests.Response类型的响应数据
+    '''
+    # 缓存读取
+    cache_key = f'{url}{options}'
+    if (isinstance(options.get('cache-ignore'), list)):
+        for i in options.get('cache-ignore'):
+            cache_key = cache_key.replace(str(i), '')
+        options.pop('cache-ignore')
+    cache_key = utils.md5(cache_key)
+    if options.get("cache") and options["cache"] != "no-cache":
+        cache = config.getCache("httpx", cache_key)
+        if cache:
+            logger.debug(f"请求 {url} 有可用缓存")
+            return pickle.loads(utils.from_base64(cache["data"]))
+    if "cache" in list(options.keys()):
+        cache_info = options.get("cache")
+        options.pop("cache")
+    else:
+        cache_info = None
+    
+
+    # 获取请求方法，没有则默认为GET请求
+    try:
+        method = options['method']
+        options.pop('method')
+    except Exception as e:
+        method = 'GET'
+    # 获取User-Agent，没有则从ua_list中随机选择一个
+    try:
+        d_lower = {k.lower(): v for k, v in options['headers'].items()}
+        useragent = d_lower['user-agent']
+    except:
+        try:
+            options['headers']['User-Agent'] = random.choice(ua_list)
+        except:
+            options['headers'] = {}
+            options['headers']['User-Agent'] = random.choice(ua_list)
+    # 检查是否在国内
+    if ((not variable.iscn) and (not options["headers"].get("X-Forwarded-For"))):
+        options["headers"]["X-Forwarded-For"] = variable.fakeip
