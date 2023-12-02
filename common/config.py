@@ -188,11 +188,10 @@ def handle_default_config():
         f.write(json.dumps(default, indent=2, ensure_ascii=False,
                 escape_forward_slashes=False))
         f.close()
-        if (not os.getenv('actions')):
+        if (not os.getenv('build')):
             logger.info('首次启动或配置文件被删除，已创建默认配置文件')
             logger.info(
-                f'\n请到{variable.workdir + os.path.sep}config.json修改配置后重新启动服务器')
-            sys.exit(0)
+                f'\n建议您到{variable.workdir + os.path.sep}config.json修改配置后重新启动服务器')
 
 
 class ConfigReadException(Exception):

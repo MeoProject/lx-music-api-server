@@ -59,7 +59,7 @@ def build_test(fileName):
         sys.exit(popen.returncode)
     else:
         print('[SUCCESS]: PyInstaller build success.')
-        print('FilePath: ' + os.getcwd() + os.sep + f'lx-music-api-server_{sha}.exe')
+        print('FilePath: ' + os.getcwd() + os.sep + os.listdir(os.getcwd() + '/dist')[0])
 
 def build_release(fileName = ''):
     os.environ['build'] = 'R'
@@ -92,7 +92,7 @@ def build_release(fileName = ''):
         sys.exit(popen.returncode)
     else:
         print('[SUCCESS]: PyInstaller build success.')
-        print('FilePath: ' + os.getcwd() + os.sep + f'lx-music-api-server_{vername}.exe')
+        print('FilePath: ' + os.getcwd() + os.sep + os.listdir(os.getcwd() + '/dist')[0])
 
 argv = sys.argv
 
