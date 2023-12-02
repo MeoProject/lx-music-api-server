@@ -8,7 +8,7 @@
 # This file is part of the "lx-music-api-server" project.
 # Do not edit except you know what you are doing.
 
-import aiohttp
+# import aiohttp
 # import asyncio
 import requests
 import random
