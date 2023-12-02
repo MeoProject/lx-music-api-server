@@ -4,6 +4,7 @@ WORKDIR /app
 
 COPY . /app
 
-RUN pip install --no-cache -r requirements.txt
+# 指定源, 如果后期源挂了, 更换个源就可以.
+RUN pip install --no-cache -i https://pypi.mirrors.ustc.edu.cn/simple/  -r requirements.txt
 
 CMD [ "python", "main.py" ]
