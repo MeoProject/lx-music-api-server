@@ -107,4 +107,10 @@ app.router.add_get('/{method}/{source}/{songId}/{quality}', handle)
 # 404
 app.router.add_route('*', '/{tail:.*}', handle_404)
 
-web.run_app(app, host=config.read_config('common.host'), port=config.read_config('common.port'))
+if (__name__ == "__main__"):
+    try:
+        web.run_app(app, host=config.read_config('common.host'), port=int(config.read_config('common.port')))
+    except Exception as e:
+        logger.error("服务器启动失败, 请查看下方日志")
+        logger.error(traceback.format_exc())
+        
