@@ -41,12 +41,14 @@ tools = jsobject({
         '320k': 'hash_320',
         'flac': 'hash_flac',
         'flac24bit': 'hash_high',
+        'master': 'hash_128',
     },
     'qualityMap': {
         '128k': '128',
         '320k': '320',
         'flac': 'flac',
         'flac24bit': 'high',
+        'master': 'viper_atmos',
     },
 })
 
