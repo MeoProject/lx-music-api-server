@@ -3,8 +3,8 @@
 ![lx-music-api-server-python](https://socialify.git.ci/lxmusics/lx-music-api-server-python/image?description=1&font=Inter&forks=1&issues=1&language=1&name=1&owner=1&pulls=1&stargazers=1&theme=Auto)
 
 ![GitHub Repo Size](https://img.shields.io/github/repo-size/lxmusics/lx-music-api-server-python?style=for-the-badge)
-[![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/lxmusics/lx-music-api-server-python/build_beta.yml?style=for-the-badge)](https://github.com/lxmusics/lx-music-api-server-python/actions/workflows/build_binary.yml)
-[![GitHub Release (with filter)](https://img.shields.io/github/v/release/lxmusics/lx-music-api-server-python?style=for-the-badge)](https://github.com/lxmusics/lx-music-api-server-python/releases)
+[![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/lxmusics/lx-music-api-server-python/build_beta.yml?style=for-the-badge)](https://github.com/lxmusics/lx-music-api-server-python/actions/workflows/build_beta.yml)
+[![GitHub Release (with filter)](https://img.shields.io/github/v/release/lxmusics/lx-music-api-server-python?style=for-the-badge)](https://github.com/lxmusics/lx-music-api-server-python/releases/latest)
 [![GitHub All Releases](https://img.shields.io/github/downloads/lxmusics/lx-music-api-server-python/total?style=for-the-badge&color=violet)](https://github.com/lxmusics/lx-music-api-server-python/releases)
 [![GitHub License](https://img.shields.io/github/license/lxmusics/lx-music-api-server-python?style=for-the-badge)](https://github.com/lxmusics/lx-music-api-server/blob/main/LICENSE)
 
