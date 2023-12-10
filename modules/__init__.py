@@ -49,16 +49,21 @@ sourceExpirationTime = {
 
 
 async def handleApiRequest(command, source, songId, quality):
-    if (source == "kg"):
-        songId = songId.lower()
     try:
-        c = config.getCache('urls', f'{source}_{songId}_{quality}')
-        if c:
-            logger.debug(f'使用缓存的{source}_{songId}_{quality}数据，URL：{c["url"]}')
+        cache = config.getCache('urls', f'{source}_{songId}_{quality}')
+        if cache:
+            logger.debug(f'使用缓存的{source}_{songId}_{quality}数据，URL：{cache["url"]}')
             return {
                 'code': 0,
                 'msg': 'success',
-                'data': c['url'],
+                'data': {
+                    'url': cache['url'],
+                    'cache': True,
+                    'quality': {
+                        'target': quality,
+                        'result': quality,
+                    }
+                },
             }
     except:
         logger.error(traceback.format_exc())
@@ -71,18 +76,33 @@ async def handleApiRequest(command, source, songId, quality):
             'data': None,
         }
     try:
-        url = await func(songId, quality)
-        logger.debug(f'获取{source}_{songId}_{quality}成功，URL：{url}')
+        result = await func(songId, quality)
+        logger.debug(f'获取{source}_{songId}_{quality}成功，URL：{result['url']}')
+
+        canExpire = sourceExpirationTime[source]['expire']
+        expireTime = sourceExpirationTime[source]['time'] + int(time.time())
         config.updateCache('urls', f'{source}_{songId}_{quality}', {
-            "expire": sourceExpirationTime[source]['expire'],
-            "time": sourceExpirationTime[source]['time'] + int(time.time()),
-            "url": url,
+            "expire": canExpire,
+            "time": expireTime,
+            "url": result['url'],
             })
-        logger.debug(f'缓存已更新：{source}_{songId}_{quality}, URL：{url}, expire: {sourceExpirationTime[source]["time"] + int(time.time())}')
+        logger.debug(f'缓存已更新：{source}_{songId}_{quality}, URL：{result['url']}, expire: {expireTime}')
+
         return {
             'code': 0,
             'msg': 'success',
-            'data': url,
+            'data': {
+                'url': result['url'],
+                'cache': False,
+                'quality': {
+                    'target': quality,
+                    'result': result['quality'],
+                },
+                'expire': {
+                    'time': expireTime,
+                    'canExpire': canExpire,
+                },
+            },
         }
     except FailedException as e:
         return {

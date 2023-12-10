@@ -63,7 +63,6 @@ def signRequest(url, params, options):
     return Httpx.request(url, options)
 
 def getKey(hash_):
-    # print(hash_ + tools.pidversec + tools.appid + tools.mid + tools.userid)
     return utils.createMD5(hash_.lower() + tools.pidversec + tools.appid + tools.mid + tools.userid)
 
 async def getMusicInfo(hash_):
@@ -120,7 +119,7 @@ async def url(songId, quality):
         'album_id': albumid,
         'userid': tools.userid,
         'area_code': 1,
-        'hash': thash.lower(),
+        'hash': thash,
         'module': '',
         'mid': tools.mid,
         'appid': tools.appid,
@@ -142,7 +141,6 @@ async def url(songId, quality):
     }
     if (tools.version == 'v5'):
         params['quality'] = tools.qualityMap[quality]
-        # print(params.quality)
     if (tools.version == "v4"):
         params['version'] = tools.clientver
     headers = createObject({
@@ -155,11 +153,15 @@ async def url(songId, quality):
         headers['x-router'] = tools['x-router']['value']
     req = signRequest(tools.url, params, {'headers': headers})
     body = createObject(req.json())
-    
+
     if body.status == 3:
         raise FailedException('该歌曲在酷狗没有版权，请换源播放')
     elif body.status == 2:
         raise FailedException('链接获取失败，请检查账号是否有会员或数字专辑是否购买')
     elif body.status != 1:
         raise FailedException('链接获取失败，可能是数字专辑或者api失效')
-    return body.url[0]
+
+    return {
+        'url': body.url[0],
+        'quality': quality
+    }

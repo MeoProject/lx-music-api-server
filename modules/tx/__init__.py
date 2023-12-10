@@ -43,6 +43,14 @@ tools = createObject({
             "h": "AI00",
         }
     },
+    'qualityMapReverse': {
+        'M500': '128k',
+        'M800': '320k',
+        'F000': 'flac',
+        'RS01': 'flac24bit',
+        'Q000': 'dolby',
+        'AI00': 'master'
+    },
     "key": config.read_config("module.tx.user.qqmusic_key"),
     "loginuin": config.read_config("module.tx.user.uin"),
     "guid": config.read_config("module.tx.vkeyserver.guid"),
@@ -107,8 +115,20 @@ async def url(songId, quality):
         },
     }
     req = signRequest(requestBody)
-    body = CreateObject(req.json())
-    # js const { purl } = data.req_0.data.midurlinfo[0]
-    if (not body.req_0.data.midurlinfo[0]['purl']):
+    body = createObject(req.json())
+    data = body.req_0.data.midurlinfo[0]
+    url = data['purl']
+
+    if (not url):
         raise FailedException('failed')
-    return tools.cdnaddr + body.req_0.data.midurlinfo[0]['purl']
+
+    try:
+        resultQuality = data['filename'].split('.')[0].replace(data['songmid'], '')
+    except:
+        resultQuality = None
+
+    return {
+        'url': tools.cdnaddr + url,
+        'quality': tools.qualityMapReverse[resultQuality]
+    }
+

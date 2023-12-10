@@ -20,6 +20,12 @@ tools = {
         'flac': 'SQ',
         'flac24bit': 'ZQ',
     },
+    'qualityMapReverse': {
+        'PQ': '128k',
+        'HQ': '320k',
+        'SQ': 'flac',
+        'ZQ': 'flac24bit',
+    },
     'token': config.read_config('module.mg.user.token'),
     'aversionid': config.read_config('module.mg.user.aversionid'),
     'useragent': config.read_config('module.mg.user.useragent'),
@@ -42,9 +48,14 @@ async def url(songId, quality):
     })
     try:
         body = req.json()
-        # print((body['data']['url']))
-        if ((not int(body['code']) == 0) or ( not body['data']['url'])):
+        data = body['data']
+
+        if ((not int(body['code']) == 0) or ( not data['url'])):
             raise FailedException('failed')
-        return body['data']['url'].split('?')[0]
+
+        return {
+            'url': data['url'].split('?')[0],
+            'quality': tools['qualityMapReverse'][data['audioFormatType']],
+        }
     except:
         raise FailedException('failed')
