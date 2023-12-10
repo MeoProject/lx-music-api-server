@@ -7,7 +7,7 @@
 # ----------------------------------------
 # This file is part of the "lx-music-api-server" project.
 
-from common.utils import md5 as _md5
+from common.utils import createMD5
 import re as _re
 
 def v(b):
@@ -92,7 +92,7 @@ def t(b):
     return res
 
 def sign(params):
-    md5Str = _md5(params).upper()
+    md5Str = createMD5(params).upper()
     h = v(md5Str)
     e = c(md5Str)
     ls = t(md5Str)

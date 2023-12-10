@@ -13,8 +13,9 @@ from base64 import b64encode
 from binascii import hexlify
 from hashlib import md5
 from Crypto.Cipher import AES
+from common import utils
 
-__all__ = ["weEncrypt", "linuxEncrypt", "eEncrypt", "MD5"]
+__all__ = ["weEncrypt", "linuxEncrypt", "eEncrypt"]
 
 MODULUS = (
     "00e0b509f6259df8642dbc35662901477df22677ec152b5ff68ace615bb7"
@@ -28,13 +29,6 @@ NONCE = b"0CoJUm6Qyw8W8jud"
 LINUXKEY = b"rFgB&h#%2?^eDg:Q"
 EAPIKEY = b'e82ckenh8dichen8'
 
-
-def MD5(value):
-    m = md5()
-    m.update(value.encode())
-    return m.hexdigest()
-
-
 def weEncrypt(text):
     """
     引用自 https://github.com/darknessomi/musicbox/blob/master/NEMbox/encrypt.py#L40
@@ -46,7 +40,6 @@ def weEncrypt(text):
     encseckey = rsa(secret, PUBKEY, MODULUS)
     return {"params": params, "encSecKey": encseckey}
 
-
 def linuxEncrypt(text):
     """
     参考自 https://github.com/Binaryify/NeteaseCloudMusicApi/blob/master/util/crypto.js#L28
@@ -55,13 +48,11 @@ def linuxEncrypt(text):
     data = aes(text, LINUXKEY)
     return {"eparams": data.decode()}
 
-
 def eapiEncrypt(url, text):
     text = str(text)
-    digest = MD5("nobody{}use{}md5forencrypt".format(url, text))
+    digest = utils.createMD5("nobody{}use{}md5forencrypt".format(url, text))
     data = "{}-36cd479b6b5-{}-36cd479b6b5-{}".format(url, text, digest)
     return {"params": aes(data.encode(), EAPIKEY).decode("utf-8")}
-
 
 def aes(text, key, method={}):
     pad = 16 - len(text) % 16
@@ -74,7 +65,6 @@ def aes(text, key, method={}):
     if "base64" in method:
         return b64encode(ciphertext)
     return hexlify(ciphertext).upper()
-
 
 def rsa(text, pubkey, modulus):
     text = text[::-1]

@@ -21,9 +21,8 @@ def checklxmheader(lxm, url):
 
         cop, version = tuple(lxm.split('&'))
         version = (3 - len(version) % 3) * '0' + version
-        cop = utils.inflate_raw_sync(binascii.unhexlify(cop.encode('utf-8'))).decode('utf-8')
-        cop = utils.from_base64(cop).decode('utf-8')
-        # print(retvalue + version)
+        cop = utils.handleInflateRawSync(binascii.unhexlify(cop.encode('utf-8'))).decode('utf-8')
+        cop = utils.createBase64Decode(cop).decode('utf-8')
         arr, outsideversion = tuple([cop.split(']')[0] + ']', cop.split(']')[1]])
         arr = json.loads(arr)
         version = re.findall("\\d+", version)[0]

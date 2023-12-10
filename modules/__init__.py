@@ -48,7 +48,7 @@ sourceExpirationTime = {
 }
 
 
-async def handle_api_request(command, source, songId, quality):
+async def handleApiRequest(command, source, songId, quality):
     if (source == "kg"):
         songId = songId.lower()
     try:
@@ -63,7 +63,7 @@ async def handle_api_request(command, source, songId, quality):
     except:
         logger.error(traceback.format_exc())
     try:
-        func = require('apis.' + source + '.' + command)
+        func = require('modules.' + source + '.' + command)
     except:
         return {
             'code': 1,

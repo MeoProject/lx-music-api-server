@@ -14,7 +14,7 @@ import os
 from pygments import highlight
 from pygments.lexers import PythonLexer
 from pygments.formatters import TerminalFormatter
-from .utils import sanitize_filename, add_to_global_namespace
+from .utils import filterFileName, addToGlobalNamespace
 from .variable import debug_mode, log_length_limit
 
 if not os.path.exists("logs"):
@@ -66,7 +66,7 @@ class log:
             datefmt='%Y-%m-%d %H:%M:%S'
             )
         if filename:
-            filename = sanitize_filename(filename)
+            filename = filterFileName(filename)
         else:
             filename = './logs/' + module_name + '.log'
         file_handler = logging.FileHandler(filename, encoding = "utf-8")
@@ -159,4 +159,4 @@ printlogger = log('print')
 def logprint(*args, sep = ' ', end = '', file = None, flush = None):
     printlogger.info(sep.join(str(arg) for arg in args), allow_hidden = False)
 
-add_to_global_namespace('print', logprint)
+addToGlobalNamespace('print', logprint)

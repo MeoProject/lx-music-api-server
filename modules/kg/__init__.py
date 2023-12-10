@@ -14,17 +14,17 @@ from common import Httpx
 import ujson as json
 import time
 
-jsobject = utils.jsobject
+createObject = utils.CreateObject
 
-def buildsignparams(dictionary, body = ""):
+def buildSignatureParams(dictionary, body = ""):
     joined_str = ''.join([f'{k}={v}' for k, v in dictionary.items()])
     return joined_str + body
 
-def buildrequestparams(dictionary):
+def buildRequestParams(dictionary):
     joined_str = '&'.join([f'{k}={v}' for k, v in dictionary.items()])
     return joined_str
 
-tools = jsobject({
+tools = createObject({
     "signkey": config.read_config("module.kg.client.signatureKey"),
     "pidversec": config.read_config("module.kg.client.pidversionsecret"),
     "clientver": config.read_config("module.kg.client.clientver"),
@@ -53,18 +53,18 @@ tools = jsobject({
 })
 
 def sign(params, body = ""):
-    params = utils.sort_dict(params)
-    params = buildsignparams(params, body)
-    return utils.md5(tools["signkey"] + params + tools["signkey"])
+    params = utils.sortDict(params)
+    params = buildSignatureParams(params, body)
+    return utils.createMD5(tools["signkey"] + params + tools["signkey"])
 
 def signRequest(url, params, options):
-    params = utils.merge_dict(tools["extra_params"], params)
-    url = url + "?" + buildrequestparams(params) + "&signature=" + sign(params, options.get("body") if options.get("body") else (options.get("data") if options.get("data") else ""))
+    params = utils.mergeDict(tools["extra_params"], params)
+    url = url + "?" + buildRequestParams(params) + "&signature=" + sign(params, options.get("body") if options.get("body") else (options.get("data") if options.get("data") else ""))
     return Httpx.request(url, options)
 
 def getKey(hash_):
     # print(hash_ + tools.pidversec + tools.appid + tools.mid + tools.userid)
-    return utils.md5(hash_.lower() + tools.pidversec + tools.appid + tools.mid + tools.userid)
+    return utils.createMD5(hash_.lower() + tools.pidversec + tools.appid + tools.mid + tools.userid)
 
 async def getMusicInfo(hash_):
     tn = int(time.time())
@@ -145,7 +145,7 @@ async def url(songId, quality):
         # print(params.quality)
     if (tools.version == "v4"):
         params['version'] = tools.clientver
-    headers = jsobject({
+    headers = createObject({
             'User-Agent': 'Android712-AndroidPhone-8983-18-0-NetMusic-wifi',
             'KG-THash': '3e5ec6b',
             'KG-Rec': '1',
@@ -154,7 +154,7 @@ async def url(songId, quality):
     if (tools['x-router']['enable']):
         headers['x-router'] = tools['x-router']['value']
     req = signRequest(tools.url, params, {'headers': headers})
-    body = jsobject(req.json())
+    body = createObject(req.json())
     
     if body.status == 3:
         raise FailedException('该歌曲在酷狗没有版权，请换源播放')

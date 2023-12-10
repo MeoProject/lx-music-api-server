@@ -28,7 +28,7 @@ logger = log.log("main")
 from common import utils
 from common import lxsecurity
 from common import Httpx
-from apis import SongURL
+from modules import SongURL
 import traceback
 import time
 Httpx.checkcn()

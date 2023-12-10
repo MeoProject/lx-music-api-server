@@ -12,23 +12,23 @@ from Crypto.Cipher import AES, DES
 import binascii
 import base64
 
-def AESEncrypt(plainText, key, iv):
+def createAesEncrypt(plainText, key, iv):
     cipher = AES.new(key, AES.MODE_CBC, iv)
     if isinstance(plainText, str):
         plainText = plainText.encode('utf-8')
     return cipher.encrypt(pad(plainText))
 
-def AESDecrypt(cipherText, key, iv):
+def createAesDecrypt(cipherText, key, iv):
     cipher = AES.new(key, AES.MODE_CBC, iv)
     return unpad(cipher.decrypt(cipherText))
 
-def hexAESDecrypt(cipherText, key, iv):
+def createAesEncryptByHex(cipherText, key, iv):
     cipher = AES.new(key, AES.MODE_CBC, iv)
     if isinstance(cipherText, str):
         cipherText = cipherText.encode('utf-8')
     return unpad(cipher.decrypt(binascii.unhexlify(cipherText)))
 
-def base64AESDecrypt(cipherText, key, iv):
+def createAesEncryptByBase64(cipherText, key, iv):
     cipher = AES.new(key, AES.MODE_CBC, iv)
     if isinstance(cipherText, str):
         cipherText = cipherText.encode('utf-8')

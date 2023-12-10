@@ -14,9 +14,9 @@ from common import config
 from .QMWSign import sign
 import ujson as json
 
-jsobject = utils.jsobject
+createObject = utils.CreateObject
 
-tools = jsobject({
+tools = createObject({
     "fileInfo": {
         "128k": {
             'e': '.mp3',
@@ -80,7 +80,7 @@ async def url(songId, quality):
         },
     }
     infoRequest = signRequest(infoReqBody, True)
-    infoBody = jsobject(infoRequest.json())
+    infoBody = createObject(infoRequest.json())
     if (infoBody.code != 0 or infoBody.req.code != 0):
         raise FailedException("获取音乐信息失败")
     strMediaMid = infoBody.req.data.track_info.file.media_mid
@@ -107,7 +107,7 @@ async def url(songId, quality):
         },
     }
     req = signRequest(requestBody)
-    body = jsobject(req.json())
+    body = CreateObject(req.json())
     # js const { purl } = data.req_0.data.midurlinfo[0]
     if (not body.req_0.data.midurlinfo[0]['purl']):
         raise FailedException('failed')
