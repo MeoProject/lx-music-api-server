@@ -19,6 +19,25 @@
 
 ## 部署方法
 
+### poetry部署
+
+环境要求: Python 3.8+
+1. 安装 poetry 
+```bash
+pip install poetry
+```
+
+2. 安装依赖
+```bash
+poetry install
+```
+
+3. 启动
+```bash
+poetry shell # 进入poetry环境
+python main.py # 运行项目
+```
+
 ### 直接部署
 
 环境要求：Python 3.8+
