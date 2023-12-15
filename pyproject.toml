@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "lx-music-api-server-python"
+version = "1.1.0"
+description = "一个适配 LX Music 的 API 后端实现"
+authors = ["helloplhm-qwq"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+aiohttp = "^3.9.1"
+pycryptodome = "^3.19.0"
+ujson = "^5.9.0"
+requests = "^2.31.0"
+colorlog = "^6.8.0"
+Pygments = "^2.17.2"
+xmltodict = "^0.13.0"
+
+[tool.poetry.group.dev.dependencies]
+Flask = "^3.0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
