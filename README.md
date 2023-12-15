@@ -23,7 +23,7 @@
 
 环境要求：Python 3.8+
 没有其他限制，能用 Python 理论上就能跑起来
-
+如果需要部署 flask 版本，请将 main.py 自行换成 main-flask.py 
 测试版本部署，linux 命令如果为 python3 请自行替换：
 
 ```bash
