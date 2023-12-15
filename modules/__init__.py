@@ -56,8 +56,8 @@ async def handleApiRequest(command, source, songId, quality):
             return {
                 'code': 0,
                 'msg': 'success',
-                'data': {
-                    'url': cache['url'],
+                'data': cache['url'],
+                'extra': {
                     'cache': True,
                     'quality': {
                         'target': quality,
@@ -91,8 +91,8 @@ async def handleApiRequest(command, source, songId, quality):
         return {
             'code': 0,
             'msg': 'success',
-            'data': {
-                'url': result['url'],
+            'data': result['url'],
+            'extra': {
                 'cache': False,
                 'quality': {
                     'target': quality,
