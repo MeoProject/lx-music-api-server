@@ -18,7 +18,6 @@ import ujson as json
 import xmltodict
 from urllib.parse import quote
 from hashlib import md5 as handleCreateMD5
-from aiohttp.web import Response
 # from flask import Response
 
 def createBase64Encode(data_bytes):
@@ -89,9 +88,6 @@ def unique_list(list_in):
     unique_list = []
     [unique_list.append(x) for x in list_in if x not in unique_list]
     return unique_list
-
-def handleResult(dic, status = 200):
-    return Response(body = json.dumps(dic, indent=2, ensure_ascii=False), content_type='application/json', status = status)
 
 def encodeURIComponent(component):
     return quote(component)

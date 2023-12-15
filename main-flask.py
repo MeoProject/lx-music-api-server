@@ -22,20 +22,21 @@ from common import config
 from common import log
 
 flask_logger = log.log('flask')
-logging.getLogger('werkzeug').addHandler(log.flaskLogHelper(flask_logger))
+logging.getLogger('werkzeug').addHandler(log.LogHelper(flask_logger))
 logger = log.log("main")
 
 from common import utils
 from common import lxsecurity
 from common import Httpx
-from modules import SongURL
+from modules import handleApiRequest
 from flask import Response
+import ujson as json
 import traceback
 import time
 Httpx.checkcn()
 
 def handleResult(dic):
-    return Response(body = json.dumps(dic, indent=2, ensure_ascii=False), mimetype='application/json')
+    return Response(json.dumps(dic, indent=2, ensure_ascii=False), mimetype='application/json')
 
 @app.route('/')
 def index():
@@ -57,7 +58,7 @@ async def handle(method, source, songId, quality):
     
     if method == 'url':
         try:
-            return handleResult(await SongURL(source, songId, quality))
+            return handleResult(await handleApiRequest(source, songId, quality))
         except Exception as e:
             logger.error(traceback.format_exc())
             return handleResult({'code': 4, 'msg': '内部服务器错误', 'data': None}), 500
