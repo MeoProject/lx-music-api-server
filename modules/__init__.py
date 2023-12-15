@@ -77,7 +77,7 @@ async def handleApiRequest(command, source, songId, quality):
         }
     try:
         result = await func(songId, quality)
-        logger.debug(f'获取{source}_{songId}_{quality}成功，URL：{result['url']}')
+        logger.debug(f'获取{source}_{songId}_{quality}成功，URL：{result["url"]}')
 
         canExpire = sourceExpirationTime[source]['expire']
         expireTime = sourceExpirationTime[source]['time'] + int(time.time())
@@ -86,7 +86,7 @@ async def handleApiRequest(command, source, songId, quality):
             "time": expireTime,
             "url": result['url'],
             })
-        logger.debug(f'缓存已更新：{source}_{songId}_{quality}, URL：{result['url']}, expire: {expireTime}')
+        logger.debug(f'缓存已更新：{source}_{songId}_{quality}, URL：{result["url"]}, expire: {expireTime}')
 
         return {
             'code': 0,
