@@ -25,15 +25,15 @@ flask_logger = log.log('flask')
 logging.getLogger('werkzeug').addHandler(log.LogHelper(flask_logger))
 logger = log.log("main")
 
-from common import utils
 from common import lxsecurity
 from common import Httpx
 from modules import handleApiRequest
 from flask import Response
+import threading
 import ujson as json
 import traceback
 import time
-Httpx.checkcn()
+threading.Thread(target=Httpx.checkcn).start()
 
 def handleResult(dic):
     return Response(json.dumps(dic, indent=2, ensure_ascii=False), mimetype='application/json')

@@ -7,11 +7,10 @@
 # ----------------------------------------
 # This file is part of the "lx-music-api-server" project.
 
-from json import dumps
+from ujson import dumps
 from os import urandom
 from base64 import b64encode
 from binascii import hexlify
-from hashlib import md5
 from Crypto.Cipher import AES
 from common import utils
 

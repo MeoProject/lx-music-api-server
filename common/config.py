@@ -6,7 +6,6 @@
 # - license: MIT -
 # ----------------------------------------
 # This file is part of the "lx-music-api-server" project.
-# Do not edit except you know what you are doing.
 
 import ujson as json
 import time

@@ -6,7 +6,6 @@
 # - license: MIT - 
 # ----------------------------------------
 # This file is part of the "lx-music-api-server" project.
-# Do not edit except you know what you are doing.
 
 # KuwoDES加密实现，CV过来的，不进行注释
 # 下方为原文件版权声明，在此进行保留

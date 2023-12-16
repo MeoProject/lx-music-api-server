@@ -17,11 +17,14 @@ def get_changelog():
     docsMsg = []
     buildMsg = []
     otherMsg = []
+    noticeMsg = []
     unknownMsg = []
     for msg in res:
-        if (re.match('[a-f0-9]*.(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)\:', msg[1:-1])):
+        if (re.match('[a-f0-9]*.(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert|notice)\:', msg[1:-1])):
             msg = msg[1:-1]
-            if msg[8:].startswith('feat:'):
+            if msg[8:].startswith('notice:'):
+                noticeMsg.append(msg)
+            elif msg[8:].startswith('feat:'):
                 featMsg.append(msg)
             elif msg[8:].startswith('fix:'):
                 fixMsg.append(msg)
@@ -36,6 +39,10 @@ def get_changelog():
             unknownMsg.append(msg)
     # final
     Nres = ''
+    if (len(noticeMsg) > 0):
+        Nres += '## 公告\n'
+        for msg in noticeMsg:
+            Nres += f'- {msg}\n'
     if (len(featMsg) > 0):
         Nres += '## 功能更新\n'
         for msg in featMsg:

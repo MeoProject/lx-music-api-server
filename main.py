@@ -12,12 +12,12 @@
 from aiohttp import web
 from common import config
 from common import lxsecurity
-from common import utils
 from common import log
 from common import Httpx
 from modules import handleApiRequest
 from aiohttp.web import Response
 import ujson as json
+import threading
 import traceback
 import time
 
@@ -27,7 +27,7 @@ def handleResult(dic, status = 200):
 logger = log.log("main")
 aiologger = log.log('aiohttp_web')
 
-Httpx.checkcn()
+threading.Thread(target=Httpx.checkcn).start()
 
 # check request info before start
 async def handle_before_request(app, handler):

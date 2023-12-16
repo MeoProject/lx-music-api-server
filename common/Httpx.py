@@ -6,7 +6,6 @@
 # - license: MIT - 
 # ----------------------------------------
 # This file is part of the "lx-music-api-server" project.
-# Do not edit except you know what you are doing.
 
 # import aiohttp
 # import asyncio
@@ -143,6 +142,8 @@ def request(url, options = {}):
             options['data'] = convert_dict_to_form_string(options['form'])
             options.pop('form')
             options['headers']['Content-Type'] = 'application/x-www-form-urlencoded'
+        if (isinstance(options['data'], dict)):
+            options['data'] = json.dumps(options['data'])
     # 进行请求
     try:
         logger.info("-----start----- " + url)
@@ -152,7 +153,7 @@ def request(url, options = {}):
         raise e
     # 请求后记录
     logger.debug(f'Request to {url} succeed with code {req.status_code}')
-    if (req.content.startswith(b'\x78\x9c')): # zlib header
+    if (req.content.startswith(b'\x78\x9c') or req.content.startswith(b'\x78\x01')): # zlib headers
         try:
             decompressed = zlib.decompress(req.content)
             if (is_valid_utf8(decompressed)):
@@ -172,6 +173,9 @@ def request(url, options = {}):
         expire_time = (cache_info if isinstance(cache_info, int) else 3600) + int(time.time())
         config.updateCache("httpx", cache_key, {"expire": True, "time": expire_time, "data": utils.createBase64Encode(cache_data)})
         logger.debug("缓存已更新: " + url)
+    def _json():
+        return json.loads(req.content)
+    setattr(req, 'json', _json)
     # 返回请求
     return req
 

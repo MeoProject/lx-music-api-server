@@ -6,14 +6,12 @@
 # - license: MIT - 
 # ----------------------------------------
 # This file is part of the "lx-music-api-server" project.
-# Do not edit except you know what you are doing.
 
 from . import utils
 import ujson as json
 import binascii
 import re
 
-# js: path = url.replace(/^https?:\/\/[\w.:]+\//, '/')
 def checklxmheader(lxm, url):
     try:
         path = url.replace(re.findall(r'(?:https?:\/\/[\w.:]+\/)', url)[0], '/').replace('//', '/')

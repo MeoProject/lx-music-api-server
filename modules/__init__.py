@@ -6,12 +6,12 @@
 # - license: MIT -
 # ----------------------------------------
 # This file is part of the "lx-music-api-server" project.
-# Do not edit except you konw what you are doing.
 
 from common.exceptions import FailedException
 from common.utils import require
 from common import log
 from common import config
+# 从.引入的包并没有在代码中直接使用，但是是用require在请求时进行引入的，不要动
 from . import kw
 from . import mg
 from . import kg

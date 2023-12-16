@@ -6,7 +6,6 @@
 # - license: MIT - 
 # ----------------------------------------
 # This file is part of the "lx-music-api-server" project.
-# Do not edit except you know what you are doing.
 
 # 一个简单的循环任务调度器
 
@@ -52,7 +51,7 @@ def thread_runner():
             if t.check_available():
                 t.latest_execute = int(time.time())
                 threading.Thread(target = t.run).start()
-        time.sleep(5)
+        time.sleep(1)
 
 def run():
     logger.debug("scheduler thread starting...")

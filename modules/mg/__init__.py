@@ -10,7 +10,6 @@
 from common import Httpx
 from common import config
 from common.exceptions import FailedException
-import traceback
 
 tools = {
     'url': 'https://app.c.nf.migu.cn/MIGUM2.0/strategy/listen-url/v2.4?toneFlag=__quality__&songId=__songId__&resourceType=2',

@@ -6,7 +6,6 @@
 # - license: MIT - 
 # ----------------------------------------
 # This file is part of the "lx-music-api-server" project.
-# Do not edit except you know what you are doing.
 
 import platform
 import binascii
@@ -14,11 +13,9 @@ import builtins
 import base64
 import zlib
 import re
-import ujson as json
 import xmltodict
 from urllib.parse import quote
 from hashlib import md5 as handleCreateMD5
-# from flask import Response
 
 def createBase64Encode(data_bytes):
     encoded_data = base64.b64encode(data_bytes)
