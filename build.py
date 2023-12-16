@@ -12,11 +12,54 @@ def get_changelog():
     res = subprocess.check_output(
         ['git', 'log', f'{get_latest_tag()}..HEAD', '--pretty=format:"%h %s"']).decode('utf-8').strip()
     res = res.split('\n')
-    Nres = ''
+    featMsg = []
+    fixMsg = []
+    docsMsg = []
+    buildMsg = []
+    otherMsg = []
+    unknownMsg = []
     for msg in res:
         if (re.match('[a-f0-9]*.(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)\:', msg[1:-1])):
-            Nres += msg[1:-1]
-            Nres += '\n'
+            msg = msg[1:-1]
+            if msg[8:].startswith('feat:'):
+                featMsg.append(msg)
+            elif msg[8:].startswith('fix:'):
+                fixMsg.append(msg)
+            elif msg[8:].startswith('docs:'):
+                docsMsg.append(msg)
+            elif msg[8:].startswith('build:'):
+                buildMsg.append(msg)
+            else:
+                otherMsg.append(msg)
+        else:
+            msg = msg[1:-1]
+            unknownMsg.append(msg)
+    # final
+    Nres = ''
+    if (len(featMsg) > 0):
+        Nres += '## 功能更新\n'
+        for msg in featMsg:
+            Nres += f'- {msg}\n'
+    if (len(fixMsg) > 0):
+        Nres += '## bug修复\n'
+        for msg in fixMsg:
+            Nres += f'- {msg}\n'
+    if (len(docsMsg) > 0):
+        Nres += '## 文档更新\n'
+        for msg in docsMsg:
+            Nres += f'- {msg}\n'
+    if (len(unknownMsg) > 0):
+        Nres += '## 未知类型的提交\n'
+        for msg in unknownMsg:
+            Nres += f'- {msg}\n'
+    if (len(buildMsg) > 0):
+        Nres += '## 构建配置\n'
+        for msg in buildMsg:
+            Nres += f'- {msg}\n'
+    if (len(otherMsg) > 0):
+        Nres += '## 其他\n'
+        for msg in otherMsg:
+            Nres += f'- {msg}\n'
     return Nres.strip()
 
 
