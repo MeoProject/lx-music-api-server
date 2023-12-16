@@ -7,7 +7,7 @@
 # ----------------------------------------
 # This file is part of the "lx-music-api-server" project.
 
-# import aiohttp
+import aiohttp
 # import asyncio
 import requests
 import random
@@ -193,7 +193,7 @@ def checkcn():
         logger.warning('检查服务器位置失败，已忽略')
         logger.warning(traceback.format_exc())
 
-async def asyncrequest(url, options = {}):
+async def AsyncRequest(url, options = {}):
     '''
     Http请求主函数, 用于发送网络请求
     - url: 需要请求的URL地址(必填)
@@ -209,6 +209,8 @@ async def asyncrequest(url, options = {}):
     
     @ return: requests.Response类型的响应数据
     '''
+    if (not variable.aioSession):
+        variable.aioSession = aiohttp.ClientSession()
     # 缓存读取
     cache_key = f'{url}{options}'
     if (isinstance(options.get('cache-ignore'), list)):
@@ -217,7 +219,7 @@ async def asyncrequest(url, options = {}):
         options.pop('cache-ignore')
     cache_key = utils.createMD5(cache_key)
     if options.get("cache") and options["cache"] != "no-cache":
-        cache = config.getCache("httpx", cache_key)
+        cache = config.getCache("httpx_async", cache_key)
         if cache:
             logger.debug(f"请求 {url} 有可用缓存")
             return pickle.loads(utils.createBase64Decode(cache["data"]))
@@ -247,3 +249,58 @@ async def asyncrequest(url, options = {}):
     # 检查是否在国内
     if ((not variable.iscn) and (not options["headers"].get("X-Forwarded-For"))):
         options["headers"]["X-Forwarded-For"] = variable.fakeip
+    # 获取请求主函数
+    try:
+        reqattr = getattr(variable.aioSession, method.lower())
+    except AttributeError:
+        raise AttributeError('Unsupported method: '+method)
+    # 请求前记录
+    logger.debug(f'HTTP Request: {url}\noptions: {options}')
+    # 转换body/form参数为原生的data参数，并为form请求追加Content-Type头
+    if (method == 'POST') or (method == 'PUT'):
+        if options.get('body'):
+            options['data'] = options['body']
+            options.pop('body')
+        if options.get('form'):
+            options['data'] = convert_dict_to_form_string(options['form'])
+            options.pop('form')
+            options['headers']['Content-Type'] = 'application/x-www-form-urlencoded'
+        if (isinstance(options['data'], dict)):
+            options['data'] = json.dumps(options['data'])
+    # 进行请求
+    try:
+        logger.info("-----start----- " + url)
+        req = await reqattr(url, **options)
+    except Exception as e:
+        logger.error(f'HTTP Request runs into an Error: {log.highlight_error(traceback.format_exc())}')
+        raise e
+    # 请求后记录
+    logger.debug(f'Request to {url} succeed with code {req.status}')
+    # 为懒人提供的不用改代码移植的方法
+    # 才不是梓澄呢
+    setattr(req, "status_code", req.status)
+    if (req.content.startswith(b'\x78\x9c') or req.content.startswith(b'\x78\x01')): # zlib headers
+        try:
+            decompressed = zlib.decompress(req.content)
+            if (is_valid_utf8(decompressed)):
+                logger.debug(log_plaintext(decompressed.decode("utf-8")))
+            else:
+                logger.debug('response is not text binary, ignore logging it')
+        except:
+            logger.debug('response is not text binary, ignore logging it')
+    else:
+        if (is_valid_utf8(req.content)):
+            logger.debug(log_plaintext(req.content.decode("utf-8")))
+        else:
+            logger.debug('response is not text binary, ignore logging it')
+    # 缓存写入
+    if (cache_info and cache_info != "no-cache"):
+        cache_data = pickle.dumps(req)
+        expire_time = (cache_info if isinstance(cache_info, int) else 3600) + int(time.time())
+        config.updateCache("httpx_async", cache_key, {"expire": True, "time": expire_time, "data": utils.createBase64Encode(cache_data)})
+        logger.debug("缓存已更新: " + url)
+    async def _json():
+        return json.loads(req.content)
+    setattr(req, 'json', _json)
+    # 返回请求
+    return req

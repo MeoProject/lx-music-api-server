@@ -9,16 +9,19 @@
 # ----------------------------------------
 # This file is part of the "lx-music-api-server" project.
 
-from aiohttp import web
 from common import config
 from common import lxsecurity
 from common import log
 from common import Httpx
+from common import variable
 from aiohttp.web import Response
 import ujson as json
 import threading
 import traceback
 import modules
+import asyncio
+import aiohttp
+import signal
 import time
 
 def handleResult(dic, status = 200):
@@ -27,7 +30,8 @@ def handleResult(dic, status = 200):
 logger = log.log("main")
 aiologger = log.log('aiohttp_web')
 
-threading.Thread(target=Httpx.checkcn).start()
+def start_checkcn_thread():
+    threading.Thread(target=Httpx.checkcn).start()
 
 # check request info before start
 async def handle_before_request(app, handler):
@@ -99,7 +103,7 @@ async def handle(request):
 async def handle_404(request):
     return handleResult({'code': 6, 'msg': '未找到您所请求的资源', 'data': None}, 404)
 
-app = web.Application(middlewares=[handle_before_request])
+app = aiohttp.web.Application(middlewares=[handle_before_request])
 # mainpage
 app.router.add_get('/', main)
 
@@ -110,10 +114,37 @@ app.router.add_get('/{method}/{source}/{songId}', handle)
 # 404
 app.router.add_route('*', '/{tail:.*}', handle_404)
 
-if (__name__ == "__main__"):
+
+async def run_app():
+    host = config.read_config('common.host')
+    port = int(config.read_config('common.port'))
+    runner = aiohttp.web.AppRunner(app)
+    await runner.setup()
+    site = aiohttp.web.TCPSite(runner, host, port)
+    await site.start()
+    logger.info(f"监听 -> http://{host}:{port}")
+
+async def initMain():
+    variable.aioSession = aiohttp.ClientSession()
     try:
-        web.run_app(app, host=config.read_config('common.host'), port=int(config.read_config('common.port')))
-    except Exception as e:
-        logger.error("服务器启动失败, 请查看下方日志")
+        await run_app()
+        logger.info("服务器启动成功，请按下Ctrl + C停止")
+        await asyncio.Event().wait()  # 等待停止事件
+    except (KeyboardInterrupt, asyncio.exceptions.CancelledError):
+        pass
+    except OSError as e:
+        if str(e).startswith("[Errno 98]"):
+            logger.error("端口已被占用，请检查\n" + str(e))
+        else:
+            logger.error("遇到未知错误，请查看日志")
+            logger.error(traceback.format_exc())
+    except:
+        logger.error("遇到未知错误，请查看日志")
         logger.error(traceback.format_exc())
-        
+    finally:
+        await variable.aioSession.close()
+        logger.info("Server stopped")
+
+if __name__ == "__main__":
+    start_checkcn_thread()
+    asyncio.run(initMain())

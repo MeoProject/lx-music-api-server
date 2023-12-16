@@ -45,3 +45,4 @@ workdir = os.getcwd()
 banList_suggest = 0
 iscn = True
 fake_ip = None
+aioSession = None
