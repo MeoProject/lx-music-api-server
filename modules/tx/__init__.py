@@ -46,8 +46,10 @@ async def info(songid):
             'size': utils.sizeFormat(int(req['track_info']['file']['size_new'][0])),
         }
     genres = []
-    for g in req['info']['genre']['content']:
-        genres.append(g['value'])
+    # fix: KeyError: 'genre'
+    if (req.get('info') and req['info'].get('genre') and req['info']['genre'].get('content')):
+        for g in req['info']['genre']['content']:
+            genres.append(g['value'])
     return {
         'name': req['track_info']['title'] + ' ' + req['track_info']['subtitle'].strip(),
         'name_ori': req['track_info']['title'],
@@ -66,7 +68,7 @@ async def info(songid):
         'cover': f'https://y.qq.com/music/photo_new/T002R800x800M000{req["track_info"]["album"]["pmid"]}.jpg',
         'sizable_cover': 'https://y.qq.com/music/photo_new/T002R{size}x{size}M000' + f'{req["track_info"]["album"]["pmid"]}.jpg',
         'publish_date': req['track_info']['time_public'],
-        'mvid': req['track_info']['mv']['id'],
+        'mvid': req['track_info']['mv']['vid'],
         'genre': genres,
         'kmid': req['track_info']['ksong']['mid'],
         'kid': req['track_info']['ksong']['id'],

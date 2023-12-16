@@ -25,22 +25,21 @@ logger = log.log('api_handler')
 sourceExpirationTime = {
     'tx': {
         "expire": True,
-        "time": 15 * 60 * 60,  # 15 hours
+        "time": 80400,  # 不知道tx为什么要取一个这么不对劲的数字当过期时长
     },
     'kg': {
         "expire": True,
-        "time": 15 * 60 * 60,  # 15 hours
+        "time": 24 * 60 * 60,  # 24 hours
     },
     'kw': {
         "expire": True,
-        "time": 30 * 60  # 30 minutes
+        "time": 60 * 60  # 60 minutes
     },
     'wy': {
         "expire": True,
-        "time": 10 * 60,  # 10 minutes
+        "time": 20 * 60,  # 20 minutes
     },
     'mg': {
-        # no expiration
         "expire": False,
         "time": 0,
     }
@@ -69,6 +68,11 @@ async def url(source, songId, quality):
                     'quality': {
                         'target': quality,
                         'result': quality,
+                    },
+                    'expire': {
+                        # 在更新缓存的时候把有效期的75%作为链接可用时长，现在加回来
+                        'time': (cache['time'] + (sourceExpirationTime[source]['time'] * 0.25)) if cache['expire'] else None,
+                        'canExpire': cache['expire'],
                     }
                 },
             }
@@ -90,7 +94,7 @@ async def url(source, songId, quality):
         expireTime = sourceExpirationTime[source]['time'] + int(time.time())
         config.updateCache('urls', f'{source}_{songId}_{quality}', {
             "expire": canExpire,
-            "time": expireTime,
+            "time": int(expireTime - sourceExpirationTime[source]['time'] * 0.25),  # 取有效期的75%作为链接可用时长
             "url": result['url'],
             })
         logger.debug(f'缓存已更新：{source}_{songId}_{quality}, URL：{result["url"]}, expire: {expireTime}')
@@ -106,7 +110,7 @@ async def url(source, songId, quality):
                     'result': result['quality'],
                 },
                 'expire': {
-                    'time': expireTime,
+                    'time': expireTime if canExpire else None,
                     'canExpire': canExpire,
                 },
             },
