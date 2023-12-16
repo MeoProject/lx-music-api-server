@@ -14,11 +14,11 @@ from common import config
 from common import lxsecurity
 from common import log
 from common import Httpx
-from modules import handleApiRequest
 from aiohttp.web import Response
 import ujson as json
 import threading
 import traceback
+import modules
 import time
 
 def handleResult(dic, status = 200):
@@ -91,8 +91,8 @@ async def handle(request):
         return handleResult({"code": 1, "msg": "lxm请求头验证失败", "data": None}, 403)
     
     try:
-        return handleResult(await handleApiRequest(method, source, songId, quality))
-    except Exception as e:
+        return handleResult(await getattr(modules, method)(source, songId, quality))
+    except:
         logger.error(traceback.format_exc())
         return handleResult({'code': 4, 'msg': '内部服务器错误', 'data': None}, 500)
 
@@ -105,6 +105,7 @@ app.router.add_get('/', main)
 
 # api
 app.router.add_get('/{method}/{source}/{songId}/{quality}', handle)
+app.router.add_get('/{method}/{source}/{songId}', handle)
 
 # 404
 app.router.add_route('*', '/{tail:.*}', handle_404)

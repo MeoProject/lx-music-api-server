@@ -48,7 +48,14 @@ sourceExpirationTime = {
 }
 
 
-async def handleApiRequest(command, source, songId, quality):
+async def url(source, songId, quality):
+    if (not quality):
+        return {
+            'code': 2,
+            'msg': '需要参数"quality"',
+            'data': None,
+        }
+
     try:
         cache = config.getCache('urls', f'{source}_{songId}_{quality}')
         if cache:
@@ -68,11 +75,11 @@ async def handleApiRequest(command, source, songId, quality):
     except:
         logger.error(traceback.format_exc())
     try:
-        func = require('modules.' + source + '.' + command)
+        func = require('modules.' + source + '.url')
     except:
         return {
             'code': 1,
-            'msg': '未知的源或命令',
+            'msg': '未知的源或不支持的方法',
             'data': None,
         }
     try:
@@ -103,6 +110,29 @@ async def handleApiRequest(command, source, songId, quality):
                     'canExpire': canExpire,
                 },
             },
+        }
+    except FailedException as e:
+        return {
+            'code': 2,
+            'msg': e.args[0],
+            'data': None,
+        }
+
+async def info(source, songid, _):
+    try:
+        func = require('modules.' + source + '.info')
+    except:
+        return {
+            'code': 1,
+            'msg': '未知的源或不支持的方法',
+            'data': None,
+        }
+    try:
+        result = await func(songid)
+        return {
+            'code': 0,
+            'msg': 'success',
+            'data': result
         }
     except FailedException as e:
         return {

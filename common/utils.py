@@ -132,5 +132,26 @@ def dump_xml(data):
 def load_xml(data):
     return xmltodict.parse(data)
 
+def sizeFormat(size):
+    if size < 1024:
+        return f"{size}B"
+    elif size < 1024**2:
+        return f"{round(size / 1024, 2)}KB"
+    elif size < 1024**3:
+        return f"{round(size / 1024**2, 2)}MB"
+    elif size < 1024**4:
+        return f"{round(size / 1024**3, 2)}GB"
+    elif size < 1024**5:
+        return f"{round(size / 1024**4, 2)}TB"
+    else:
+        return f"{round(size / 1024**5, 2)}PB"
+
+def timeLengthFormat(t):
+    t = int(t)
+    hour = t // 3600
+    minute = (t % 3600) // 60
+    second = t % 60
+    return f"{((('0' + str(hour)) if (len(str(hour)) == 1) else str(hour)) + ':') if (hour > 0) else ''}{minute:02}:{second:02}"
+
 addToGlobalNamespace('require', require)
 
