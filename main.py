@@ -21,7 +21,6 @@ import traceback
 import modules
 import asyncio
 import aiohttp
-import signal
 import time
 
 def handleResult(dic, status = 200):
