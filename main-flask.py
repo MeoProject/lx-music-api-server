@@ -3,7 +3,7 @@
 # ----------------------------------------
 # - mode: python - 
 # - author: helloplhm-qwq - 
-# - name: main.py - 
+# - name: main-flask.py - 
 # - project: lx-music-api-server - 
 # - license: MIT - 
 # ----------------------------------------
@@ -95,6 +95,7 @@ def check():
             if config.read_config("security.allowed_host.blacklist.enable"):
                 config.ban_ip(request.remote_addr, int(config.read_config("security.allowed_host.blacklist.length")))
             return handleResult({'code': 6, 'msg': '未找到您所请求的资源', 'data': None}), 404
-    
-# run
-app.run(host=config.read_config('common.host'), port=config.read_config('common.port'))
+
+if (__name__ == '__main__'):
+    # run
+    app.run(host=config.read_config('common.host'), port=config.read_config('common.port'))
