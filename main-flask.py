@@ -27,11 +27,11 @@ logger = log.log("main")
 
 from common import lxsecurity
 from common import Httpx
-from modules import handleApiRequest
 from flask import Response
 import threading
 import ujson as json
 import traceback
+import modules
 import time
 threading.Thread(target=Httpx.checkcn).start()
 
@@ -58,7 +58,7 @@ async def handle(method, source, songId, quality):
     
     if method == 'url':
         try:
-            return handleResult(await handleApiRequest(source, songId, quality))
+            return handleResult(await getattr(modules, method)(source, songId, quality))
         except Exception as e:
             logger.error(traceback.format_exc())
             return handleResult({'code': 4, 'msg': '内部服务器错误', 'data': None}), 500
