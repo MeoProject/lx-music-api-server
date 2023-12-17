@@ -193,9 +193,28 @@ def checkcn():
         logger.warning('检查服务器位置失败，已忽略')
         logger.warning(traceback.format_exc())
 
+class ClientResponse:
+    # 这个类为了方便aiohttp响应与requests响应的跨类使用，也为了解决pickle无法缓存的问题
+    def __init__(self, status, content, headers):
+        self.status = status
+        self.content = content
+        self.headers = headers
+        self.text = content.decode("utf-8", errors='ignore')
+    
+    def json(self):
+        return json.loads(self.content)
+
+
+async def convert_to_requests_response(aiohttp_response):
+    content = await aiohttp_response.content.read()  # 从aiohttp响应中读取字节数据
+    status_code = aiohttp_response.status  # 获取状态码
+    headers = dict(aiohttp_response.headers.items())  # 获取标头信息并转换为字典
+    
+    return ClientResponse(status_code, content, headers)
+
 async def AsyncRequest(url, options = {}):
     '''
-    Http请求主函数, 用于发送网络请求
+    Http异步请求主函数, 用于发送网络请求
     - url: 需要请求的URL地址(必填)
     - options: 请求的配置参数(可选, 留空时为GET请求, 总体与nodejs的请求的options填写差不多)
         - method: 请求方法
@@ -222,7 +241,8 @@ async def AsyncRequest(url, options = {}):
         cache = config.getCache("httpx_async", cache_key)
         if cache:
             logger.debug(f"请求 {url} 有可用缓存")
-            return pickle.loads(utils.createBase64Decode(cache["data"]))
+            c = pickle.loads(utils.createBase64Decode(cache["data"]))
+            return c
     if "cache" in list(options.keys()):
         cache_info = options.get("cache")
         options.pop("cache")
@@ -270,15 +290,15 @@ async def AsyncRequest(url, options = {}):
     # 进行请求
     try:
         logger.info("-----start----- " + url)
-        req = await reqattr(url, **options)
+        req_ = await reqattr(url, **options)
     except Exception as e:
         logger.error(f'HTTP Request runs into an Error: {log.highlight_error(traceback.format_exc())}')
         raise e
     # 请求后记录
-    logger.debug(f'Request to {url} succeed with code {req.status}')
+    logger.debug(f'Request to {url} succeed with code {req_.status}')
     # 为懒人提供的不用改代码移植的方法
     # 才不是梓澄呢
-    setattr(req, "status_code", req.status)
+    req = await convert_to_requests_response(req_)
     if (req.content.startswith(b'\x78\x9c') or req.content.startswith(b'\x78\x01')): # zlib headers
         try:
             decompressed = zlib.decompress(req.content)
@@ -299,8 +319,5 @@ async def AsyncRequest(url, options = {}):
         expire_time = (cache_info if isinstance(cache_info, int) else 3600) + int(time.time())
         config.updateCache("httpx_async", cache_key, {"expire": True, "time": expire_time, "data": utils.createBase64Encode(cache_data)})
         logger.debug("缓存已更新: " + url)
-    async def _json():
-        return json.loads(req.content)
-    setattr(req, 'json', _json)
     # 返回请求
     return req
