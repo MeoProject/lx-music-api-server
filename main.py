@@ -37,9 +37,11 @@ async def handle_before_request(app, handler):
     async def handle_request(request):
         # nginx proxy header
         if (request.headers.get("X-Real-IP")):
-            request.remote = request.headers.get("X-Real-IP")
+            request.remote_addr = request.headers.get("X-Real-IP")
+        else:
+            request.remote_addr = request.remote
         # check ip
-        if (config.check_ip_banned(request.remote)):
+        if (config.check_ip_banned(request.remote_addr)):
             return handleResult({"code": 1, "msg": "您的IP已被封禁", "data": None}, 403)
         # check global rate limit
         if (
@@ -49,23 +51,23 @@ async def handle_before_request(app, handler):
             ):
             return handleResult({"code": 5, "msg": "全局限速", "data": None}, 429)
         if (
-            (time.time() - config.getRequestTime(request.remote))
+            (time.time() - config.getRequestTime(request.remote_addr))
             <
             (config.read_config("security.rate_limit.ip"))
             ):
             return handleResult({"code": 5, "msg": "IP限速", "data": None}, 429)
         # update request time
         config.updateRequestTime('global')
-        config.updateRequestTime(request.remote)
+        config.updateRequestTime(request.remote_addr)
         # check host
         if (config.read_config("security.allowed_host.enable")):
             if request.remote_host.split(":")[0] not in config.read_config("security.allowed_host.list"):
                 if config.read_config("security.allowed_host.blacklist.enable"):
-                    config.ban_ip(request.remote, int(config.read_config("security.allowed_host.blacklist.length")))
+                    config.ban_ip(request.remote_addr, int(config.read_config("security.allowed_host.blacklist.length")))
                 return handleResult({'code': 6, 'msg': '未找到您所请求的资源', 'data': None}, 404)
         try:
             resp = await handler(request)
-            aiologger.info(f'{request.remote} - {request.method} "{request.path}", {resp.status}')
+            aiologger.info(f'{request.remote_addr} - {request.method} "{request.path}", {resp.status}')
             return resp
         except: 
             logger.error(traceback.format_exc())
