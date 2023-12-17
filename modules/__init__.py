@@ -71,7 +71,7 @@ async def url(source, songId, quality):
                     },
                     'expire': {
                         # 在更新缓存的时候把有效期的75%作为链接可用时长，现在加回来
-                        'time': (cache['time'] + (sourceExpirationTime[source]['time'] * 0.25)) if cache['expire'] else None,
+                        'time': int(cache['time'] + (sourceExpirationTime[source]['time'] * 0.25)) if cache['expire'] else None,
                         'canExpire': cache['expire'],
                     }
                 },
