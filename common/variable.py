@@ -39,6 +39,7 @@ def _read_config(key):
 
 debug_mode = debug_mode if (debug_mode := _read_config("common.debug_mode")) else False
 log_length_limit = log_length_limit if (log_length_limit := _read_config("common.log_length_limit")) else 500
+log_file = log_file if (log_file := _read_config("common.log_file")) else True
 running = True
 config = {}
 workdir = os.getcwd()
