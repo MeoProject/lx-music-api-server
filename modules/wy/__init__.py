@@ -38,7 +38,7 @@ tools = {
 async def url(songId, quality):
     path = '/api/song/enhance/player/url/v1'
     requestUrl = 'https://interface.music.163.com/eapi/song/enhance/player/url/v1'
-    req = Httpx.request(requestUrl, {
+    req = await Httpx.AsyncRequest(requestUrl, {
         'method': 'POST',
         'headers': {
             'Cookie': tools['cookie'],
@@ -49,14 +49,13 @@ async def url(songId, quality):
             "encodeType": "flac",
         }))
     })
-    body = json.loads(req.text)
+    body = req.json()
     if (not body.get("data") or (not body.get("data")) or (not body.get("data")[0].get("url"))):
         raise FailedException("failed")
 
     data = body["data"][0]
-    if (config.read_config('module.wy.reject_unmatched_quality')):
-        if (data['level'] != tools['qualityMap'][quality]):
-            raise FailedException("reject unmatched quality")
+    if (data['level'] != tools['qualityMap'][quality]):
+        raise FailedException("reject unmatched quality")
 
     return {
         'url': data["url"].split("?")[0],

@@ -7,7 +7,6 @@
 # ----------------------------------------
 # This file is part of the "lx-music-api-server" project.
 
-from common.exceptions import FailedException
 from common import Httpx
 from common import utils
 from common import config
@@ -62,7 +61,7 @@ async def signRequest(data, cache = False):
     data = json.dumps(data)
     s = sign(data)
     headers = {}
-    return Httpx.request('https://u.y.qq.com/cgi-bin/musics.fcg?format=json&sign=' + s, {
+    return await Httpx.AsyncRequest('https://u.y.qq.com/cgi-bin/musics.fcg?format=json&sign=' + s, {
         'method': 'POST',
         'body': data,
         'headers': headers,

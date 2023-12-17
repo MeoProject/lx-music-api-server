@@ -49,7 +49,8 @@ async def getMusicInfo(hash_, use_cache = True):
         'cache-ignore': [tn]
     }
     options['body'] = json.dumps(options['data']).replace(', ', ',').replace(': ', ':')
-    body = Httpx.request(url, dict(options)).json()
+    body = await Httpx.AsyncRequest(url, dict(options))
+    body = body.json()
     return body['data'][0][0] if (body['data'] and body['data'][0]) else {}
 
 async def getMusicSingerInfo(hash_, use_cache = True):
@@ -95,3 +96,11 @@ async def getMusicSingerInfo(hash_, use_cache = True):
             'sizable_avatar': a['sizable_avatar'],
         })
     return res
+
+async def getMusicMVHash(hash_, use_cache = True):
+    req = await Httpx.AsyncRequest('http://mobilecdnbj.kugou.com/api/v3/song/info?hash=' + hash_, {
+            'method': 'GET',
+            'cache': 86400 * 30 if use_cache else 'no-cache',
+        })
+    body = req.json()
+    return body['data']['mvhash'] if (body['data']) else ''

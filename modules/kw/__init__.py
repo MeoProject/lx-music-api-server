@@ -30,7 +30,7 @@ tools = {
 
 async def url(songId, quality):
     target_url = f'''https://bd-api.kuwo.cn/api/service/music/downloadInfo/{songId}?isMv=0&format={tools['extMap'][quality]}&br={tools['qualityMap'][quality]}'''
-    req = Httpx.request(target_url, {
+    req = await Httpx.AsyncRequest(target_url, {
         'method': 'GET',
         'headers': {
             'User-Agent': 'okhttp/3.10.0',

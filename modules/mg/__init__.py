@@ -32,7 +32,7 @@ tools = {
 }
 
 async def url(songId, quality):
-    req = Httpx.request(tools['url'].replace('__quality__', tools['qualityMap'][quality]).replace('__songId__', songId), {
+    req = await Httpx.AsyncRequest(tools['url'].replace('__quality__', tools['qualityMap'][quality]).replace('__songId__', songId), {
         'method': 'GET',
         'headers': {
             'User-Agent': tools['useragent'],
