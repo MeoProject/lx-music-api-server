@@ -145,5 +145,11 @@ async def initMain():
         logger.info("Server stopped")
 
 if __name__ == "__main__":
-    start_checkcn_thread()
-    asyncio.run(initMain())
+    try:
+        start_checkcn_thread()
+        asyncio.run(initMain())
+    except KeyboardInterrupt:
+        pass
+    except:
+        logger.error('初始化出错，请检查日志')
+        logger.error(traceback.format_exc())
