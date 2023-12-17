@@ -73,6 +73,6 @@ async def url(songId, quality):
         raise FailedException('链接获取失败，可能是数字专辑或者api失效')
 
     return {
-        'url': body.url[0],
+        'url': body["url"][0],
         'quality': quality
     }
