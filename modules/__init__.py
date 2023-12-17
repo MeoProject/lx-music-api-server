@@ -94,7 +94,8 @@ async def url(source, songId, quality):
         expireTime = sourceExpirationTime[source]['time'] + int(time.time())
         config.updateCache('urls', f'{source}_{songId}_{quality}', {
             "expire": canExpire,
-            "time": int(expireTime - sourceExpirationTime[source]['time'] * 0.25),  # 取有效期的75%作为链接可用时长
+            # 取有效期的75%作为链接可用时长
+            "time": int(expireTime - sourceExpirationTime[source]['time'] * 0.25),
             "url": result['url'],
             })
         logger.debug(f'缓存已更新：{source}_{songId}_{quality}, URL：{result["url"]}, expire: {expireTime}')
@@ -143,4 +144,26 @@ async def info(source, songid, _):
             'code': 2,
             'msg': e.args[0],
             'data': None,
+        }
+
+async def mv(source, mvId, _):
+    try:
+        func = require('modules.' + source + '.mv')
+    except:
+        return {
+            'code': 1,
+            'msg': '未知的源或不支持的方法',
+            'data': None,
+        }
+    try:
+        result = await func(mvId)
+        return {
+            'code': 0,
+            'msg': 'success',
+            'data': result
+        }
+    except FailedException as e:
+        return {
+            'code': 2,
+            'msg': e.args[0],
         }

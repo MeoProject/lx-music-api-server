@@ -7,10 +7,13 @@
 # ----------------------------------------
 # This file is part of the "lx-music-api-server" project.
 
+from .musicInfo import getMusicMVHash as _getMVHash
 from .musicInfo import getMusicSingerInfo as _getInfo2
 from .musicInfo import getMusicInfo as _getInfo
 from .utils import tools
 from .player import url
+from .mv import getMvInfo as _getMvInfo
+from .mv import getMvPlayURL as _getMvUrl
 from common.exceptions import FailedException
 from common import Httpx
 from common import utils
@@ -20,13 +23,10 @@ async def info(hash_):
     tasks = []
     tasks.append(_getInfo(hash_))
     tasks.append(_getInfo2(hash_))
-    tasks.append(Httpx.request('http://mobilecdnbj.kugou.com/api/v3/song/info?hash=' + hash_, {
-            'method': 'GET'
-        }))
+    tasks.append(_getMVHash(hash_))
     res = await asyncio.gather(*tasks)
     res1 = res[0]
     res2 = res[1]
-    mvhash = res[2].json()['data']['mvhash'] if (res[2].json()['data']) else ''
     file_info = {}
     for k, v in tools['qualityHashMap'].items():
         if (res1['audio_info'][v] and k != 'master'):
@@ -51,11 +51,21 @@ async def info(hash_):
         'songmid': res1['audio_id'],
         'album_id': res1['album_info']['album_id'],
         'album': res1['album_info']['album_name'],
-        'bpm': res1['bpm'],
+        'bpm': int(res1['bpm']),
         'language': res1['language'],
         'cover': res1['album_info']['sizable_cover'].format(size = 1080),
         'sizable_cover': res1['album_info']['sizable_cover'],
         'publish_date': res1['publish_date'],
-        'mvid': mvhash,
+        'mvid': res[2],
         'genre': []
     }
+
+async def mv(hash_):
+    tasks = []
+    tasks.append(_getMvInfo(hash_))
+    tasks.append(_getMvUrl(hash_))
+    res = await asyncio.gather(*tasks)
+    res1 = res[0]
+    res2 = res[1]
+    res1['play_info'] = res2
+    return res1
