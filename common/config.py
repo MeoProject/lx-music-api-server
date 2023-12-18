@@ -47,7 +47,7 @@ class ConfigReadException(Exception):
 
 default = {
     "common": {
-        "host": "0.0.0.0",
+        "host": "172.30.139.163",
         "_host-desc": "服务器启动时所使用的HOST地址",
         "port": "9763",
         "_port-desc": "服务器启动时所使用的端口",
