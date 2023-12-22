@@ -412,7 +412,6 @@ def read_default_config(key):
 
         return value
     except:
-        logger.warning(f'配置文件{key}不存在')
         return None
 
 def _read_config(key):
