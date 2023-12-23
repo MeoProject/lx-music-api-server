@@ -65,6 +65,8 @@ default = {
         "_proxy-desc": "代理配置，HTTP与HTTPS协议需分开配置",
         "log_file": True,
         "_log_file-desc": "是否开启日志文件",
+        "allow_download_script": True,
+        '_allow_download_script-desc': '是否允许直接从服务端下载脚本，开启后可以直接访问/script下载脚本',
     },
     "security": {
         "rate_limit": {

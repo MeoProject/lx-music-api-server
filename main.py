@@ -15,6 +15,7 @@ from common import log
 from common import Httpx
 from common import variable
 from common import scheduler
+from common import lx_script
 from aiohttp.web import Response
 import ujson as json
 import threading
@@ -63,7 +64,7 @@ async def handle_before_request(app, handler):
             config.updateRequestTime(request.remote_addr)
             # check host
             if (config.read_config("security.allowed_host.enable")):
-                if request.remote_host.split(":")[0] not in config.read_config("security.allowed_host.list"):
+                if request.host.split(":")[0] not in config.read_config("security.allowed_host.list"):
                     if config.read_config("security.allowed_host.blacklist.enable"):
                         config.ban_ip(request.remote_addr, int(config.read_config("security.allowed_host.blacklist.length")))
                     return handleResult({'code': 6, 'msg': '未找到您所请求的资源', 'data': None}, 404)
@@ -116,6 +117,9 @@ app.router.add_get('/', main)
 # api
 app.router.add_get('/{method}/{source}/{songId}/{quality}', handle)
 app.router.add_get('/{method}/{source}/{songId}', handle)
+
+if (config.read_config('common.allow_download_script')):
+    app.router.add_get('/script', lx_script.generate_script_response)
 
 # 404
 app.router.add_route('*', '/{tail:.*}', handle_404)

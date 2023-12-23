@@ -35,3 +35,5 @@ config.json
 *.un~
 *.un
 
+# temp script
+lx-music-source-example.js
