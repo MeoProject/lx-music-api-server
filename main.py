@@ -14,6 +14,7 @@ from common import lxsecurity
 from common import log
 from common import Httpx
 from common import variable
+from common import scheduler
 from aiohttp.web import Response
 import ujson as json
 import threading
@@ -130,6 +131,7 @@ async def run_app():
     logger.info(f"监听 -> http://{host}:{port}")
 
 async def initMain():
+    await scheduler.run()
     variable.aioSession = aiohttp.ClientSession()
     try:
         await run_app()
@@ -147,7 +149,11 @@ async def initMain():
         logger.error("遇到未知错误，请查看日志")
         logger.error(traceback.format_exc())
     finally:
-        await variable.aioSession.close()
+        logger.info('wating for sessions to complete...')
+        if variable.aioSession:
+            await variable.aioSession.close()
+        
+        variable.running = False
         logger.info("Server stopped")
 
 if __name__ == "__main__":
