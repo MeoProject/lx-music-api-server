@@ -52,7 +52,7 @@ async def generate_script_response(request):
     for line in scriptLines:
         line = line.strip()
         if (line.startswith('const API_URL')):
-            newScriptLines.append(f'const API_URL = "{request.scheme}://{request.host}/"')
+            newScriptLines.append(f'const API_URL = "{request.scheme}://{request.host}"')
         elif (line.startswith('const API_KEY')):
             newScriptLines.append(f'const API_KEY = "{config.read_config("security.key.value")}"')
         else:
