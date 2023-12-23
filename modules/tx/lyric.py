@@ -1,3 +1,18 @@
+# ----------------------------------------
+# - mode: python - 
+# - author: helloplhm-qwq - 
+# - name: lyric.py - 
+# - project: lx-music-api-server - 
+# - license: MIT - 
+# ----------------------------------------
+# This file is part of the "lx-music-api-server" project.
+
+from .utils import signRequest
+from .musicInfo import getMusicInfo
+from common.exceptions import FailedException
+from common.utils import createBase64Decode
+from common import variable
+from common import qdes
 import re
 
 class ParseTools:
@@ -130,26 +145,26 @@ class ParseTools:
         tlrc_lines = tlrc.split('\n')
         lrc_lines = lrc.split('\n')
         new_lrc = []
+        time_tag_rxp = r'^\[[\d:.]+\]'
+        
         for line in tlrc_lines:
-            result = self.rxps['lineTime2'].search(line)
+            result = re.match(time_tag_rxp, line)
             if not result:
                 continue
-            words = re.sub(self.rxps['lineTime2'], '', line)
+            words = re.sub(time_tag_rxp, '', line)
             if not words.strip():
                 continue
-            time = result.group(1)
-            if '.' in time:
-                time += ''.ljust(3 - len(time.split('.')[1]), '0')
-            t1 = self.get_intv(time)
+            tag = re.sub(r'\[\d+:\d+\.\d+\]', '', result.group(0))
+
             while lrc_lines:
                 lrc_line = lrc_lines.pop(0)
-                lrc_line_result = self.rxps['lineTime2'].search(lrc_line)
+                lrc_line_result = re.match(time_tag_rxp, lrc_line)
                 if not lrc_line_result:
                     continue
-                t2 = self.get_intv(lrc_line_result.group(1))
-                if abs(t1 - t2) < 100:
-                    new_lrc.append(re.sub(self.rxps['lineTime2'], lrc_line_result.group(0), line))
+                if tag in lrc_line_result.group(0):
+                    new_lrc.append(re.sub(time_tag_rxp, lrc_line_result.group(0), line))
                     break
+        
         return '\n'.join(new_lrc)
 
     def parse(self, lrc, tlrc, rlrc):
@@ -169,3 +184,74 @@ class ParseTools:
             info['tlyric'] = self.fix_tlrc_time_tag(tlrc, info['lyric'])
 
         return info
+
+global_parser = ParseTools()
+
+def parseLyric(l, t = '', r = ''):
+    return global_parser.parse(l, t, r)
+
+async def getLyric(songId):
+    # mid and Numberid
+    if (re.match("^[0-9]+$", str(songId))):
+        songId = int(songId)
+    else:
+        try:
+            getNumberIDRequest = await getMusicInfo(songId)
+        except:
+            raise FailedException('歌曲信息获取失败')
+        songId = getNumberIDRequest['track_info']['id']
+    req = await signRequest({
+        "comm": {
+            "ct": '19',
+            "cv": '1859',
+            "uin": '0',
+        },
+        "req": {
+            "method": 'GetPlayLyricInfo',
+            "module": 'music.musichallSong.PlayLyricInfo',
+            "param": {
+                "format": 'json',
+                "crypt": 1 if variable.qdes_lib_loaded else 0,
+                "ct": 19,
+                "cv": 1873,
+                "interval": 0,
+                "lrc_t": 0,
+                "qrc": 1 if variable.qdes_lib_loaded else 0,
+                "qrc_t": 0,
+                "roma": 1 if variable.qdes_lib_loaded else 0,
+                "roma_t": 0,
+                "songID": songId,
+                "trans": 1,
+                "trans_t": 0,
+                "type": -1,
+            }
+        }
+    })
+    body = req.json()
+    if ((body['code'] != 0) or (body['req']['code'] != 0)):
+        raise FailedException('歌词获取失败')
+    if (variable.qdes_lib_loaded):
+        l = body['req']['data']['lyric']
+        t = body['req']['data']['trans']
+        r = body['req']['data']['roma']
+        if (l.startswith('789C') and len(l) < 200): # unsupported format
+            raise FailedException('纯音乐短歌词不受支持')
+        dl = qdes.qdes_decrypt(l)
+        if (t):
+            dt = qdes.qdes_decrypt(t)
+        else:
+            dt = ''
+        if (r):
+            dr = qdes.qdes_decrypt(r)
+        else:
+            dr = ''
+        return global_parser.parse(dl, dt, dr)
+    else: # 不获取QRC时的歌词不被加密，解码base64，不进行parse，不支持逐字和罗马音，歌词数据没有毫秒
+        l = body['req']['data']['lyric']
+        t = body['req']['data']['trans']
+        return {
+            'lyric': createBase64Decode(l).decode('utf-8'),
+            'tlyric': createBase64Decode(t).decode('utf-8'),
+            'rlyric': '',
+            'lxlyric': '',
+        }

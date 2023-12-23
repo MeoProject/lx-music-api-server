@@ -10,6 +10,7 @@
 from .player import url
 from .musicInfo import getMusicInfo as _getInfo
 from .utils import formatSinger
+from .lyric import getLyric as _getLyric
 from common import utils
 
 
@@ -75,5 +76,6 @@ async def info(songid):
         'bpm': req['track_info']['bpm'],
     }
 
-
+async def lyric(songId):
+    return await _getLyric(songId)
 

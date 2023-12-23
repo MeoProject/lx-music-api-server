@@ -7,13 +7,13 @@
 # ----------------------------------------
 # This file is part of the "lx-music-api-server" project.
 
-import os
-import ujson as json
+import os as _os
+import ujson as _json
 
 def _read_config_file():
     try:
         with open("./config.json", "r", encoding = "utf-8") as f:
-            return json.load(f)
+            return _json.load(f)
     except:
         pass
 
@@ -42,8 +42,9 @@ log_length_limit = log_length_limit if (log_length_limit := _read_config("common
 log_file = log_file if (not isinstance(log_file := _read_config("common.log_file"), type(None))) else True
 running = True
 config = {}
-workdir = os.getcwd()
+workdir = _os.getcwd()
 banList_suggest = 0
 iscn = True
 fake_ip = None
 aioSession = None
+qdes_lib_loaded = False

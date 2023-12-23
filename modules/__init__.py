@@ -123,9 +123,9 @@ async def url(source, songId, quality):
             'data': None,
         }
 
-async def info(source, songid, _):
+async def other(method, source, songid, _):
     try:
-        func = require('modules.' + source + '.info')
+        func = require('modules.' + source + '.' + method)
     except:
         return {
             'code': 1,
@@ -144,26 +144,4 @@ async def info(source, songid, _):
             'code': 2,
             'msg': e.args[0],
             'data': None,
-        }
-
-async def mv(source, mvId, _):
-    try:
-        func = require('modules.' + source + '.mv')
-    except:
-        return {
-            'code': 1,
-            'msg': '未知的源或不支持的方法',
-            'data': None,
-        }
-    try:
-        result = await func(mvId)
-        return {
-            'code': 0,
-            'msg': 'success',
-            'data': result
-        }
-    except FailedException as e:
-        return {
-            'code': 2,
-            'msg': e.args[0],
         }

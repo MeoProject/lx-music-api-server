@@ -60,7 +60,7 @@ default = {
         "proxy": {
             "enable": False,
             "http_addr": "http://127.0.0.1:7890",
-            "https_addr": "https://127.0.0.1:7890",
+            "https_addr": "http://127.0.0.1:7890",
         },
         "_proxy-desc": "代理配置，HTTP与HTTPS协议需分开配置",
         "log_file": True,

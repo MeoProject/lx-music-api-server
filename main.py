@@ -97,7 +97,10 @@ async def handle(request):
         return handleResult({"code": 1, "msg": "lxm请求头验证失败", "data": None}, 403)
     
     try:
-        return handleResult(await getattr(modules, method)(source, songId, quality))
+        if (method in dir(modules)):
+            return handleResult(await getattr(modules, method)(source, songId, quality))
+        else:
+            return handleResult(await modules.other(method, source, songId, quality))
     except:
         logger.error(traceback.format_exc())
         return handleResult({'code': 4, 'msg': '内部服务器错误', 'data': None}, 500)
