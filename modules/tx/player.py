@@ -8,7 +8,7 @@
 # This file is part of the "lx-music-api-server" project.
 
 from common.exceptions import FailedException
-from common import utils
+from common import config, utils
 from .musicInfo import getMusicInfo
 from .utils import tools
 from .utils import signRequest
@@ -33,8 +33,8 @@ async def url(songId, quality):
             },
         },
         'comm': {
-            "qq": tools.loginuin,
-            "authst": tools.key,
+            "qq": config.read_config('module.tx.user.uin'),
+            "authst": config.read_config('module.tx.user.qqmusic_key'),
             "ct": "26",
             "cv": "2010101",
             "v": "2010101"

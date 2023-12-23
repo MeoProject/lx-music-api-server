@@ -12,6 +12,7 @@ import binascii
 import builtins
 import base64
 import zlib
+import time
 import re
 import xmltodict
 from urllib.parse import quote
@@ -152,6 +153,11 @@ def timeLengthFormat(t):
     minute = (t % 3600) // 60
     second = t % 60
     return f"{((('0' + str(hour)) if (len(str(hour)) == 1) else str(hour)) + ':') if (hour > 0) else ''}{minute:02}:{second:02}"
+
+def timestamp_format(t):
+    if (not isinstance(t, int)):
+        t = int(t)
+    return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(t))
 
 addToGlobalNamespace('require', require)
 

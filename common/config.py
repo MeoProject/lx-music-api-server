@@ -160,6 +160,11 @@ default = {
                 "_uin-desc": "key对应的QQ号"
             },
             "cdnaddr": "http://ws.stream.qqmusic.qq.com/",
+            'refresh_login': {
+                'desc': '刷新登录相关配置，enable是否启动，interval刷新间隔',
+                'enable': False,
+                'interval': 86000
+            }
         },
         "wy": {
             "desc": "网易云音乐相关配置",

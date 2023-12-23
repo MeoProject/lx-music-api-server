@@ -50,10 +50,8 @@ tools = createObject({
         'Q000': 'dolby',
         'AI00': 'master'
     },
-    "key": config.read_config("module.tx.user.qqmusic_key"),
     "loginuin": config.read_config("module.tx.user.uin"),
     "guid": config.read_config("module.tx.vkeyserver.guid"),
-    "uin": config.read_config("module.tx.vkeyserver.uin"),
     "cdnaddr": config.read_config("module.tx.cdnaddr") if config.read_config("module.tx.cdnaddr") else 'http://ws.stream.qqmusic.qq.com/',
 })
 
