@@ -68,11 +68,19 @@ default = {
         "allow_download_script": True,
         '_allow_download_script-desc': '是否允许直接从服务端下载脚本，开启后可以直接访问 /script?key=你的请求key 下载脚本',
         "download_config": {
-            "desc": "源脚本的相关配置",
+            "desc": "源脚本的相关配置，dev为是否启用开发模式",
             "name": "修改为你的源脚本名称",
             "intro": "修改为你的源脚本描述",
             "author": "修改为你的源脚本作者",
-            "version": "修改为你的源版本"
+            "version": "修改为你的源版本",
+            "dev": True,
+            "quality": {
+                "kw": ["128k", "320k", "flac"],
+                "kg": ["128k"],
+                "tx": ["128k"],
+                "wy": ["128k"],
+                "mg": ["128k"],
+            }
         }
     },
     "security": {

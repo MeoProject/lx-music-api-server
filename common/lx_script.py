@@ -13,6 +13,8 @@ from . import scheduler
 from .variable import iscn
 from .log import log
 from aiohttp.web import Response
+import ujson as json
+import re
 
 logger = log('lx_script')
 
@@ -55,8 +57,6 @@ async def generate_script_response(request):
             newScriptLines.append(f'const API_URL = "{request.scheme}://{request.host}"')
         elif (line.startswith('const API_KEY')):
             newScriptLines.append(f'const API_KEY = "{config.read_config("security.key.value")}"')
-        elif (line.startswith("/*")):
-            newScriptLines.append(" /*")
         elif (line.startswith("* @name")):
             newScriptLines.append(" * @name " + config.read_config("common.download_config.name"))
         elif (line.startswith("* @description")):
@@ -65,10 +65,15 @@ async def generate_script_response(request):
             newScriptLines.append((" * @author helloplhm-qwq & Folltoshe & " + config.read_config("common.download_config.author")) if config.read_config("common.download_config.author") else " * @author helloplhm-qwq & Folltoshe")
         elif (line.startswith("* @version")):
             newScriptLines.append(" * @name " + config.read_config("common.download_config.version"))
+        elif (line.startswith("const DEV_ENABLE ")):
+            newScriptLines.append("const DEV_ENABLE = " + str(config.read_config("common.download_config.dev")).lower())
         else:
             newScriptLines.append(line)
+    r = '\n'.join(newScriptLines)
     
-    return Response(text = '\n'.join(newScriptLines), content_type = 'text/javascript',
+    r = re.sub(r'const MUSIC_QUALITY = {[^}]+}', f'const MUSIC_QUALITY = JSON.parse(\'{json.dumps(config.read_config("common.download_config.quality"))}\')', r)
+
+    return Response(text = r, content_type = 'text/javascript',
                     headers = {
                         'Content-Disposition': 'attachment; filename=lx-music-source.js'
                     })
