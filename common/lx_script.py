@@ -55,6 +55,16 @@ async def generate_script_response(request):
             newScriptLines.append(f'const API_URL = "{request.scheme}://{request.host}"')
         elif (line.startswith('const API_KEY')):
             newScriptLines.append(f'const API_KEY = "{config.read_config("security.key.value")}"')
+        elif (line.startswith("/*")):
+            newScriptLines.append(" /*")
+        elif (line.startswith("* @name")):
+            newScriptLines.append(" * @name " + config.read_config("common.download_config.name"))
+        elif (line.startswith("* @description")):
+            newScriptLines.append(" * @description " + config.read_config("common.download_config.intro"))
+        elif (line.startswith("* @author")):
+            newScriptLines.append((" * @author helloplhm-qwq & Folltoshe & " + config.read_config("common.download_config.author")) if config.read_config("common.download_config.author") else " * @author helloplhm-qwq & Folltoshe")
+        elif (line.startswith("* @version")):
+            newScriptLines.append(" * @name " + config.read_config("common.download_config.version"))
         else:
             newScriptLines.append(line)
     

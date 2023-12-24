@@ -66,7 +66,14 @@ default = {
         "log_file": True,
         "_log_file-desc": "是否开启日志文件",
         "allow_download_script": True,
-        '_allow_download_script-desc': '是否允许直接从服务端下载脚本，开启后可以直接访问/script下载脚本',
+        '_allow_download_script-desc': '是否允许直接从服务端下载脚本，开启后可以直接访问 /script?key=你的请求key 下载脚本',
+        "download_config": {
+            "desc": "源脚本的相关配置",
+            "name": "修改为你的源脚本名称",
+            "intro": "修改为你的源脚本描述",
+            "author": "修改为你的源脚本作者",
+            "version": "修改为你的源版本"
+        }
     },
     "security": {
         "rate_limit": {
