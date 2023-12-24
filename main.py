@@ -70,6 +70,12 @@ async def handle_before_request(app, handler):
                     return handleResult({'code': 6, 'msg': '未找到您所请求的资源', 'data': None}, 404)
 
             resp = await handler(request)
+            if (isinstance(resp, str)):
+                resp = Response(body = resp, content_type='text/plain', status = 200)
+            elif (isinstance(resp, dict):
+                resp = handleResult(resp)
+            elif (not isinstance(resp, Response)):
+                resp = Response(body = str(resp), content_type='text/plain', status = 200)
             aiologger.info(f'{request.remote_addr} - {request.method} "{request.path}", {resp.status}')
             return resp
         except: 
