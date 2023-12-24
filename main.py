@@ -72,7 +72,7 @@ async def handle_before_request(app, handler):
             resp = await handler(request)
             if (isinstance(resp, str)):
                 resp = Response(body = resp, content_type='text/plain', status = 200)
-            elif (isinstance(resp, dict):
+            elif (isinstance(resp, dict)):
                 resp = handleResult(resp)
             elif (not isinstance(resp, Response)):
                 resp = Response(body = str(resp), content_type='text/plain', status = 200)
