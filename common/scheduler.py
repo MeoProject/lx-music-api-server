@@ -49,10 +49,13 @@ def append(name, task, interval = 86400):
 async def thread_runner():
     global tasks, running_event
     while not running_event.is_set():
+        tasks_runner = []
         for t in tasks:
             if t.check_available() and not running_event.is_set():
                 t.latest_execute = int(time.time())
-                await t.run()  # 等待异步任务完成
+                tasks_runner.append(t.run())
+        if (tasks_runner):
+            await asyncio.gather(*tasks_runner)
         await asyncio.sleep(1)
 
 async def run():
