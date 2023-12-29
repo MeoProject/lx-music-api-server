@@ -16,7 +16,7 @@ colorlog = "^6.8.0"
 Pygments = "^2.17.2"
 xmltodict = "^0.13.0"
 
-[tool.poetry.group.dev.dependencies]
+[tool.poetry.dev-dependencies]
 Flask = "^3.0.0"
 
 [build-system]
