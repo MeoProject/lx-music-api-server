@@ -64,7 +64,7 @@ async def generate_script_response(request):
         elif (line.startswith("* @author")):
             newScriptLines.append((" * @author helloplhm-qwq & Folltoshe & " + config.read_config("common.download_config.author")) if config.read_config("common.download_config.author") else " * @author helloplhm-qwq & Folltoshe")
         elif (line.startswith("* @version")):
-            newScriptLines.append(" * @name " + config.read_config("common.download_config.version"))
+            newScriptLines.append(" * @version " + config.read_config("common.download_config.version"))
         elif (line.startswith("const DEV_ENABLE ")):
             newScriptLines.append("const DEV_ENABLE = " + str(config.read_config("common.download_config.dev")).lower())
         else:
