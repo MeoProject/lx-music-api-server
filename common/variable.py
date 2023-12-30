@@ -36,10 +36,12 @@ def _read_config(key):
         return value
     except:
         return None
-
-debug_mode = debug_mode if (debug_mode := _read_config("common.debug_mode")) else False
-log_length_limit = log_length_limit if (log_length_limit := _read_config("common.log_length_limit")) else 500
-log_file = log_file if (not isinstance(log_file := _read_config("common.log_file"), type(None))) else True
+_dm = _read_config("common.debug_mode")
+_lm = _read_config("common.log_file")
+_ll = _read_config("common.log_length_limit")
+debug_mode = _dm if (_dm) else False
+log_length_limit = _ll if (_ll) else 500
+log_file = _lm if (not isinstance(_lm , type(None))) else True
 running = True
 config = {}
 workdir = _os.getcwd()

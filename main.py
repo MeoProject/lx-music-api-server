@@ -9,6 +9,12 @@
 # ----------------------------------------
 # This file is part of the "lx-music-api-server" project.
 
+import sys
+
+if (sys.version_info.major < 3 or sys.version_info.minor < 6):
+    print('Python版本过低，请使用Python 3.6+ ')
+    sys.exit(1)
+
 from common import config
 from common import lxsecurity
 from common import log
@@ -30,6 +36,14 @@ def handleResult(dic, status = 200):
 
 logger = log.log("main")
 aiologger = log.log('aiohttp_web')
+
+stopEvent = None
+if (sys.version_info.minor < 8):
+    logger.warning('您使用的Python版本已经停止更新，不建议继续使用')
+    import concurrent
+    stopEvent = concurrent.futures._base.CancelledError
+else:
+    stopEvent = asyncio.exceptions.CancelledError
 
 def start_checkcn_thread():
     threading.Thread(target=Httpx.checkcn).start()
@@ -147,7 +161,7 @@ async def initMain():
         await run_app()
         logger.info("服务器启动成功，请按下Ctrl + C停止")
         await asyncio.Event().wait()  # 等待停止事件
-    except (KeyboardInterrupt, asyncio.exceptions.CancelledError):
+    except (KeyboardInterrupt, stopEvent):
         pass
     except OSError as e:
         if str(e).startswith("[Errno 98]"):
