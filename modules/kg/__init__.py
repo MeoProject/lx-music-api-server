@@ -12,6 +12,8 @@ from .musicInfo import getMusicSingerInfo as _getInfo2
 from .musicInfo import getMusicInfo as _getInfo
 from .utils import tools
 from .player import url
+from .lyric import getLyric as _getLyric
+from .lyric import lyricSearchByHash as _lyricSearch
 from .mv import getMvInfo as _getMvInfo
 from .mv import getMvPlayURL as _getMvUrl
 from common.exceptions import FailedException
@@ -69,3 +71,8 @@ async def mv(hash_):
     res2 = res[1]
     res1['play_info'] = res2
     return res1
+
+async def lyric(hash_):
+    lyric_search_result = await _lyricSearch(hash_)
+    choosed_lyric = lyric_search_result[0]
+    return await _getLyric(choosed_lyric['id'], choosed_lyric['accesskey'])

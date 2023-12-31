@@ -7,13 +7,10 @@
 # ----------------------------------------
 # This file is part of the "lx-music-api-server" project.
 
-from .player import url
 from .musicInfo import getMusicInfo as _getInfo
 from .utils import formatSinger
 from .lyric import getLyric as _getLyric
 from common import utils
-from . import refresh_login
-
 
 async def info(songid):
     req = await _getInfo(songid)
