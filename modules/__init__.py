@@ -88,7 +88,7 @@ async def url(source, songId, quality):
         }
     try:
         result = await func(songId, quality)
-        logger.debug(f'获取{source}_{songId}_{quality}成功，URL：{result["url"]}')
+        logger.info(f'获取{source}_{songId}_{quality}成功，URL：{result["url"]}')
 
         canExpire = sourceExpirationTime[source]['expire']
         expireTime = sourceExpirationTime[source]['time'] + int(time.time())
@@ -115,6 +115,43 @@ async def url(source, songId, quality):
                     'canExpire': canExpire,
                 },
             },
+        }
+    except FailedException as e:
+        logger.info(f'获取{source}_{songId}_{quality}失败，原因：' + e.args[0])
+        return {
+            'code': 2,
+            'msg': e.args[0],
+            'data': None,
+        }
+
+async def lyric(source, songId, _):
+    cache = config.getCache('lyric', f'{source}_{songId}')
+    if cache:
+        return {
+            'code': 0,
+            'msg': 'success',
+            'data': cache['data']
+        }
+    try:
+        func = require('modules.' + source + '.lyric')
+    except:
+        return {
+            'code': 1,
+            'msg': '未知的源或不支持的方法',
+            'data': None,
+        }
+    try:
+        result = await func(songId)
+        config.updateCache('lyric', f'{source}_{songId}', {
+            "data": result,
+            "time": int(time.time() + (86400 * 3)), # 歌词缓存3天
+            "expire": True,
+        })
+        logger.debug(f'缓存已更新：{source}_{songId}, lyric: {result}')
+        return {
+            'code': 0,
+            'msg': 'success',
+            'data': result
         }
     except FailedException as e:
         return {
