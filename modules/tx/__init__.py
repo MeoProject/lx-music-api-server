@@ -7,18 +7,20 @@
 # ----------------------------------------
 # This file is part of the "lx-music-api-server" project.
 
+from .player import url
 from .musicInfo import getMusicInfo as _getInfo
 from .utils import formatSinger
 from .lyric import getLyric as _getLyric
 from common import utils
+from . import refresh_login
 
 async def info(songid):
     req = await _getInfo(songid)
     singerList = []
-    for s in req['track_info']['singer']:
+    forin req['track_info']['singer']:
         s.pop('uin')
         s.pop('title')
-        singerList.append(s)
+        singerList.append()
     file_info = {}
     if (req['track_info']['file']['size_128mp3'] != 0):
         file_info['128k'] = {
