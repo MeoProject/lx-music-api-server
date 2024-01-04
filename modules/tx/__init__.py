@@ -17,10 +17,10 @@ from . import refresh_login
 async def info(songid):
     req = await _getInfo(songid)
     singerList = []
-    forin req['track_info']['singer']:
+    for s in req['track_info']['singer']:
         s.pop('uin')
         s.pop('title')
-        singerList.append()
+        singerList.append(s)
     file_info = {}
     if (req['track_info']['file']['size_128mp3'] != 0):
         file_info['128k'] = {
