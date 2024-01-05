@@ -648,6 +648,10 @@ def ban_ip(ip_addr, ban_time=-1):
             'expire_time': read_config('security.banlist.expire.length') if (ban_time == -1) else ban_time,
         })
         write_data('banList', banList)
+        banListRaw = read_data('banListRaw')
+        if (ip_addr not in banListRaw):
+            banListRaw.append(ip_addr)
+            write_data('banListRaw', banListRaw)
     else:
         if (variable.banList_suggest < 10):
             variable.banList_suggest += 1
