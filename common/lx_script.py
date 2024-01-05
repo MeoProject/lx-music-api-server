@@ -21,6 +21,7 @@ logger = log('lx_script')
 async def get_response(retry = 0):
     if (retry > 10):
         logger.warning('请求源脚本内容失败')
+        return
     baseurl = 'https://raw.githubusercontent.com/lxmusics/lx-music-api-server/main/lx-music-source-example.js'
     try:
         if (iscn and (retry % 2) == 0):
