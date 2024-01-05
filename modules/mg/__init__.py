@@ -7,8 +7,10 @@
 # ----------------------------------------
 # This file is part of the "lx-music-api-server" project.
 
+import random
 from common import Httpx
 from common import config
+from common import variable
 from common.exceptions import FailedException
 
 tools = {
@@ -25,24 +27,21 @@ tools = {
         'SQ': 'flac',
         'ZQ': 'flac24bit',
     },
-    'token': config.read_config('module.mg.user.token'),
-    'aversionid': config.read_config('module.mg.user.aversionid'),
-    'useragent': config.read_config('module.mg.user.useragent'),
-    'osversion': config.read_config('module.mg.user.osversion'),
 }
 
 async def url(songId, quality):
+    user_info = config.read_config('module.mg.user') if (not variable.use_cookie_pool) else random.choice(config.read_config('module.cookiepool.mg'))
     req = await Httpx.AsyncRequest(tools['url'].replace('__quality__', tools['qualityMap'][quality]).replace('__songId__', songId), {
         'method': 'GET',
         'headers': {
-            'User-Agent': tools['useragent'],
-            'aversionid': tools['aversionid'],
-            'token': tools['token'],
+            'User-Agent': user_info['useragent'],
+            'aversionid': user_info['aversionid'],
+            'token': user_info['token'],
             'channel': '0146832',
             'language': 'Chinese',
             'ua': 'Android_migu',
             'mode': 'android',
-            'os': 'Android ' + tools['osversion'],
+            'os': 'Android ' + user_info['osversion'],
         },
     })
     try:
