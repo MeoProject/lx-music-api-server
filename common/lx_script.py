@@ -28,7 +28,11 @@ async def get_response(retry = 0):
             req = await Httpx.AsyncRequest('https://mirror.ghproxy.com/' + baseurl)
         else:
             req = await Httpx.AsyncRequest(baseurl)
-    except: 
+    except Exception as e:
+        if (isinstance(e, RuntimeError)):
+            if ('Session is closed' in str(e)):
+                logger.error('脚本更新失败，clientSession已被关闭')
+                return
         return await get_response(retry + 1)
     return req
 
