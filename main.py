@@ -146,13 +146,22 @@ app.router.add_route('*', '/{tail:.*}', handle_404)
 
 
 async def run_app():
-    host = config.read_config('common.host')
-    port = int(config.read_config('common.port'))
-    runner = aiohttp.web.AppRunner(app)
-    await runner.setup()
-    site = aiohttp.web.TCPSite(runner, host, port)
-    await site.start()
-    logger.info(f"监听 -> http://{host}:{port}")
+    while True:
+        try:
+            host = config.read_config('common.host')
+            port = int(config.read_config('common.port'))
+            runner = aiohttp.web.AppRunner(app)
+            await runner.setup()
+            site = aiohttp.web.TCPSite(runner, host, port)
+            await site.start()
+            logger.info(f"监听 -> http://{host}:{port}")
+            return
+        except OSError as e:
+            if str(e).startswith("[Errno 98]"):
+                logger.error("端口已被占用，请检查\n" + str(e))
+                logger.info('服务器将在10s后再次尝试启动...')
+                await asyncio.sleep(10)
+                logger.info('重新尝试启动...')
 
 async def initMain():
     await scheduler.run()
@@ -164,11 +173,8 @@ async def initMain():
     except (KeyboardInterrupt, stopEvent):
         pass
     except OSError as e:
-        if str(e).startswith("[Errno 98]"):
-            logger.error("端口已被占用，请检查\n" + str(e))
-        else:
-            logger.error("遇到未知错误，请查看日志")
-            logger.error(traceback.format_exc())
+        logger.error("遇到未知错误，请查看日志")
+        logger.error(traceback.format_exc())
     except:
         logger.error("遇到未知错误，请查看日志")
         logger.error(traceback.format_exc())
