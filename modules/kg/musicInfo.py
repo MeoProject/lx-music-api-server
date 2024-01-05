@@ -27,18 +27,17 @@ async def getMusicInfo(hash_, use_cache = True):
             "User-Agent": "Android712-AndroidPhone-11451-376-0-FeeCacheUpdate-wifi",
             "x-router": "kmr.service.kugou.com",
         },
-        "data": {
+        "body": {
             "area_code": "1",
             "show_privilege": "1",
             "show_album_info": "1",
             "is_publish": "",
             "appid": 1005,
             "clientver": 11451,
-            "mid": tools.mid,
+            "mid": '114514',
             "dfid": "-",
             "clienttime": tn,
             "key": 'OIlwlieks28dk2k092lksi2UIkp',
-            "fields": "",
             "data": [
                 {
                     "hash": hash_
@@ -48,7 +47,6 @@ async def getMusicInfo(hash_, use_cache = True):
         'cache': 86400 * 30 if use_cache else 'no-cache',
         'cache-ignore': [tn]
     }
-    options['body'] = json.dumps(options['data']).replace(', ', ',').replace(': ', ':')
     body = await Httpx.AsyncRequest(url, dict(options))
     body = body.json()
     return body['data'][0][0] if (body['data'] and body['data'][0]) else {}

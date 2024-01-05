@@ -41,7 +41,7 @@ async def url(songId, quality):
     req = await Httpx.AsyncRequest(requestUrl, {
         'method': 'POST',
         'headers': {
-            'Cookie': config.read_config('module.wy.cookie') if (not variable.use_cookie_pool) else random.choice(config.read_config('module.cookiepool.wy')),
+            'Cookie': config.read_config('module.wy.cookie') if (not variable.use_cookie_pool) else random.choice(config.read_config('module.cookiepool.wy'))['cookie'],
         },
         'form': eapiEncrypt(path, json.dumps({
             "ids": json.dumps([songId]),
