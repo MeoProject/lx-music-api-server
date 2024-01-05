@@ -63,7 +63,7 @@ async def refresh():
         else:
             logger.info('刷新登录成功')
             config.write_config('module.tx.user.uin',
-                                body['req1']['data']['musicid'])
+                                str(body['req1']['data']['musicid']))
             logger.info('已通过相应数据更新uin')
             config.write_config('module.tx.user.qqmusic_key',
                                 body['req1']['data']['musickey'])
@@ -93,7 +93,7 @@ async def refresh():
         else:
             logger.info('刷新登录成功')
             config.write_config('module.tx.user.uin',
-                                body['req1']['data']['musicid'])
+                                str(body['req1']['data']['musicid']))
             logger.info('已通过相应数据更新uin')
             config.write_config('module.tx.user.qqmusic_key',
                                 body['req1']['data']['musickey'])
@@ -158,7 +158,7 @@ async def refresh_login_for_pool(user_info):
             user_list[user_list.index(
                 user_info)]['qqmusic_key'] = body['req1']['data']['musickey']
             user_list[user_list.index(
-                user_info)]['uin'] = body['req1']['data']['musicid']
+                user_info)]['uin'] = str(body['req1']['data']['musicid'])
             config.write_config('module.cookiepool.tx', user_list)
             logger.info(f'为QQ音乐账号(WeChat_{user_info["uin"]})数据更新完毕')
             return
@@ -190,7 +190,7 @@ async def refresh_login_for_pool(user_info):
             user_list[user_list.index(
                 user_info)]['qqmusic_key'] = body['req1']['data']['musickey']
             user_list[user_list.index(
-                user_info)]['uin'] = body['req1']['data']['musicid']
+                user_info)]['uin'] = str(body['req1']['data']['musicid'])
             config.write_config('module.cookiepool.tx', user_list)
             logger.info(f'为QQ音乐账号(QQ_{user_info["uin"]})数据更新完毕')
             return
