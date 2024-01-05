@@ -57,5 +57,5 @@ async def signRequest(url, params, options, signkey = tools["signkey"]):
     url = url + "?" + buildRequestParams(params)
     return await Httpx.AsyncRequest(url, options)
 
-def getKey(hash_):
-    return utils.createMD5(hash_.lower() + tools.pidversec + tools.appid + tools.mid + tools.userid)
+def getKey(hash_, user_info):
+    return utils.createMD5(hash_.lower() + tools.pidversec + tools.appid + user_info['mid'] + user_info['userid'])
