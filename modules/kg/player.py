@@ -47,7 +47,7 @@ async def url(songId, quality):
         'behavior': 'play',
         'clienttime': int(time.time()),
         'pid': 2,
-        'key': getKey(thash),
+        'key': getKey(thash, user_info),
         'dfid': '-',
         'pidversion': 3001
     }
