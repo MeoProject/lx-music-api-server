@@ -59,8 +59,8 @@ default = {
         "_fakeip-desc": "服务器在海外时的IP伪装值",
         "proxy": {
             "enable": False,
-            "http_addr": "http://127.0.0.1:7890",
-            "https_addr": "http://127.0.0.1:7890",
+            "http_value": "http://127.0.0.1:7890",
+            "https_value": "http://127.0.0.1:7890",
         },
         "_proxy-desc": "代理配置，HTTP与HTTPS协议需分开配置",
         "log_file": True,
