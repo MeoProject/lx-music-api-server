@@ -20,7 +20,7 @@ logger = log('lx_script')
 
 async def get_response(retry = 0):
     if (retry > 10):
-        raise Exception('请求源脚本内容失败')
+        logger.warning('请求源脚本内容失败')
     baseurl = 'https://raw.githubusercontent.com/lxmusics/lx-music-api-server/main/lx-music-source-example.js'
     try:
         if (iscn and (retry % 2) == 0):
@@ -39,7 +39,7 @@ async def get_script():
             f.close()
         logger.info('更新源脚本成功')
     else:
-        raise Exception('请求源脚本内容失败')
+        logger.warning('请求源脚本内容失败')
 
 async def generate_script_response(request):
     if (request.query.get('key') != config.read_config('security.key.value') and config.read_config('security.key.enable')):

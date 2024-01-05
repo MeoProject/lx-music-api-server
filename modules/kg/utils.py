@@ -21,9 +21,6 @@ tools = createObject({
     "x-router": config.read_config("module.kg.tracker.x-router"),
     "url": config.read_config("module.kg.tracker.host") + config.read_config("module.kg.tracker.path"),
     "version": config.read_config("module.kg.tracker.version"),
-    "userid": config.read_config("module.kg.user.userid"),
-    "token": config.read_config("module.kg.user.token"),
-    "mid": config.read_config("module.kg.user.mid"),
     "extra_params": config.read_config("module.kg.tracker.extra_params"),
     "appid": config.read_config("module.kg.client.appid"),
     'qualityHashMap': {

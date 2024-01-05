@@ -65,6 +65,8 @@ default = {
         "_proxy-desc": "代理配置，HTTP与HTTPS协议需分开配置",
         "log_file": True,
         "_log_file-desc": "是否开启日志文件",
+        'cookiepool': False,
+        '_cookiepool-desc': '是否开启cookie池，这将允许用户配置多个cookie并在请求时随机使用一个，启用后请在module.cookiepool中配置cookie，在user处配置的cookie会被忽略，cookiepool中格式统一为列表嵌套user处的cookie的字典',
         "allow_download_script": True,
         '_allow_download_script-desc': '是否允许直接从服务端下载脚本，开启后可以直接访问 /script?key=你的请求key 下载脚本',
         "download_config": {
@@ -174,14 +176,14 @@ default = {
                 "desc": "用户数据，可以通过浏览器获取，需要vip账号来获取会员歌曲，如果没有请留为空值，qqmusic_key可以从Cookie中/客户端的请求体中（comm.authst）获取",
                 "qqmusic_key": "",
                 "uin": "",
-                "_uin-desc": "key对应的QQ号"
+                "_uin-desc": "key对应的QQ号",
+                'refresh_login': {
+                    'desc': '刷新登录相关配置，enable是否启动，interval刷新间隔',
+                    'enable': False,
+                    'interval': 86000
+                }
             },
             "cdnaddr": "http://ws.stream.qqmusic.qq.com/",
-            'refresh_login': {
-                'desc': '刷新登录相关配置，enable是否启动，interval刷新间隔',
-                'enable': False,
-                'interval': 86000
-            }
         },
         "wy": {
             "desc": "网易云音乐相关配置",
@@ -197,8 +199,41 @@ default = {
                 "aversionid": "",
                 "token": "",
                 "osversion": "10",
-                "useragent": "Mozilla / 5.0 (Windows NT 10.0; Win64; x64) AppleWebKit / 537.36 (KHTML, like Gecko) Chrome / 89.0.4389.82 Safari / 537.36",
+                "useragent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.82 Safari/537.36",
             },
+        },
+        'cookiepool': {
+            'kg': [
+                {
+                    'userid': '0',
+                    'token': '',
+                    'mid': '114514',
+                },
+            ],
+            'tx': [
+                {
+                    'qqmusic_key': '',
+                    'uin': '',
+                    'refresh_login': {
+                        'desc': 'cookie池中对于此账号刷新登录的配置，账号间互不干扰',
+                        'enable': False,
+                        'interval': 86000,
+                    }
+                }
+            ],
+            'wy': [
+                {
+                    'cookie': '',
+                }
+            ],
+            'mg': [
+                {
+                    'aversionid': '',
+                    'token': '',
+                    'osversion': '10',
+                    'useragent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.82 Safari/537.36',
+                }
+            ],
         },
     },
 }
@@ -413,7 +448,7 @@ def write_config(key, value):
     current[keys[-1]] = value
     variable.config = config
     with open('config.json', 'w', encoding='utf-8') as f:
-        json.dump(config, f, indent=2, ensure_ascii=False)
+        json.dump(config, f, indent=2, ensure_ascii=False, escape_forward_slashes=False)
         f.close()
 
 def read_default_config(key):
@@ -511,7 +546,7 @@ def initConfig():
                     logger.warning('配置文件并不是一个有效的字典，使用默认值')
                     variable.config = default
                     with open("./config.json", "w", encoding="utf-8") as f:
-                        f.write(json.dumps(variable.config, indent=2, ensure_ascii=False))
+                        f.write(json.dumps(variable.config, indent=2, ensure_ascii=False, escape_forward_slashes=False))
                         f.close()
             except:
                 if os.path.getsize("./config.json") != 0:
@@ -552,11 +587,17 @@ value TEXT)''')
 
     logger.debug('数据库初始化成功')
 
-    # print
-    if (load_data() == {}):
+    # handle data
+    all_data_keys = {'banList': [], 'requestTime': {}, 'banListRaw': []}
+    data = load_data()
+    if (data == {}):
         write_data('banList', [])
         write_data('requestTime', {})
         logger.info('数据库内容为空，已写入默认值')
+    for k, v in all_data_keys.items():
+        if (k not in data):
+            write_data(k, v)
+            logger.info(f'数据库中不存在{k}，已创建')
 
     # 处理代理配置
     if (read_config('common.proxy.enable')):
@@ -567,6 +608,36 @@ value TEXT)''')
             os.environ['https_proxy'] = read_config('common.proxy.https_value')
             logger.info('HTTPS协议代理地址: ' + read_config('common.proxy.https_value'))
         logger.info('代理功能已开启，请确保代理地址正确，否则无法连接网络')
+
+    # cookie池
+    if (read_config('common.cookiepool')):
+        logger.info('已启用cookie池功能，请确定配置的cookie都能正确获取链接')
+        logger.info('传统的源 - 单用户cookie配置将被忽略')
+        logger.info('所以即使某个源你只有一个cookie，也请填写到cookiepool对应的源中，否则将无法使用该cookie')
+        variable.use_cookie_pool = True
+
+    # 移除已经过期的封禁数据
+    banlist = read_data('banList')
+    banlistRaw = read_data('banListRaw')
+    count = 0
+    for b in banlist:
+        if (b['expire'] and (time.time() > b['expire_time'])):
+            count += 1
+            banlist.remove(b)
+            if (b['ip'] in banlistRaw):
+                banlistRaw.remove(b['ip'])
+    write_data('banList', banlist)
+    write_data('banListRaw', banlistRaw)
+    if (count != 0):
+        logger.info(f'已移除{count}条过期封禁数据')
+
+    # 处理旧版数据库的banListRaw
+    banlist = read_data('banList')
+    banlistRaw = read_data('banListRaw')
+    if (banlist != [] and banlistRaw == []):
+        for b in banlist:
+            banlistRaw.append(b['ip'])
+    return 
 
 def ban_ip(ip_addr, ban_time=-1):
     if read_config('security.banlist.enable'):
@@ -586,20 +657,26 @@ def ban_ip(ip_addr, ban_time=-1):
 def check_ip_banned(ip_addr):
     if read_config('security.banlist.enable'):
         banList = read_data('banList')
-        for ban in banList:
-            if (ban['ip'] == ip_addr):
-                if (ban['expire']):
-                    if (ban['expire_time'] > int(time.time())):
-                        return True
+        banlistRaw = read_data('banListRaw')
+        if (ip_addr in banlistRaw):
+            for b in banList:
+                if (b['ip'] == ip_addr):
+                    if (b['expire']):
+                        if (b['expire_time'] > int(time.time())):
+                            return True
+                        else:
+                            banList.remove(b)
+                            banlistRaw.remove(b['ip'])
+                            write_data('banListRaw', banlistRaw)
+                            write_data('banList', banList)
+                            return False
                     else:
-                        banList.remove(ban)
-                        write_data('banList', banList)
-                        return False
+                        return True
                 else:
-                    return True
-            else:
-                return False
-        return False
+                    return False
+            return False
+        else:
+            return False
     else:
         if (variable.banList_suggest <= 10):
             variable.banList_suggest += 1

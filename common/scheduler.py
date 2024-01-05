@@ -21,11 +21,12 @@ global tasks
 tasks = []
 
 class taskWrapper:
-    def __init__(self, name, function, interval = 86400, latest_execute = 0):
+    def __init__(self, name, function, interval = 86400, args = {}, latest_execute = 0):
         self.function = function
         self.interval = interval
         self.name = name
         self.latest_execute = latest_execute
+        self.args = args
 
     def check_available(self):
         return (time.time() - self.latest_execute) >= self.interval
@@ -33,16 +34,16 @@ class taskWrapper:
     async def run(self):
         try:
             logger.info(f"task {self.name} run start")
-            await self.function()
+            await self.function(**self.args)
             logger.info(f'task {self.name} run success, next execute: {timestamp_format(self.interval + self.latest_execute)}')
         except Exception as e:
             logger.error(f"task {self.name} run failed, waiting for next execute...")
             logger.error(traceback.format_exc())
 
-def append(name, task, interval = 86400):
+def append(name, task, interval = 86400, args = {}):
     global tasks
+    wrapper = taskWrapper(name, task, interval, args)
     logger.debug(f"new task ({name}) registered")
-    wrapper = taskWrapper(name, task, interval)
     return tasks.append(wrapper)
 
 # 在 thread_runner 函数中修改循环逻辑
@@ -51,7 +52,7 @@ async def thread_runner():
     while not running_event.is_set():
         tasks_runner = []
         for t in tasks:
-            if t.check_available() and not running_event.is_set():
+            if (t.check_available() and not running_event.is_set()):
                 t.latest_execute = int(time.time())
                 tasks_runner.append(t.run())
         if (tasks_runner):
