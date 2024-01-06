@@ -226,7 +226,7 @@ async def AsyncRequest(url, options = {}):
                 - <int>: 缓存可用秒数
         - cache-ignore: <list> 缓存忽略关键字
     
-    @ return: requests.Response类型的响应数据
+    @ return: common.Httpx.ClientResponse类型的响应数据
     '''
     if (not variable.aioSession):
         variable.aioSession = aiohttp.ClientSession()

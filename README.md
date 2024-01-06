@@ -17,6 +17,8 @@
 
 **主开发是高一住校学生，只有周末有时间回复，也欢迎所有人来贡献代码，我们在这里万分感谢**
 
+**临近期末考试，更新会放缓，新功能请不要催得太紧**
+
 ## 部署方法
 
 ### poetry部署
@@ -97,6 +99,97 @@ docker inspect lx-music-api-server-python
 | 400  | 参数错误                           |
 | 429  | 请求过于频繁                       |
 | 500  | 服务器内部错误（对应 body.code 4） |
+
+## 备注
+
+### 本项目中可能会出现以下优秀代码
+
+1. 三角形具有稳定性
+```python
+for a in xxx:
+  if (xxx):
+    if (xxx):
+      if (xxx):
+        for b in xxx:
+          if (xxx):
+            while (xxx):
+              pass
+            pass
+          pass
+        pass
+      pass
+    pass
+  pass
+```
+
+2. 能一行写完那就坚决不多行
+```python
+sys.stdout.write('\r|'+'=' * (int(dd['pares'].index(ds) / total * 50)) + ' ' * (49 - int(dd['pares'].index(ds) / total * 50)) + f'''|{int(dd['pares'].index(ds) / total * 100)}%    xx''' + ds['title']+' ' * 20)
+```
+
+3. 不复用重复部分
+```python
+async def other(method, source, songid, _):
+    try:
+        func = require('modules.' + source + '.' + method)
+    except:
+        return {
+            'code': 1,
+            'msg': '未知的源或不支持的方法',
+            'data': None,
+        }
+    try:
+        result = await func(songid)
+        return {
+            'code': 0,
+            'msg': 'success',
+            'data': result
+        }
+    except FailedException as e:
+        return {
+            'code': 2,
+            'msg': e.args[0],
+            'data': None,
+        }
+
+async def other_with_query(method, source, t, _, query):
+    try:
+        func = require('modules.' + source + '.' + method)
+    except:
+        return {
+            'code': 1,
+            'msg': '未知的源或不支持的方法',
+            'data': None,
+        }
+    try:
+        result = await func(t, query)
+        return {
+            'code': 0,
+            'msg': 'success',
+            'data': result
+        }
+    except FailedException as e:
+        return {
+            'code': 2,
+            'msg': e.args[0],
+            'data': None,
+        }
+```
+
+4. 模块不拆分
+详见[config.py](https://github.com/lxmusics/lx-music-api-server-python/tree/main/common/config.py)
+
+5. 不明所以的变量名
+```python
+a = '小明'
+b = 1
+c = 2
+d = b''
+def e(a, b, c):
+  c = xxx
+  d = xxx
+f = e(c, b, a)
+```
 
 ## 项目协议
 
