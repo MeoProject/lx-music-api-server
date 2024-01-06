@@ -175,7 +175,10 @@ def sizeFormat(size):
         return f"{round(size / 1024**5, 2)}PB"
 
 def timeLengthFormat(t):
-    t = int(t)
+    try:
+        t = int(t)
+    except:
+        return '//'
     hour = t // 3600
     minute = (t % 3600) // 60
     second = t % 60

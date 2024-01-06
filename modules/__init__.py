@@ -160,6 +160,12 @@ async def lyric(source, songId, _):
             'data': None,
         }
 
+async def lyric_with_query(source, songId, thisvariableisnotuseful):
+    return await lyric(source, songId, None)
+
+async def url_with_query(source, songId, quality):
+    return await url(source, songId, quality)
+
 async def other(method, source, songid, _):
     try:
         func = require('modules.' + source + '.' + method)
@@ -171,6 +177,30 @@ async def other(method, source, songid, _):
         }
     try:
         result = await func(songid)
+        return {
+            'code': 0,
+            'msg': 'success',
+            'data': result
+        }
+    except FailedException as e:
+        return {
+            'code': 2,
+            'msg': e.args[0],
+            'data': None,
+        }
+
+async def other_with_query(method, source, t, _, query):
+    print(method)
+    try:
+        func = require('modules.' + source + '.' + method)
+    except:
+        return {
+            'code': 1,
+            'msg': '未知的源或不支持的方法',
+            'data': None,
+        }
+    try:
+        result = await func(t, query)
         return {
             'code': 0,
             'msg': 'success',

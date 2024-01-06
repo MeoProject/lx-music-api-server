@@ -119,10 +119,17 @@ async def handle(request):
         return handleResult({"code": 1, "msg": "lxm请求头验证失败", "data": None}, 403)
     
     try:
-        if (method in dir(modules)):
+        query = dict(request.query)
+        print(query)
+        if (method in dir(modules) and query == {}):
             return handleResult(await getattr(modules, method)(source, songId, quality))
+        elif ((method + '_with_query') in dir(modules) and query != {}):
+            return handleResult(await getattr(modules, method + '_with_query')(source, songId, quality, query))
         else:
-            return handleResult(await modules.other(method, source, songId, quality))
+            if (query == {}):
+                return handleResult(await modules.other(method, source, songId, quality))
+            else:
+                return handleResult(await modules.other_with_query(method, source, songId, quality, query))
     except:
         logger.error(traceback.format_exc())
         return handleResult({'code': 4, 'msg': '内部服务器错误', 'data': None}, 500)
