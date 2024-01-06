@@ -11,6 +11,7 @@ from .player import url
 from .musicInfo import getMusicInfo as _getInfo
 from .utils import formatSinger
 from .lyric import getLyric as _getLyric
+from .mv import getMvPlayURLandInfo as _getMvInfo
 from common import utils
 from . import refresh_login
 
@@ -79,3 +80,5 @@ async def info(songid):
 async def lyric(songId):
     return await _getLyric(songId)
 
+async def mv(vid):
+    return await _getMvInfo(vid)
