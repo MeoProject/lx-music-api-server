@@ -16,6 +16,7 @@ from .lyric import getLyric as _getLyric
 from .lyric import lyricSearchByHash as _lyricSearch
 from .mv import getMvInfo as _getMvInfo
 from .mv import getMvPlayURL as _getMvUrl
+from .search import getSongSearchResult as _songsearch
 from common.exceptions import FailedException
 from common import Httpx
 from common import utils
@@ -76,3 +77,9 @@ async def lyric(hash_):
     lyric_search_result = await _lyricSearch(hash_)
     choosed_lyric = lyric_search_result[0]
     return await _getLyric(choosed_lyric['id'], choosed_lyric['accesskey'])
+
+async def search(type, params):
+    if (type == 'song'):
+        return await _songsearch(**params)
+    else:
+        raise FailedException('暂不支持该类型搜索')
