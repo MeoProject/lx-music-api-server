@@ -190,7 +190,6 @@ async def other(method, source, songid, _):
         }
 
 async def other_with_query(method, source, t, _, query):
-    print(method)
     try:
         func = require('modules.' + source + '.' + method)
     except:
