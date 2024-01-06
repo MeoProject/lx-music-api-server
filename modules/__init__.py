@@ -211,3 +211,6 @@ async def other_with_query(method, source, t, _, query):
             'msg': e.args[0],
             'data': None,
         }
+
+async def info_with_query(source, songid, _, query):
+    return await other('info', source, songid, None)
