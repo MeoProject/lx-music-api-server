@@ -120,7 +120,6 @@ async def handle(request):
     
     try:
         query = dict(request.query)
-        print(query)
         if (method in dir(modules) and query == {}):
             return handleResult(await getattr(modules, method)(source, songId, quality))
         elif ((method + '_with_query') in dir(modules) and query != {}):
