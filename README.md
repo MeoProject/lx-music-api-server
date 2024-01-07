@@ -29,12 +29,18 @@
 pip install poetry
 ```
 
-2. 安装依赖
+2. clone本项目
+```bash
+git clone https://github.com/lxmusics/lx-music-api-server-python.git
+cd lx-music-api-server-python
+```
+
+3. 安装依赖
 ```bash
 poetry install
 ```
 
-3. 启动
+4. 启动
 ```bash
 poetry shell # 进入poetry环境
 python main.py # 运行项目
@@ -42,10 +48,10 @@ python main.py # 运行项目
 
 ### 直接部署
 
-环境要求：Python 3.6+, 建议Python 3.8+ 
-没有其他限制，能用 Python 理论上就能跑起来 
-flask版本即将停止支持，不建议使用 
-测试版本部署，linux 命令如果为 python3 请自行替换：
+环境要求：Python 3.6+, 建议Python 3.8+  
+没有其他限制，能用 Python 理论上就能跑起来  
+flask版本即将停止支持，不建议使用  
+测试版本部署，linux 命令如果为 python3 请自行替换：  
 
 ```bash
 git clone https://github.com/lxmusics/lx-music-api-server-python.git # clone本项目
