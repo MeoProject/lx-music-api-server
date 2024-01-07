@@ -55,6 +55,7 @@ flask版本即将停止支持，不建议使用
 
 ```bash
 git clone https://github.com/lxmusics/lx-music-api-server-python.git # clone本项目
+cd lx-music-api-server-python # 进入项目目录
 python -m pip install -r ./requirements.txt # 安装依赖
 python main.py # 启动服务
 ```
