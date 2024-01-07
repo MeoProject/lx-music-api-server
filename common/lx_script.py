@@ -25,7 +25,7 @@ jsd_mirror_list = [
     'https://jsd.cdn.zzko.cn',
     'https://jsdelivr.b-cdn.net',
 ]
-githun_raw_mirror_list = [
+github_raw_mirror_list = [
     'https://raw.githubusercontent.com',
     'https://mirror.ghproxy.com/https://raw.githubusercontent.com',
     'https://ghraw.gkcoll.xyz',
@@ -47,7 +47,7 @@ async def get_response(retry = 0):
         if (i < 5):
             req = await Httpx.AsyncRequest(jsd_mirror_list[retry] + jsdbaseurl)
         elif (i < 11):
-            req = await Httpx.AsyncRequest(githun_raw_mirror_list[retry - 5] + baseurl)
+            req = await Httpx.AsyncRequest(github_raw_mirror_list[retry - 5] + baseurl)
         if (not req.text.startswith('/*!')):
             logger.info('疑似请求到了无效的内容，忽略')
             raise Exception from None
