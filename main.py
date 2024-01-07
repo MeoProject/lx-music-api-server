@@ -11,7 +11,7 @@
 
 import sys
 
-if (sys.version_info.major < 3 or sys.version_info.minor < 6):
+if ((sys.version_info.major == 3 and sys.version_info.minor < 6) or sys.version_info.major == 2):
     print('Python版本过低，请使用Python 3.6+ ')
     sys.exit(1)
 
@@ -38,7 +38,7 @@ logger = log.log("main")
 aiologger = log.log('aiohttp_web')
 
 stopEvent = None
-if (sys.version_info.minor < 8):
+if (sys.version_info.minor < 8 and sys.version_info.major == 3):
     logger.warning('您使用的Python版本已经停止更新，不建议继续使用')
     import concurrent
     stopEvent = concurrent.futures._base.CancelledError
