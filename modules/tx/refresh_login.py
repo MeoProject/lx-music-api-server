@@ -101,7 +101,7 @@ async def refresh():
     else:
         logger.error('未知的qqmusic_key格式')
 
-if (config.read_config('module.tx.user.refresh_login.enable') and not variable.use_cookie_pool):
+if (config.read_config('module.tx.refresh_login.enable') and not variable.use_cookie_pool):
     # changed refresh login config path
     txconfig = config.read_config('module.tx')
     refresh_login_info = txconfig['refresh_login']
@@ -109,9 +109,9 @@ if (config.read_config('module.tx.user.refresh_login.enable') and not variable.u
     txconfig.pop('refresh_login')
     config.write_config('module.tx', txconfig)
 
+if (config.read_config('module.tx.user.refresh_login.enable') and not variable.use_cookie_pool):
     scheduler.append('qqmusic_refresh_login', refresh,
                      config.read_config('module.tx.user.refresh_login.interval'))
-
 
 async def refresh_login_for_pool(user_info):
     if (user_info['qqmusic_key'].startswith('W_X')):
