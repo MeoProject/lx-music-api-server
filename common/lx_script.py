@@ -61,7 +61,7 @@ async def get_response(retry = 0):
 async def get_script():
     req = await get_response()
     if (req.status == 200):
-        with open('./lx-music-source-example.js', 'w') as f:
+        with open('./lx-music-source-example.js', 'w', encoding='utf-8') as f:
             f.write(req.text)
             f.close()
         logger.info('更新源脚本成功')
