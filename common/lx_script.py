@@ -28,7 +28,7 @@ async def get_response(retry = 0):
             # req = await Httpx.AsyncRequest('https://mirror.ghproxy.com/' + baseurl)
             # `mirror.ghproxy.com` server is unstable to access in China,
             # Here provided a self built mirror site of `raw.githubusercontent.com`.
-            # It's drove by Vercel, and please use it low-key,
+            # It's drive by Vercel, and please use it low-key,
             # (It's the only one domain name I hold, I don't wish it been blocked by GFW)
             req = await Httpx.AsyncRequest(baseurl.replace('raw.githubusercontent.com', 'ghraw.gkcoll.xyz'))
         else:
