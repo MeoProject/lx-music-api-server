@@ -18,16 +18,39 @@ import re
 
 logger = log('lx_script')
 
+jsd_mirror_list = [
+    'https://cdn.jsdelivr.net',
+    'https://gcore.jsdelivr.net',
+    'https://fastly.jsdelivr.net',
+    'https://jsd.cdn.zzko.cn',
+    'https://jsdelivr.b-cdn.net',
+]
+githun_raw_mirror_list = [
+    'https://raw.githubusercontent.com',
+    'https://mirror.ghproxy.com/https://raw.githubusercontent.com',
+    'https://ghraw.gkcoll.xyz',
+    'https://raw.fgit.mxtrans.net',
+    'https://github.moeyy.xyz/https://raw.githubusercontent.com',
+    'https://raw.fgit.cf',
+]
+
 async def get_response(retry = 0):
-    if (retry > 10):
+    if (retry > 21):
         logger.warning('请求源脚本内容失败')
         return
-    baseurl = 'https://raw.githubusercontent.com/lxmusics/lx-music-api-server/main/lx-music-source-example.js'
+    baseurl = '/lxmusics/lx-music-api-server/main/lx-music-source-example.js'
+    jsdbaseurl = '/gh/lxmusics/lx-music-api-server@main/lx-music-source-example.js'
     try:
-        if (iscn and (retry % 2) == 0):
-            req = await Httpx.AsyncRequest('https://mirror.ghproxy.com/' + baseurl)
-        else:
-            req = await Httpx.AsyncRequest(baseurl)
+        i = retry
+        if (i > 10):
+            i = i - 11
+        if (i < 5):
+            req = await Httpx.AsyncRequest(jsd_mirror_list[retry] + jsdbaseurl)
+        elif (i < 11):
+            req = await Httpx.AsyncRequest(githun_raw_mirror_list[retry - 5] + baseurl)
+        if (not req.text.startswith('/*!')):
+            logger.info('疑似请求到了无效的内容，忽略')
+            raise Exception from None
     except Exception as e:
         if (isinstance(e, RuntimeError)):
             if ('Session is closed' in str(e)):
@@ -35,7 +58,6 @@ async def get_response(retry = 0):
                 return
         return await get_response(retry + 1)
     return req
-
 async def get_script():
     req = await get_response()
     if (req.status == 200):
