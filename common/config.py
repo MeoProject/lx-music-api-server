@@ -49,8 +49,18 @@ default = {
     "common": {
         "host": "0.0.0.0",
         "_host-desc": "服务器启动时所使用的HOST地址",
-        "port": "9763",
-        "_port-desc": "服务器启动时所使用的端口",
+        "ports": [ 9763 ],
+        "_ports-desc": "服务器启动时所使用的端口",
+        "ssl_info": {
+            "desc": "服务器https配置",
+            "enable": False,
+            "ssl_ports": [ 443 ],
+            "path": {
+                "desc": "ssl证书的文件地址",
+                "cert": "/path/to/your/cer",
+                "privkey": "/path/to/your/private/key",
+            },
+        },
         "debug_mode": False,
         "_debug_mode-desc": "是否开启调试模式",
         "log_length_limit": 500,
@@ -83,7 +93,7 @@ default = {
                 "wy": ["128k"],
                 "mg": ["128k"],
             }
-        }
+        },
     },
     "security": {
         "rate_limit": {
