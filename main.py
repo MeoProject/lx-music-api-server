@@ -150,17 +150,51 @@ if (config.read_config('common.allow_download_script')):
 # 404
 app.router.add_route('*', '/{tail:.*}', handle_404)
 
-
 async def run_app():
     while True:
         try:
             host = config.read_config('common.host')
-            port = int(config.read_config('common.port'))
-            runner = aiohttp.web.AppRunner(app)
-            await runner.setup()
-            site = aiohttp.web.TCPSite(runner, host, port)
-            await site.start()
-            logger.info(f"监听 -> http://{host}:{port}")
+            ports = [int(port) for port in config.read_config('common.ports')]
+            ssl_ports = [int(port) for port in config.read_config('common.ssl_info.ssl_ports')]
+            
+            final_ssl_ports = []
+            final_ports = []
+            for p in ports:
+                if (p not in ssl_ports):
+                    final_ports.append(p)
+                else:
+                    final_ssl_ports.append(p)
+            # 读取证书和私钥路径
+            cert_path = config.read_config('common.ssl_info.path.cert')
+            privkey_path = config.read_config('common.ssl_info.path.privkey')
+
+            # 创建 HTTP AppRunner
+            http_runner = aiohttp.web.AppRunner(app)
+            await http_runner.setup()
+
+            # 启动 HTTP 端口监听
+            for port in final_ports:
+                http_site = aiohttp.web.TCPSite(http_runner, host, port)
+                await http_site.start()
+                logger.info(f"监听 -> http://{host}:{port}")
+
+            if (config.read_config("common.ssl_info.enable") and final_ssl_ports != []):
+                if (os.path.exists(cert_path) and os.path.exists(privkey_path)):
+                    import ssl
+                    # 创建 SSL 上下文，加载配置文件中指定的证书和私钥
+                    ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+                    ssl_context.load_cert_chain(cert_path, privkey_path)
+
+                    # 创建 HTTPS AppRunner
+                    https_runner = aiohttp.web.AppRunner(app)
+                    await https_runner.setup()
+
+                    # 启动 HTTPS 端口监听
+                    for port in ssl_ports:
+                        https_site = aiohttp.web.TCPSite(https_runner, host, port, ssl_context=ssl_context)
+                        await https_site.start()
+                        logger.info(f"监听 -> https://{host}:{port}")
+
             return
         except OSError as e:
             if str(e).startswith("[Errno 98]"):
@@ -168,6 +202,9 @@ async def run_app():
                 logger.info('服务器将在10s后再次尝试启动...')
                 await asyncio.sleep(10)
                 logger.info('重新尝试启动...')
+            else:
+                raise
+
 
 async def initMain():
     await scheduler.run()
