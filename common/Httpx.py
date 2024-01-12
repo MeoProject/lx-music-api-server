@@ -229,7 +229,7 @@ async def AsyncRequest(url, options = {}):
     @ return: common.Httpx.ClientResponse类型的响应数据
     '''
     if (not variable.aioSession):
-        variable.aioSession = aiohttp.ClientSession()
+        variable.aioSession = aiohttp.ClientSession(trust_env=True)
     # 缓存读取
     cache_key = f'{url}{options}'
     if (isinstance(options.get('cache-ignore'), list)):
