@@ -208,7 +208,7 @@ async def run_app():
 
 async def initMain():
     await scheduler.run()
-    variable.aioSession = aiohttp.ClientSession()
+    variable.aioSession = aiohttp.ClientSession(trust_env=True)
     try:
         await run_app()
         logger.info("服务器启动成功，请按下Ctrl + C停止")
