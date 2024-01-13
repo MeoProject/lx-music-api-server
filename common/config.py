@@ -62,6 +62,17 @@ default = {
                 "privkey": "/path/to/your/private/key",
             },
         },
+        "reverse_proxy": {
+            "desc": "针对类似于nginx一类的反代的配置",
+            "allow_proxy": True,
+            "_allow_proxy-desc": "是否允许反代",
+            "proxy_whitelist_remote": [
+                "反代时允许的ip来源列表，通常为127.0.0.1",
+                "127.0.0.1"
+            ],
+            "real_ip_header": 'X-Real-IP',
+            "_real_ip_header-desc": "反代来源ip的来源头，不懂请保持默认",
+        },
         "debug_mode": False,
         "_debug_mode-desc": "是否开启调试模式",
         "log_length_limit": 500,

@@ -32,7 +32,7 @@ import aiohttp
 import time
 import os
 
-def handleResult(dic, status = 200):
+def handleResult(dic, status = 200) -> Response:
     return Response(body = json.dumps(dic, indent=2, ensure_ascii=False), content_type='application/json', status = status)
 
 logger = log.log("main")
@@ -46,16 +46,22 @@ if (sys.version_info.minor < 8 and sys.version_info.major == 3):
 else:
     stopEvent = asyncio.exceptions.CancelledError
 
-def start_checkcn_thread():
+def start_checkcn_thread() -> None:
     threading.Thread(target=Httpx.checkcn).start()
 
 # check request info before start
 async def handle_before_request(app, handler):
     async def handle_request(request):
         try:
-            # nginx proxy header
-            if (request.headers.get("X-Real-IP")):
-                request.remote_addr = request.headers.get("X-Real-IP")
+            if (config.read_config('common.reverse_proxy.enable')):
+                if (request.headers.get(config.read_config('common.reverse_proxy.real_ip_header'))):
+                    # proxy header
+                    if (request.remote in config.read_config('common.reverse_proxy.proxy_whitelist_remote')):
+                        request.remote_addr = request.headers.get(config.read_config('common.reverse_proxy.real_ip_header'))
+                    else:
+                        return handleResult({"code": 1, "msg": "反代客户端远程地址不在反代ip白名单中", "data": None}, 403)
+                else:
+                    request.remote_addr = request.remote
             else:
                 request.remote_addr = request.remote
             # check ip
@@ -91,7 +97,7 @@ async def handle_before_request(app, handler):
                 resp = handleResult(resp)
             elif (not isinstance(resp, Response)):
                 resp = Response(body = str(resp), content_type='text/plain', status = 200)
-            aiologger.info(f'{request.remote_addr} - {request.method} "{request.path}", {resp.status}')
+            aiologger.info(f'{request.remote_addr + "" if (request.remote == request.remote_addr) else f"|proxy@{request.remote}"} - {request.method} "{request.path}", {resp.status}')
             return resp
         except: 
             logger.error(traceback.format_exc())
