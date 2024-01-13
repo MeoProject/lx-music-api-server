@@ -76,8 +76,8 @@ def _404(_):
 @app.before_request
 def check():
     # nginx proxy header
-    if (request.headers.get("X-Real-IP")):
-        request.remote_addr = request.headers.get("X-Real-IP")
+    if (request.headers.get(config.read_config("security.get_ip_header"))):
+        request.remote_addr = request.headers.get(config.read_config("security.get_ip_header"))
     # check ip
     if (config.check_ip_banned(request.remote_addr)):
         return handleResult({"code": 1, "msg": "您的IP已被封禁", "data": None}), 403

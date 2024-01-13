@@ -53,8 +53,8 @@ async def handle_before_request(app, handler):
     async def handle_request(request):
         try:
             # nginx proxy header
-            if (request.headers.get("X-Real-IP")):
-                request.remote_addr = request.headers.get("X-Real-IP")
+            if (request.headers.get(config.read_config("security.get_ip_header"))):
+                request.remote_addr = request.headers.get(config.read_config("security.get_ip_header"))
             else:
                 request.remote_addr = request.remote
             # check ip
