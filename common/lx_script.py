@@ -79,6 +79,7 @@ async def generate_script_response(request):
     scriptLines = script.split('\n')
     newScriptLines = []
     for line in scriptLines:
+        oline = line
         line = line.strip()
         if (line.startswith('const API_URL')):
             newScriptLines.append(f'const API_URL = "{request.scheme}://{request.host}"')
@@ -95,14 +96,17 @@ async def generate_script_response(request):
         elif (line.startswith("const DEV_ENABLE ")):
             newScriptLines.append("const DEV_ENABLE = " + str(config.read_config("common.download_config.dev")).lower())
         else:
-            newScriptLines.append(line)
+            newScriptLines.append(oline)
     r = '\n'.join(newScriptLines)
     
     r = re.sub(r'const MUSIC_QUALITY = {[^}]+}', f'const MUSIC_QUALITY = JSON.parse(\'{json.dumps(config.read_config("common.download_config.quality"))}\')', r)
 
     return Response(text = r, content_type = 'text/javascript',
                     headers = {
-                        'Content-Disposition': 'attachment; filename=lx-music-source.js'
+                        'Content-Disposition': f'attachment; filename={
+                            config.read_config("common.download_config.filename")
+                            if config.read_config("common.download_config.filename").endswith(".js")
+                            else (config.read_config("common.download_config.filename" + ".js"))}'
                     })
 
 if (config.read_config('common.allow_download_script')):
