@@ -53,7 +53,7 @@ def start_checkcn_thread() -> None:
 async def handle_before_request(app, handler):
     async def handle_request(request):
         try:
-            if (config.read_config('common.reverse_proxy.enable')):
+            if (config.read_config('common.reverse_proxy.allow_proxy')):
                 if (request.headers.get(config.read_config('common.reverse_proxy.real_ip_header'))):
                     # proxy header
                     if (request.remote in config.read_config('common.reverse_proxy.proxy_whitelist_remote')):
