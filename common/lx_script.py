@@ -82,7 +82,7 @@ async def generate_script_response(request):
         oline = line
         line = line.strip()
         if (line.startswith('const API_URL')):
-            newScriptLines.append(f'const API_URL = "{request.scheme}://{request.host}"')
+            newScriptLines.append(f'''const API_URL = "{'https' if config.read_config('common.ssl_info.is_https') else 'http'}://{request.host}"''')
         elif (line.startswith('const API_KEY')):
             newScriptLines.append(f'const API_KEY = "{config.read_config("security.key.value")}"')
         elif (line.startswith("* @name")):
@@ -103,10 +103,10 @@ async def generate_script_response(request):
 
     return Response(text = r, content_type = 'text/javascript',
                     headers = {
-                        'Content-Disposition': f'attachment; filename={
+                        'Content-Disposition': f'''attachment; filename={
                             config.read_config("common.download_config.filename")
                             if config.read_config("common.download_config.filename").endswith(".js")
-                            else (config.read_config("common.download_config.filename" + ".js"))}'
+                            else (config.read_config("common.download_config.filename" + ".js"))}'''
                     })
 
 if (config.read_config('common.allow_download_script')):

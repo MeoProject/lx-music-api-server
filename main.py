@@ -30,6 +30,7 @@ import modules
 import asyncio
 import aiohttp
 import time
+import os
 
 def handleResult(dic, status = 200):
     return Response(body = json.dumps(dic, indent=2, ensure_ascii=False), content_type='application/json', status = status)
