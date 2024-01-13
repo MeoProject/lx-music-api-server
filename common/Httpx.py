@@ -8,7 +8,6 @@
 # This file is part of the "lx-music-api-server" project.
 
 import aiohttp
-# import asyncio
 import requests
 import random
 import traceback
@@ -22,7 +21,7 @@ from . import config
 from . import utils
 from . import variable
 
-def is_valid_utf8(text):
+def is_valid_utf8(text) -> bool:
     try:
         if isinstance(text, bytes):
             text = text.decode('utf-8')
@@ -38,16 +37,16 @@ def is_valid_utf8(text):
         logger.error(traceback.format_exc())
         return False
 
-def is_plain_text(text):
+def is_plain_text(text) -> bool:
     # 判断是否为纯文本
     pattern = re.compile(r'[^\x00-\x7F]')
     return not bool(pattern.search(text))
 
-def convert_dict_to_form_string(dic):
+def convert_dict_to_form_string(dic: dict) -> str:
     # 将字典转换为表单字符串
     return '&'.join([f'{k}={v}' for k, v in dic.items()])
 
-def log_plaintext(text):
+def log_plaintext(text: str) -> str:
     if (text.startswith('{') and text.endswith('}')):
         try:
             text = json.loads(text)
@@ -72,7 +71,7 @@ ua_list = [ 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gec
 # 日志记录器
 logger = log.log('http_utils')
 
-def request(url, options = {}):
+def request(url: str, options = {}) -> requests.Response:
     '''
     Http请求主函数, 用于发送网络请求
     - url: 需要请求的URL地址(必填)
@@ -205,14 +204,14 @@ class ClientResponse:
         return json.loads(self.content)
 
 
-async def convert_to_requests_response(aiohttp_response):
+async def convert_to_requests_response(aiohttp_response) -> ClientResponse:
     content = await aiohttp_response.content.read()  # 从aiohttp响应中读取字节数据
     status_code = aiohttp_response.status  # 获取状态码
     headers = dict(aiohttp_response.headers.items())  # 获取标头信息并转换为字典
     
     return ClientResponse(status_code, content, headers)
 
-async def AsyncRequest(url, options = {}):
+async def AsyncRequest(url, options = {}) -> ClientResponse:
     '''
     Http异步请求主函数, 用于发送网络请求
     - url: 需要请求的URL地址(必填)
