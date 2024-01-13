@@ -55,12 +55,12 @@ async def url(songId, quality):
             body = req.json()
             data = body['data']
 
-            if (body['code'] != 200) or (data['audioInfo']['bitrate'] == 1):
+            if (body['code'] != 200) or (int(data['audioInfo']['bitrate']) == 1):
                 raise FailedException('failed')
 
             return {
                 'url': data['url'].split('?')[0],
-                'quality': tools['qualityMapReverse'][data['audioInfo']['bitrate']]
+                'quality': tools['qualityMapReverse'][int(data['audioInfo']['bitrate'])]
             }
         except:
             raise FailedException('failed')
