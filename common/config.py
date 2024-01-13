@@ -226,6 +226,31 @@ default = {
                 "useragent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.82 Safari/537.36",
             },
         },
+        "kw": {
+            "desc": "酷我音乐相关配置，proto支持值：['bd-api', 'kuwodes']",
+            "proto": "bd-api",
+            "user": {
+                "uid": "0",
+                "token": "",
+                "device_id": "0",
+            },
+            "des": {
+                "desc": "kuwodes接口（mobi, nmobi）一类的加密相关配置",
+                "f": "kuwo",
+                "need_encrypt": True,
+                "param填写注释": "{songId}为歌曲id, {map_quality}为map后的歌曲音质（酷我规范）, {raw_quality}为请求时的歌曲音质（LX规范）, {ext}为歌曲文件扩展名",
+                "params": "type=convert_url_with_sign&rid={songId}&quality={map_quality}&ext={ext}",
+                "host": "nmobi.kuwo.cn",
+                "path": "mobi.s",
+                "response_types": ['这里是reponse_type的所有支持值，当设置为json时会使用到下面的两个值来获取url/bitrate，如果为text，则为传统的逐行解析方式', 'json', 'text'],
+                "response_type": "json",
+                "url_json_path": "data.url",
+                "bitrate_json_path": "data.bitrate",
+                "headers": {
+                    "User-Agent": 'okhttp/3.10.0'
+                }
+            }
+        },
         'cookiepool': {
             'kg': [
                 {
@@ -258,6 +283,13 @@ default = {
                     'useragent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.82 Safari/537.36',
                 }
             ],
+            'kw': [
+                {
+                    "uid": "0",
+                    "token": "",
+                    "device_id": "0",
+                },
+            ]
         },
     },
 }
@@ -457,6 +489,7 @@ def push_to_list(key, obj):
 
     save_data(config)
 
+
 def write_config(key, value):
     config = None
     with open('config.json', 'r', encoding='utf-8') as f:
@@ -472,8 +505,10 @@ def write_config(key, value):
     current[keys[-1]] = value
     variable.config = config
     with open('config.json', 'w', encoding='utf-8') as f:
-        json.dump(config, f, indent=2, ensure_ascii=False, escape_forward_slashes=False)
+        json.dump(config, f, indent=2, ensure_ascii=False,
+                  escape_forward_slashes=False)
         f.close()
+
 
 def read_default_config(key):
     try:
@@ -495,6 +530,7 @@ def read_default_config(key):
     except:
         return None
 
+
 def _read_config(key):
     try:
         config = variable.config
@@ -514,6 +550,7 @@ def _read_config(key):
         return value
     except (KeyError, TypeError):
         return None
+
 
 def read_config(key):
     try:
@@ -561,6 +598,7 @@ def write_data(key, value):
 
     save_data(config)
 
+
 def initConfig():
     try:
         with open("./config.json", "r", encoding="utf-8") as f:
@@ -570,7 +608,8 @@ def initConfig():
                     logger.warning('配置文件并不是一个有效的字典，使用默认值')
                     variable.config = default
                     with open("./config.json", "w", encoding="utf-8") as f:
-                        f.write(json.dumps(variable.config, indent=2, ensure_ascii=False, escape_forward_slashes=False))
+                        f.write(json.dumps(variable.config, indent=2,
+                                ensure_ascii=False, escape_forward_slashes=False))
                         f.close()
             except:
                 if os.path.getsize("./config.json") != 0:
@@ -627,10 +666,12 @@ value TEXT)''')
     if (read_config('common.proxy.enable')):
         if (read_config('common.proxy.http_value')):
             os.environ['http_proxy'] = read_config('common.proxy.http_value')
-            logger.info('HTTP协议代理地址: ' + read_config('common.proxy.http_value'))
+            logger.info('HTTP协议代理地址: ' +
+                        read_config('common.proxy.http_value'))
         if (read_config('common.proxy.https_value')):
             os.environ['https_proxy'] = read_config('common.proxy.https_value')
-            logger.info('HTTPS协议代理地址: ' + read_config('common.proxy.https_value'))
+            logger.info('HTTPS协议代理地址: ' +
+                        read_config('common.proxy.https_value'))
         logger.info('代理功能已开启，请确保代理地址正确，否则无法连接网络')
 
     # cookie池
@@ -661,7 +702,8 @@ value TEXT)''')
     if (banlist != [] and banlistRaw == []):
         for b in banlist:
             banlistRaw.append(b['ip'])
-    return 
+    return
+
 
 def ban_ip(ip_addr, ban_time=-1):
     if read_config('security.banlist.enable'):
