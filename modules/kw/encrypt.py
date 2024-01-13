@@ -1,7 +1,7 @@
 # ----------------------------------------
 # - mode: python - 
 # - author: helloplhm-qwq - 
-# - name: kwdes.py - 
+# - name: encrypt.py - 
 # - project: lx-music-api-server - 
 # - license: MIT - 
 # ----------------------------------------

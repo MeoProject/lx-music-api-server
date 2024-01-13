@@ -52,7 +52,8 @@ default = {
         "ports": [ 9763 ],
         "_ports-desc": "服务器启动时所使用的端口",
         "ssl_info": {
-            "desc": "服务器https配置",
+            "desc": "服务器https配置，is_https是这个服务器是否是https服务器，如果你使用了反向代理来转发这个服务器，如果它使用了https，也请将它设置为true",
+            "is_https": False,
             "enable": False,
             "ssl_ports": [ 443 ],
             "path": {
@@ -85,9 +86,11 @@ default = {
             "intro": "修改为你的源脚本描述",
             "author": "修改为你的源脚本作者",
             "version": "修改为你的源版本",
+            "filename": "lx-music-source.js",
+            "_filename-desc": "客户端保存脚本时的文件名（可能因浏览器不同出现不一样的情况）",
             "dev": True,
             "quality": {
-                "kw": ["128k", "320k", "flac"],
+                "kw": ["128k"],
                 "kg": ["128k"],
                 "tx": ["128k"],
                 "wy": ["128k"],
