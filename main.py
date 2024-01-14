@@ -97,7 +97,7 @@ async def handle_before_request(app, handler):
                 resp = handleResult(resp)
             elif (not isinstance(resp, Response)):
                 resp = Response(body = str(resp), content_type='text/plain', status = 200)
-            aiologger.info(f'{request.remote_addr + "" if (request.remote == request.remote_addr) else f"|proxy@{request.remote}"} - {request.method} "{request.path}", {resp.status}')
+            aiologger.info(f'{request.remote_addr + ("" if (request.remote == request.remote_addr) else f"|proxy@{request.remote}")} - {request.method} "{request.path}", {resp.status}')
             return resp
         except: 
             logger.error(traceback.format_exc())
