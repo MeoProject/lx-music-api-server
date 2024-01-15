@@ -9,7 +9,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.8"
 aiohttp = "^3.9.1"
-pycryptodome = "^3.19.0"
+pycryptodome = "^3.20.0"
 ujson = "^5.9.0"
 requests = "^2.31.0"
 colorlog = "^6.8.0"
