@@ -366,7 +366,6 @@ def getCache(module, key):
                        (module, key))
 
         result = cursor.fetchone()
-        print(result)
         if result:
             cache_data = json.loads(result[0])
             cache_data["time"] = int(cache_data["time"])
@@ -391,7 +390,6 @@ def updateCache(module, key, data):
         cursor.execute(
             "SELECT data FROM cache WHERE module=? AND key=?", (module, key))
         result = cursor.fetchone()
-        print(data)
         if result:
             cursor.execute(
                 "UPDATE cache SET data = ? WHERE module = ? AND key = ?", (json.dumps(data), module, key))
