@@ -59,7 +59,9 @@ def formatSubResult(l):
         })
     return res
 
-async def getSongSearchResult(query, page, size):
+async def getSongSearchResult(query, page = 1, size = 20):
+    page = int(page)
+    size = int(size)
     req = await Httpx.AsyncRequest(utils.encodeURI(f'https://songsearch.kugou.com/song_search_v2?' + buildRequestParams({
         "keyword": query,
         "page": page,
