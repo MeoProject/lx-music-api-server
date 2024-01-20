@@ -127,15 +127,10 @@ async def handle(request):
     
     try:
         query = dict(request.query)
-        if (method in dir(modules) and query == {}):
-            return handleResult(await getattr(modules, method)(source, songId, quality))
-        elif ((method + '_with_query') in dir(modules) and query != {}):
-            return handleResult(await getattr(modules, method + '_with_query')(source, songId, quality, query))
+        if (method in dir(modules)):
+            return handleResult(await getattr(modules, method)(source, songId, quality, query))
         else:
-            if (query == {}):
-                return handleResult(await modules.other(method, source, songId, quality))
-            else:
-                return handleResult(await modules.other_with_query(method, source, songId, quality, query))
+            return handleResult(await modules.other(source, songId, quality, query))
     except:
         logger.error(traceback.format_exc())
         return handleResult({'code': 4, 'msg': '内部服务器错误', 'data': None}, 500)

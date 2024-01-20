@@ -47,14 +47,17 @@ sourceExpirationTime = {
 }
 
 
-async def url(source, songId, quality):
+async def url(source, songId, quality, query):
     if (not quality):
         return {
             'code': 2,
             'msg': '需要参数"quality"',
             'data': None,
         }
-
+    
+    if (source == "kg"):
+        songId = songId.lower()
+    
     try:
         cache = config.getCache('urls', f'{source}_{songId}_{quality}')
         if cache:
@@ -124,7 +127,7 @@ async def url(source, songId, quality):
             'data': None,
         }
 
-async def lyric(source, songId, _):
+async def lyric(source, songId, _, query):
     cache = config.getCache('lyric', f'{source}_{songId}')
     if cache:
         return {
@@ -160,15 +163,9 @@ async def lyric(source, songId, _):
             'data': None,
         }
 
-async def lyric_with_query(source, songId, thisvariableisnotuseful):
-    return await lyric(source, songId, None)
-
-async def url_with_query(source, songId, quality):
-    return await url(source, songId, quality)
-
-async def other(method, source, songid, _):
+async def search(source, songid, _, query):
     try:
-        func = require('modules.' + source + '.' + method)
+        func = require('modules.' + source + '.search')
     except:
         return {
             'code': 1,
@@ -176,7 +173,7 @@ async def other(method, source, songid, _):
             'data': None,
         }
     try:
-        result = await func(songid)
+        result = await func(songid, query)
         return {
             'code': 0,
             'msg': 'success',
@@ -189,7 +186,7 @@ async def other(method, source, songid, _):
             'data': None,
         }
 
-async def other_with_query(method, source, t, _, query):
+async def other(method, source, songid, _, query):
     try:
         func = require('modules.' + source + '.' + method)
     except:
@@ -199,7 +196,7 @@ async def other_with_query(method, source, t, _, query):
             'data': None,
         }
     try:
-        result = await func(t, query)
+        result = await func(songid)
         return {
             'code': 0,
             'msg': 'success',
