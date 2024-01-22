@@ -21,68 +21,110 @@
 
 ## 部署方法
 
-### poetry部署
+### Poetry 部署
 
 环境要求: Python 3.8+
-1. 安装 poetry 
-```bash
-pip install poetry
-```
 
-2. clone本项目
-```bash
-git clone https://github.com/lxmusics/lx-music-api-server-python.git
-cd lx-music-api-server-python
-```
+1. 安装 poetry
+
+    ```bash
+    pip install poetry
+    ```
+
+2. clone本项目并进入项目目录
+
+    ```bash
+    git clone https://github.com/lxmusics/lx-music-api-server-python.git
+    cd lx-music-api-server-python
+    ```
 
 3. 安装依赖
-```bash
-poetry install
-```
+
+    ```bash
+    poetry install
+    ```
 
 4. 启动
-```bash
-poetry shell # 进入poetry环境
-python main.py # 运行项目
-```
+
+    ```bash
+    poetry shell # 进入poetry环境
+    python main.py # 运行项目
+    ```
+
+---
 
 ### 直接部署
 
-环境要求：Python 3.6+, 建议Python 3.8+  
+环境要求：Python 3.6 - 3.11, 建议Python 3.8+  
+
+Python 3.12 及以上会装不上依赖
 没有其他限制，能用 Python 理论上就能跑起来  
-flask版本即将停止支持，不建议使用  
-测试版本部署，linux 命令如果为 python3 请自行替换：  
+linux 命令如果为 python3 请自行替换  
 
-```bash
-git clone https://github.com/lxmusics/lx-music-api-server-python.git # clone本项目
-cd lx-music-api-server-python # 进入项目目录
-python -m pip install -r ./requirements.txt # 安装依赖
-python main.py # 启动服务
-```
+1. clone本项目并进入项目目录
 
-对于 release 的部署和上方类似，这里不再赘述
+    ```bash
+    git clone https://github.com/lxmusics/lx-music-api-server-python.git
+    cd lx-music-api-server-python
+    ```
+
+2. 安装依赖
+
+    ```bash
+    python -m pip install -r ./requirements.txt
+    ```
+
+3. 启动
+
+    ```bash
+    python main.py
+    ```
+
+---
 
 ### Docker 部署
 
 环境要求：Docker
 
-**该方法未经测试，不知道需要的 Docker 版本，可以自己尝试现有的 Docker 版本是否可以使用**
+该方法**未经测试**，不知道需要的 Docker 版本，可以自己尝试现有的 Docker 版本是否可以使用
 
-```bash
-# 更新软件包
-sudo apt-get update
+1. 更新软件包
 
-# 安装Docker，已有跳过
-sudo apt-get install -y docker.io
+    ```bash
+    sudo apt-get update
+    ```
 
-# 创建容器
-docker run  --name lx-music-api-server-python -p 9763:9763 -d ikun0014/lx-music-api-server-python:latest
+2. 安装Docker，已有跳过
 
-# 获取容器目录
-docker inspect lx-music-api-server-python
-```
+    ```bash
+    sudo apt-get install -y docker.io
+    ```
 
-**配置文件填写需要到容器目录里的 /app 目录填写 config.json**
+3. 创建容器
+
+    ```bash
+    docker run  --name lx-music-api-server-python -p 9763:9763 -d ikun0014/lx-music-api-server-python:latest
+    ```
+
+4. 获取容器目录
+
+    ```bash
+    docker inspect lx-music-api-server-python
+    ```
+
+5. 到容器目录里的 `/app` 目录填写 `config.json`
+
+---
+
+### Release 部署
+
+1. 从 [Releases](https://github.com/lxmusics/lx-music-api-server-python/releases)
+   或 [Actions](https://github.com/lxmusics/lx-music-api-server-python/actions)
+   下载对应你系统的可执行文件 (从 GitHub Actions 下载需要登录 GitHub 账号)
+
+2. 将下载的文件解压
+
+3. 运行解压后的可执行文件
 
 ## 返回码说明
 
@@ -112,91 +154,96 @@ docker inspect lx-music-api-server-python
 ### 本项目中可能会出现以下优秀代码
 
 1. 三角形具有稳定性
-```python
-for a in xxx:
-  if (xxx):
-    if (xxx):
+
+    ```python
+    for a in xxx:
       if (xxx):
-        for b in xxx:
+        if (xxx):
           if (xxx):
-            while (xxx):
+            for b in xxx:
+              if (xxx):
+                while (xxx):
+                  pass
+                pass
               pass
             pass
           pass
         pass
       pass
-    pass
-  pass
-```
+    ```
 
 2. 能一行写完那就坚决不多行
-```python
-sys.stdout.write('\r|'+'=' * (int(dd['pares'].index(ds) / total * 50)) + ' ' * (49 - int(dd['pares'].index(ds) / total * 50)) + f'''|{int(dd['pares'].index(ds) / total * 100)}%    xx''' + ds['title']+' ' * 20)
-```
+
+    ```python
+    sys.stdout.write('\r|'+'=' * (int(dd['pares'].index(ds) / total * 50)) + ' ' * (49 - int(dd['pares'].index(ds) / total * 50)) + f'''|{int(dd['pares'].index(ds) / total * 100)}%    xx''' + ds['title']+' ' * 20)
+    ```
 
 3. 不复用重复部分
-```python
-async def other(method, source, songid, _):
-    try:
-        func = require('modules.' + source + '.' + method)
-    except:
-        return {
-            'code': 1,
-            'msg': '未知的源或不支持的方法',
-            'data': None,
-        }
-    try:
-        result = await func(songid)
-        return {
-            'code': 0,
-            'msg': 'success',
-            'data': result
-        }
-    except FailedException as e:
-        return {
-            'code': 2,
-            'msg': e.args[0],
-            'data': None,
-        }
 
-async def other_with_query(method, source, t, _, query):
-    try:
-        func = require('modules.' + source + '.' + method)
-    except:
-        return {
-            'code': 1,
-            'msg': '未知的源或不支持的方法',
-            'data': None,
-        }
-    try:
-        result = await func(t, query)
-        return {
-            'code': 0,
-            'msg': 'success',
-            'data': result
-        }
-    except FailedException as e:
-        return {
-            'code': 2,
-            'msg': e.args[0],
-            'data': None,
-        }
-```
+    ```python
+    async def other(method, source, songid, _):
+        try:
+            func = require('modules.' + source + '.' + method)
+        except:
+            return {
+                'code': 1,
+                'msg': '未知的源或不支持的方法',
+                'data': None,
+            }
+        try:
+            result = await func(songid)
+            return {
+                'code': 0,
+                'msg': 'success',
+                'data': result
+            }
+        except FailedException as e:
+            return {
+                'code': 2,
+                'msg': e.args[0],
+                'data': None,
+            }
+
+    async def other_with_query(method, source, t, _, query):
+        try:
+            func = require('modules.' + source + '.' + method)
+        except:
+            return {
+                'code': 1,
+                'msg': '未知的源或不支持的方法',
+                'data': None,
+            }
+        try:
+            result = await func(t, query)
+            return {
+                'code': 0,
+                'msg': 'success',
+                'data': result
+            }
+        except FailedException as e:
+            return {
+                'code': 2,
+                'msg': e.args[0],
+                'data': None,
+            }
+    ```
 
 4. 模块不拆分
-详见[config.py](https://github.com/lxmusics/lx-music-api-server-python/tree/main/common/config.py)
+
+    详见[config.py](https://github.com/lxmusics/lx-music-api-server-python/tree/main/common/config.py)
 
 5. 不明所以的变量名
-```python
-a = '小明'
-b = 1
-c = 2
-d = b''
-def e(a, b, c):
-  c = xxx
-  d = xxx
-f = e(c, b, a)
-```
+
+    ```python
+    a = '小明'
+    b = 1
+    c = 2
+    d = b''
+    def e(a, b, c):
+      c = xxx
+      d = xxx
+    f = e(c, b, a)
+    ```
 
 ## 项目协议
 
@@ -224,6 +271,4 @@ folltoshe+foxmail.com
 
 ## 贡献者
 
-<a href="https://github.com/lxmusics/lx-music-api-server-python/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=lxmusics/lx-music-api-server-python" />
-</a>
+[![Contributor](https://contrib.rocks/image?repo=lxmusics/lx-music-api-server-python)](https://github.com/lxmusics/lx-music-api-server-python/graphs/contributors)
