@@ -72,7 +72,7 @@ async def generate_script_response(request):
     if (request.query.get('key') != config.read_config('security.key.value') and config.read_config('security.key.enable')):
         return 'key验证失败'
     try:
-        with open('./lx-music-source-example.js', 'r') as f:
+        with open('./lx-music-source-example.js', 'r', encoding='utf-8') as f:
             script = f.read()
     except:
         return '本地无源脚本'
