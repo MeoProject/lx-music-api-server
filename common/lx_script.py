@@ -70,12 +70,12 @@ async def get_script():
 
 async def generate_script_response(request):
     if (request.query.get('key') != config.read_config('security.key.value') and config.read_config('security.key.enable')):
-        return 'key验证失败'
+        return Response(body = json.dumps({'code': 6, 'msg': 'key验证失败', 'data': None}, indent=2, ensure_ascii=False), content_type='application/json', status = 400)
     try:
         with open('./lx-music-source-example.js', 'r', encoding='utf-8') as f:
             script = f.read()
     except:
-        return '本地无源脚本'
+        return Response(body = json.dumps({'code': 4, 'msg': '本地无源脚本', 'data': None}, indent=2, ensure_ascii=False), content_type='application/json', status = 500)
     scriptLines = script.split('\n')
     newScriptLines = []
     for line in scriptLines:
