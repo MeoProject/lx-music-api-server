@@ -153,7 +153,11 @@ if (config.read_config('common.allow_download_script')):
 app.router.add_route('*', '/{tail:.*}', handle_404)
 
 async def run_app():
+    retries = 0
     while True:
+        if (retries > 4):
+            logger.warning("重试次数已达上限，但仍有部分端口未能完成监听，已自动进行忽略")
+            return
         try:
             host = config.read_config('common.host')
             ports = [int(port) for port in config.read_config('common.ports')]
@@ -162,10 +166,11 @@ async def run_app():
             final_ssl_ports = []
             final_ports = []
             for p in ports:
-                if (p not in ssl_ports):
+                if (p not in ssl_ports and p not in variable.running_ports):
                     final_ports.append(p)
                 else:
-                    final_ssl_ports.append(p)
+                    if (p not in variable.running_ports):
+                        final_ssl_ports.append(p)
             # 读取证书和私钥路径
             cert_path = config.read_config('common.ssl_info.path.cert')
             privkey_path = config.read_config('common.ssl_info.path.privkey')
@@ -176,9 +181,11 @@ async def run_app():
 
             # 启动 HTTP 端口监听
             for port in final_ports:
-                http_site = aiohttp.web.TCPSite(http_runner, host, port)
-                await http_site.start()
-                logger.info(f"监听 -> http://{host}:{port}")
+                if (port not in variable.running_ports):
+                    http_site = aiohttp.web.TCPSite(http_runner, host, port)
+                    await http_site.start()
+                    variable.running_ports.append(port)
+                    logger.info(f"监听 -> http://{host}:{port}")
 
             if (config.read_config("common.ssl_info.enable") and final_ssl_ports != []):
                 if (os.path.exists(cert_path) and os.path.exists(privkey_path)):
@@ -193,9 +200,11 @@ async def run_app():
 
                     # 启动 HTTPS 端口监听
                     for port in ssl_ports:
-                        https_site = aiohttp.web.TCPSite(https_runner, host, port, ssl_context=ssl_context)
-                        await https_site.start()
-                        logger.info(f"监听 -> https://{host}:{port}")
+                        if (port not in variable.running_ports):
+                            https_site = aiohttp.web.TCPSite(https_runner, host, port, ssl_context=ssl_context)
+                            await https_site.start()
+                            variable.running_ports.append(port)
+                            logger.info(f"监听 -> https://{host}:{port}")
 
             return
         except OSError as e:
@@ -204,6 +213,7 @@ async def run_app():
                 logger.info('服务器将在10s后再次尝试启动...')
                 await asyncio.sleep(10)
                 logger.info('重新尝试启动...')
+                retries += 1
             else:
                 raise
 
