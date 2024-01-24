@@ -51,3 +51,4 @@ fake_ip = None
 aioSession = None
 qdes_lib_loaded = False
 use_cookie_pool = False
+running_ports = []
