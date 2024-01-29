@@ -12,7 +12,7 @@ aiohttp = "^3.9.1"
 pycryptodome = "^3.20.0"
 ujson = "^5.9.0"
 requests = "^2.31.0"
-colorlog = "^6.8.0"
+colorlog = "^6.8.2"
 Pygments = "^2.17.2"
 xmltodict = "^0.13.0"
 
