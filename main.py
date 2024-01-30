@@ -91,10 +91,14 @@ async def handle_before_request(app, handler):
                     return handleResult({'code': 6, 'msg': '未找到您所请求的资源', 'data': None}, 404)
 
             resp = await handler(request)
-            if (isinstance(resp, str)):
-                resp = Response(body = resp, content_type='text/plain', status = 200)
-            elif (isinstance(resp, (list, dict))):
+            if (isinstance(resp, (str, list, dict))):
                 resp = handleResult(resp)
+            elif (isinstance(resp, tuple) and len(resp) == 2): # flask like response
+                body, status = resp
+                if (isinstance(body, (str, list, dict))):
+                    resp = handleResult(body, status)
+                else:
+                    resp = Response(body = str(body), content_type='text/plain', status = status)
             elif (not isinstance(resp, Response)):
                 resp = Response(body = str(resp), content_type='text/plain', status = 200)
             aiologger.info(f'{request.remote_addr + ("" if (request.remote == request.remote_addr) else f"|proxy@{request.remote}")} - {request.method} "{request.path}", {resp.status}')
