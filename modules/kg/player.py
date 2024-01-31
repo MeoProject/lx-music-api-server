@@ -46,7 +46,7 @@ async def url(songId, quality):
         'album_audio_id': albumaudioid,
         'behavior': 'play',
         'clienttime': int(time.time()),
-        'pid': 2,
+        'pid': tools.pid,
         'key': getKey(thash, user_info),
         'dfid': '-',
         'pidversion': 3001

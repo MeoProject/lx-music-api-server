@@ -10,7 +10,6 @@
 from . import Httpx
 from . import config
 from . import scheduler
-from .variable import iscn
 from .log import log
 from aiohttp.web import Response
 import ujson as json
@@ -70,12 +69,12 @@ async def get_script():
 
 async def generate_script_response(request):
     if (request.query.get('key') != config.read_config('security.key.value') and config.read_config('security.key.enable')):
-        return Response(body = json.dumps({'code': 6, 'msg': 'key验证失败', 'data': None}, indent=2, ensure_ascii=False), content_type='application/json', status = 400)
+        return {'code': 6, 'msg': 'key验证失败', 'data': None}, 403
     try:
         with open('./lx-music-source-example.js', 'r', encoding='utf-8') as f:
             script = f.read()
     except:
-        return Response(body = json.dumps({'code': 4, 'msg': '本地无源脚本', 'data': None}, indent=2, ensure_ascii=False), content_type='application/json', status = 500)
+        return {'code': 4, 'msg': '本地无源脚本', 'data': None}, 400
     scriptLines = script.split('\n')
     newScriptLines = []
     for line in scriptLines:
