@@ -14,6 +14,7 @@ def get_specified_tag(index):
 
 def get_changelog():
     cmd = ['git', 'log', f'{get_latest_tag()}..HEAD', '--pretty=format:"%h %s"']
+    print(cmd)
     res = subprocess.check_output(cmd).decode('utf-8').strip()
     res = res.split('\n')
     featMsg = []
