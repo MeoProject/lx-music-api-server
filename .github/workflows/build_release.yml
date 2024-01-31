@@ -1,12 +1,24 @@
 
 name: Build Release
 
-on:
-  workflow_dispatch:
+on: 
+  push:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
+      - '.gitignore'
+
+permissions:
+  contents: write
+  pull-requests: write
 
 jobs:
-  build-windows:
-    runs-on: windows-latest
+  build:
+    if: contains(github.event.head_commit.message, '[release]')
+    strategy:
+      matrix:
+        runs-on: [windows-latest, macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.runs-on }}
     steps:
       - name: Checkout git repo
         uses: actions/checkout@v2
@@ -22,37 +34,68 @@ jobs:
       - name: Install dependencies
         run: python -m pip install -r ./requirements.txt
       
-      - name: Build EXE
-        run: python build.py build release
+      - name: Build
+        run: python build.py build test
       
       - name: Upload
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
-          name: windows
+          name: dist-${{ matrix.runs-on }}
           path: ./dist
-
-  build-linux:
+  
+  release:
+    if: contains(github.event.head_commit.message, '[release]')
+    needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout git repo
-        uses: actions/checkout@v2
-
+      - name: Check out git repository
+        uses: actions/checkout@v3
+      
       - name: Setup Python 3.11
         uses: actions/setup-python@v2
         with:
           python-version: '3.11'
-
-      - name: Install pyinstaller
-        run: python -m pip install pyinstaller
       
-      - name: Install dependencies
-        run: python -m pip install -r ./requirements.txt
-        
-      - name: Build Executable
-        run: python build.py build release
-        
-      - name: Upload
-        uses: actions/upload-artifact@v2
+      - name: Get version
+        run: |
+          python -m pip install toml
+          echo PACKAGE_VERSION=`python -c 'import toml; print(toml.load("./pyproject.toml")["tool"]["poetry"]["version"])'` >> $GITHUB_ENV
+      
+      - name: Create git tag
+        uses: pkgdeps/git-tag-action@v2
         with:
-          name: linux
-          path: ./dist
+          github_token: ${{ github.token }}
+          github_repo: ${{ github.repository }}
+          version: ${{ env.PACKAGE_VERSION }}
+          git_commit_sha: ${{ github.sha }}
+          git_tag_prefix: "v"
+      
+      - name: Download Build Files
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          pattern: dist-*
+          merge-multiple: false
+
+      - name: Get File Address
+        run: |
+          echo "windowsFile=./dist/dist-windows-latest/lx-music-api-server_$(git rev-parse --short HEAD).exe" >> $GITHUB_ENV
+          echo "macosFile=./dist/dist-macos-latest/lx-music-api-server_$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          echo "linuxFile=./dist/dist-ubuntu-latest/lx-music-api-server_$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+      
+      - name: Generate Changelog
+        run: python build.py changelog >> ./changelog.md
+      
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          body_path: ./changelog.md
+          prerelease: false
+          draft: false
+          tag_name: v${{ env.PACKAGE_VERSION }}
+          files: |
+            ${{ env.windowsFile }}
+            ${{ env.macosFile }}
+            ${{ env.linuxFile }}
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
