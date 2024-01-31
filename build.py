@@ -13,8 +13,8 @@ def get_specified_tag(index):
     return subprocess.check_output(['git', 'tag']).decode('utf-8').strip().split("\n")[index]
 
 def get_changelog():
-    res = subprocess.check_output(
-        ['git', 'log', f'{get_latest_tag()}..HEAD', '--pretty=format:"%h %s"']).decode('utf-8').strip()
+    cmd = ['git', 'log', f'{get_latest_tag()}..HEAD', '--pretty=format:"%h %s"']
+    res = subprocess.check_output(cmd).decode('utf-8').strip()
     res = res.split('\n')
     featMsg = []
     fixMsg = []
