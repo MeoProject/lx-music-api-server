@@ -168,6 +168,7 @@ default = {
                 "_clientver-desc": "客户端versioncode，pidversionsecret可能随此值而变化",
                 "pidversionsecret": "57ae12eb6890223e355ccfcb74edf70d",
                 "_pidversionsecret-desc": "获取URL时所用的key值计算验证值",
+                "pid": "2",
             },
             "tracker": {
                 "desc": "trackerapi请求配置，不懂请保持默认，修改请统一为字符串格式",
@@ -187,6 +188,15 @@ default = {
                 "token": "",
                 "userid": "0",
                 "mid": "114514",
+                "lite_sign_in": {
+                    "desc": "是否启用概念版自动签到，仅在appid=3116时运行",
+                    "enable": False,
+                    "interval": 86400,
+                    "mixsongmid": {
+                        "desc": "mix_songmid的获取方式, 默认auto, 可以改成一个数字手动",
+                        "value": "auto"
+                    }
+                }
             }
         },
         "tx": {
@@ -257,6 +267,15 @@ default = {
                     'userid': '0',
                     'token': '',
                     'mid': '114514',
+                    "lite_sign_in": {
+                        "desc": "是否启用概念版自动签到，仅在appid=3116时运行",
+                        "enable": False,
+                        "interval": 86400,
+                        "mixsongmid": {
+                            "desc": "mix_songmid的获取方式, 默认auto, 可以改成一个数字手动",
+                            "value": "auto"
+                        }
+                    }
                 },
             ],
             'tx': [
