@@ -1,4 +1,5 @@
 import subprocess
+import toml
 import sys
 import re
 import os
@@ -121,7 +122,7 @@ def build_release(fileName = ''):
               'Please check if you forgetting to activate the virtualenv.', sep='\n')
         sys.exit(1)
 
-    vername = get_latest_tag()
+    vername = toml.load("./pyproject.toml")["tool"]["poetry"]["version"]
 
     popen = subprocess.Popen([get_python_path(),
                               '-m',
