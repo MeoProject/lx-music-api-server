@@ -23,6 +23,8 @@ test.py
 logs
 config.json
 *.log
+*.bak
+*.tmp
 
 # VSCode
 .history
