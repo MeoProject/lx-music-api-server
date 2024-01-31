@@ -9,10 +9,12 @@ def get_latest_tag():
     t = subprocess.check_output(['git', 'tag']).decode('utf-8').strip().split("\n")
     return t[-1] if (t[-1] != toml.load("./pyproject.toml")["tool"]["poetry"]["version"]) else t[-2]
 
+def get_specified_tag(index):
+    return subprocess.check_output(['git', 'tag']).decode('utf-8').strip().split("\n")[index]
 
 def get_changelog():
     res = subprocess.check_output(
-        ['git', 'log', f'{get_latest_tag()}..HEAD', '--pretty=format:"%h %s"']).decode('utf-8').strip()
+        ['git', 'log', f'{get_specified_tag(-2)}..get_specified_tag(-1)', '--pretty=format:"%h %s"']).decode('utf-8').strip()
     res = res.split('\n')
     featMsg = []
     fixMsg = []
