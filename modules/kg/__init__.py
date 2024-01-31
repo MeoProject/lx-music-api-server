@@ -17,6 +17,7 @@ from .lyric import lyricSearchByHash as _lyricSearch
 from .mv import getMvInfo as _getMvInfo
 from .mv import getMvPlayURL as _getMvUrl
 from .search import getSongSearchResult as _songsearch
+from . import lite_signin
 from common.exceptions import FailedException
 from common import Httpx
 from common import utils

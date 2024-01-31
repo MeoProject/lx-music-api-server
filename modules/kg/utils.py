@@ -23,6 +23,7 @@ tools = createObject({
     "version": config.read_config("module.kg.tracker.version"),
     "extra_params": config.read_config("module.kg.tracker.extra_params"),
     "appid": config.read_config("module.kg.client.appid"),
+    "pid": config.read_config("module.kg.client.pid"),
     'qualityHashMap': {
         '128k': 'hash_128',
         '320k': 'hash_320',
@@ -43,7 +44,7 @@ def buildSignatureParams(dictionary, body = ""):
     joined_str = ''.join([f'{k}={v}' for k, v in dictionary.items()])
     return joined_str + body
 
-def buildRequestParams(dictionary):
+def buildRequestParams(dictionary: dict):
     joined_str = '&'.join([f'{k}={v}' for k, v in dictionary.items()])
     return joined_str
 
