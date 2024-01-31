@@ -6,7 +6,8 @@ import os
 
 
 def get_latest_tag():
-    return subprocess.check_output(['git', 'describe', '--abbrev=0', '--tags']).decode('utf-8').strip()
+    t = subprocess.check_output(['git', 'tag']).decode('utf-8').strip().split("\n")
+    return t[-1] if (t[-1] != toml.load("./pyproject.toml")["tool"]["poetry"]["version"]) else t[-2]
 
 
 def get_changelog():
