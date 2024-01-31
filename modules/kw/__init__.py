@@ -80,13 +80,14 @@ async def url(songId, quality):
         url = ''
         bitrate = 1
         if (des_info["response_type"] == 'json'):
-            body = req.json()
+            url = req.json()
             for p in des_info['url_json_path'].split('.'):
-                url = body.get(p)
+                url = url.get(p)
                 if (url == None):
                     raise FailedException('failed')
+            bitrate = req.json()
             for p in des_info['bitrate_json_path'].split('.'):
-                bitrate = body.get(p)
+                bitrate = bitrate.get(p)
                 if (bitrate == None):
                     raise FailedException('failed')
         elif (des_info['response_type'] == 'text'):
