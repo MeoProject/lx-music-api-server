@@ -1,7 +1,7 @@
 # ----------------------------------------
 # - mode: python -
 # - author: helloplhm-qwq -
-# - name: lyric.py -
+# - name: lite_signin.py -
 # - project: lx-music-api-server -
 # - license: MIT -
 # ----------------------------------------
