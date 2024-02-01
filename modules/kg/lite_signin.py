@@ -38,6 +38,7 @@ async def randomMixSongMid():
     # 所以需要进行一次搜索接口来获取
     search_req = await Httpx.AsyncRequest(utils.encodeURI(f'https://songsearch.kugou.com/song_search_v2?' + buildRequestParams({
         "keyword": randomSong['filename'],
+        "area_code": 1,
         "page": 1,
         "pagesize": 1,
         "userid": 0,
