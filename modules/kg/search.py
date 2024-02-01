@@ -66,6 +66,7 @@ async def getSongSearchResult(query, page = 1, size = 20):
         "keyword": query,
         "page": page,
         "pagesize": size,
+        "area_code": 1,
         "userid": 0,
         "clientver": "",
         "platform": "WebFilter",
