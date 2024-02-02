@@ -1,4 +1,3 @@
-
 name: Build Release
 
 on: 
@@ -77,14 +76,14 @@ jobs:
           pattern: dist-*
           merge-multiple: false
 
-      - name: Get File Address
+      - name: Rename File
         run: |
-          echo "windowsFile=./dist/dist-windows-latest/lx-music-api-server_$(git rev-parse --short HEAD).exe" >> $GITHUB_ENV
-          echo "macosFile=./dist/dist-macos-latest/lx-music-api-server_$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-          echo "linuxFile=./dist/dist-ubuntu-latest/lx-music-api-server_$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          mv ./dist/dist-windows-latest/lx-music-api-server_${{ env.PACKAGE_VERSION }}.exe ./dist/lx-music-api-server_${{ env.PACKAGE_VERSION }}_windows.exe
+          mv ./dist/dist-macos-latest/lx-music-api-server_${{ env.PACKAGE_VERSION }} ./dist/lx-music-api-server_${{ env.PACKAGE_VERSION }}_macos
+          mv ./dist/dist-ubuntu-latest/lx-music-api-server_${{ env.PACKAGE_VERSION }} ./dist/lx-music-api-server_${{ env.PACKAGE_VERSION }}_linux
       
-      - name: Generate Changelog
-        run: python build.py changelog >> ./changelog.md
+      # - name: Generate Changelog
+      #   run: python build.py changelog >> ./changelog.md
       
       - name: Release
         uses: softprops/action-gh-release@v1
@@ -94,8 +93,8 @@ jobs:
           draft: false
           tag_name: v${{ env.PACKAGE_VERSION }}
           files: |
-            ${{ env.windowsFile }}
-            ${{ env.macosFile }}
-            ${{ env.linuxFile }}
+            ./dist/lx-music-api-server_${{ env.PACKAGE_VERSION }}_windows.exe
+            ./dist/lx-music-api-server_${{ env.PACKAGE_VERSION }}_macos
+            ./dist/lx-music-api-server_${{ env.PACKAGE_VERSION }}_linux
         env:
           GITHUB_TOKEN: ${{ github.token }}
