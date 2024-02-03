@@ -78,8 +78,8 @@ Required environment: Python 3.8+
 
 Required environment: Python 3.6 - 3.11, Python 3.8+ is better.
 
-Python 3.12 or higher maybe install requirements failed.
-Without other restrictions, you can run only with Python.
+Python 3.12 or higher maybe install requirements failed.  
+Without other restrictions, you can run only with Python.  
 If you are using linux, you command maybe python3, please replace it yourself.
 
 1. Clone this project and enter the project directory
