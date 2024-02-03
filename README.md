@@ -276,10 +276,10 @@ helloplhm-qwq+outlook.com
 folltoshe+foxmail.com  
 (请将`+`替换成`@`)
 
-## Star 趋势图
+## ✨Star 趋势图
 
 [![Stargazers over time](https://starchart.cc/lxmusics/lx-music-api-server-python.svg)](https://starchart.cc/lxmusics/lx-music-api-server-python)
 
-## 贡献者
+## ⚙️贡献者
 
 [![Contributor](https://contrib.rocks/image?repo=lxmusics/lx-music-api-server-python)](https://github.com/lxmusics/lx-music-api-server-python/graphs/contributors)

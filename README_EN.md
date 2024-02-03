@@ -274,10 +274,10 @@ helloplhm-qwq+outlook.com
 folltoshe+foxmail.com  
 (please replace `+` to `@`)
 
-## Star trend chart
+## ✨Star trend chart
 
 [![Stargazers over time](https://starchart.cc/lxmusics/lx-music-api-server-python.svg)](https://starchart.cc/lxmusics/lx-music-api-server-python)
 
-## Contributor
+## ⚙️Contributor
 
 [![Contributor](https://contrib.rocks/image?repo=lxmusics/lx-music-api-server-python)](https://github.com/lxmusics/lx-music-api-server-python/graphs/contributors)
