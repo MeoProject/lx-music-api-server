@@ -21,7 +21,7 @@ You can find the corresponding available source scripts in the original reposito
 
 1. Download the executable file corresponding to your system from [Releases](https://github.com/lxmusics/lx-music-api-server-python/releases) or [Actions](https://github.com/lxmusics/lx-music-api-server-python/actions)
 
-2. Run the extracted executable file (maybe you need to unzip the downloaded file if it is a compressed files)
+2. Run the downloaded executable file (maybe you need to unzip the downloaded file if it is a compressed files)
 
 ---
 
