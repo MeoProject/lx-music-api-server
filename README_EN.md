@@ -1,3 +1,5 @@
+English | [简体中文](README.md)
+
 <div align="center">
 
 ![lx-music-api-server-python](https://socialify.git.ci/lxmusics/lx-music-api-server-python/image?description=1&font=Inter&forks=1&issues=1&language=1&name=1&owner=1&pulls=1&stargazers=1&theme=Auto)
@@ -15,7 +17,22 @@ You can find the corresponding available source scripts in the original reposito
 
 **Ban** and other situations caused by the use of this project have **nothing** to do with this project.
 
-## How to deploy
+## 💡Feature
+
+- [ ] Functions
+  - [ ] All APIs (playlist, search)
+  - [ ] Netease Cloud Refresh Login
+  - [ ] Client plays music on webdav
+  - [ ] Client plays local music on the server
+  - [x] Cookie pool
+  - [x] HTTPS listening, multi port listening
+  - [x] Supports reverse compatibility
+  - [x] Get higher quality
+  - [x] QRC decrypt
+- [ ] Localization (currently only Simplified Chinese is supported)
+- [x] Platform support: `Windows` `Linux` `MacOS`
+
+## 💻How to deploy
 
 ### Use Release (recommended)
 
@@ -118,7 +135,7 @@ This method **has not been tested**, and we don't know the required Docker versi
 
 5. Go to the `/app` directory in the container directory and modify `config.json`.
 
-## Return code description
+## 📖Return code description
 
 The code meaning in the `body.code` field value in the interface return value.
 
@@ -141,7 +158,7 @@ The code meaning of `statuscode` returned by the interface.
 | 429  | Too frequent requests                                |
 | 500  | Server internal error (corresponding to body.code 4) |
 
-## Remarks
+## 🔖Remarks
 
 ### The following excellent codes may appear in this project.
 
@@ -237,7 +254,7 @@ The code meaning of `statuscode` returned by the interface.
     f = e(c, b, a)
     ```
 
-## Project agreement
+## 📄Project agreement
 
 This project is issued under [MIT](https://github.com/lxmusics/lx-music-api-server/blob/main/LICENSE) license. The following agreement is a supplement to the original MIT agreement. In case of conflict, the following agreement shall prevail.
 
@@ -248,9 +265,9 @@ Word agreement: "this project" in this agreement refers to this audio source pro
 3. Any direct, indirect, special, accidental or consequential damages of any nature arising from the use of this project (including but not limited to damages caused by loss of goodwill, shutdown, computer failure or malfunction, or any and all other commercial damages or losses) shall be borne by the user.
 4. This project is completely free of charge, and the open source is published on GitHub for people all over the world to learn and exchange technology. This project does not guarantee that the technology in the project may violate local laws and regulations. **It is forbidden to use this project in violation of local laws and regulations.** The user shall bear any illegal acts caused by the user knowing or not knowing that the local laws and regulations do not allow it, and this project will not bear any direct, indirect, special, accidental or consequential responsibilities.
 
-If you use this project, you will accept the above agreement on your behalf.  
-Music platform is not easy, please respect copyright and support genuine.
+If you use this project, you will accept the above agreement on your behalf.
 
+Music platform is not easy, please respect copyright and support genuine.  
 This project is only used for the exploration and research of technical feasibility, and does not accept any commercial (including but not limited to advertising) cooperation and donation.  
 If you have any questions about this, please mail to:  
 helloplhm-qwq+outlook.com  
