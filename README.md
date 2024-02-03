@@ -13,13 +13,19 @@
 原仓库：[lx-music-api-server](https://github.com/lxmusics/lx-music-api-server)  
 你可以在原仓库中找到对应的可用源脚本
 
-**由于使用此项目导致的封号等情况与本项目无关**
-
-**主开发是高一住校学生，只有周末有时间回复，也欢迎所有人来贡献代码，我们在这里万分感谢**
-
-**临近期末考试，更新会放缓，新功能请不要催得太紧**
+由于使用此项目导致的**封号**等情况**与本项目无关**
 
 ## 部署方法
+
+### Release 部署（推荐）
+
+1. 从 [Releases](https://github.com/lxmusics/lx-music-api-server-python/releases)
+   或 [Actions](https://github.com/lxmusics/lx-music-api-server-python/actions)
+   下载对应你系统的可执行文件 (从 GitHub Actions 下载需要登录 GitHub 账号)
+
+2. 运行可执行文件（如果下载的文件是压缩包请先解压）
+
+---
 
 ### Poetry 部署
 
@@ -113,18 +119,6 @@ linux 命令如果为 python3 请自行替换
     ```
 
 5. 到容器目录里的 `/app` 目录填写 `config.json`
-
----
-
-### Release 部署
-
-1. 从 [Releases](https://github.com/lxmusics/lx-music-api-server-python/releases)
-   或 [Actions](https://github.com/lxmusics/lx-music-api-server-python/actions)
-   下载对应你系统的可执行文件 (从 GitHub Actions 下载需要登录 GitHub 账号)
-
-2. 将下载的文件解压
-
-3. 运行解压后的可执行文件
 
 ## 返回码说明
 
