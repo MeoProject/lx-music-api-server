@@ -12,7 +12,7 @@ import subprocess
 import sys
 from PIL import Image
 import aiohttp
-from common.utils import createMD5, timeLengthFormat
+from common.utils import createFileMD5, createMD5, timeLengthFormat
 from . import log, config
 import ujson as json
 import traceback
@@ -211,6 +211,7 @@ def getAudioMeta(filepath):
             "lyrics": lyric[0],
             'length': audio.info.length,
             'format_length': timeLengthFormat(audio.info.length),
+            'md5': createFileMD5(filepath),
         }
     except:
         logger.error(f"get audio meta error: {filepath}")
@@ -238,7 +239,7 @@ def extractCover(audio_info, temp_path):
         f.write(audio_info['cover'])
     return path
 
-def findAudios():
+def findAudios(cache):
 
     available_exts = [
         'mp3',
@@ -253,6 +254,9 @@ def findAudios():
         return []
     
     audios = []
+    _map = {}
+    for c in cache:
+        _map[c['filepath']] = c
     for file in files:
         if (not file.endswith(tuple(available_exts))):
             continue
@@ -260,8 +264,11 @@ def findAudios():
         if (not checkAudioValid(path)):
             continue
         logger.info(f"found audio: {path}")
-        meta = getAudioMeta(path)
-        audios = audios + [meta]
+        if (not (_map.get(path) and _map[path]['md5'] == createFileMD5(path))):
+            meta = getAudioMeta(path)
+            audios = audios + [meta]
+        else:
+            audios = audios + [_map[path]]
     
     return audios
 
@@ -321,7 +328,7 @@ def initMain():
     if (cache['file_list'] == os.listdir(AUDIO_PATH)):
         audios = cache['audios']
     else:
-        audios = findAudios()
+        audios = findAudios(cache['audios'])
         writeLocalCache(audios)
     for a in audios:
         map[a['filepath']] = a

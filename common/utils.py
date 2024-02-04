@@ -7,6 +7,7 @@
 # ----------------------------------------
 # This file is part of the "lx-music-api-server" project.
 
+import hashlib
 import platform
 import binascii
 import builtins
@@ -16,7 +17,6 @@ import time
 import re
 import xmltodict
 from urllib.parse import quote, unquote, urlparse
-from hashlib import md5 as handleCreateMD5
 
 def createBase64Encode(data_bytes):
     encoded_data = base64.b64encode(data_bytes)
@@ -67,7 +67,14 @@ def filterFileName(filename):
 def createMD5(s: (str, bytes)):
     if (isinstance(s, str)):
         s = s.encode("utf-8")
-    return handleCreateMD5(s).hexdigest()
+    return hashlib.md5(s).hexdigest()
+
+def createFileMD5(path):
+    with open(path, 'rb') as f:
+        md5 = hashlib.md5()
+        for chunk in iter(lambda: f.read(4096), b""):
+            md5.update(chunk)
+        return md5.hexdigest()
 
 def readFile(path, mode = "text"):
     try:
