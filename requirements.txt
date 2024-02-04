@@ -6,3 +6,5 @@ colorlog
 pygments
 xmltodict
 toml
+mutagen
+pillow
