@@ -14,7 +14,6 @@ from PIL import Image
 import aiohttp
 from common.utils import createMD5, timeLengthFormat
 from . import log, config
-from pydub.utils import mediainfo
 import ujson as json
 import traceback
 import mutagen
