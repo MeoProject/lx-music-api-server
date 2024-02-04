@@ -143,7 +143,7 @@ def getAudioMeta(filepath):
         audio = mutagen.File(filepath)
         if not audio:
             return None
-        logger.info(audio.items())
+        logger.debug(audio.items())
         if (filepath.lower().endswith('.mp3')):
             cover = audio.get('APIC:')
             if (cover):
@@ -161,8 +161,20 @@ def getAudioMeta(filepath):
                 album = album.text
             if (lyric):
                 lyric = lyric.text
-            else:
-                lyric = [None]
+            if (not lyric):
+                if (os.path.isfile(os.path.splitext(filepath)[0] + '.lrc')):
+                    with open(os.path.splitext(filepath)[0] + '.lrc', 'r', encoding='utf-8') as f:
+                        t = f.read().replace('\ufeff', '')
+                        logger.debug(t)
+                        lyric = filterLyricLine(t)
+                        logger.debug(lyric)
+                        if (not checkLyricValid(lyric)):
+                            lyric = [None]
+                        else:
+                            lyric = [lyric]
+                        f.close()
+                else:
+                    lyric = [None]
         else:
             cover = audio.get('cover')
             if (cover):
@@ -182,6 +194,8 @@ def getAudioMeta(filepath):
                         lyric = filterLyricLine(f.read())
                         if (not checkLyricValid(lyric)):
                             lyric = [None]
+                        else:
+                            lyric = [lyric]
                         f.close()
                 else:
                     lyric = [None]

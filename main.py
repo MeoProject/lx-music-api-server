@@ -159,6 +159,7 @@ async def handle_local(request):
         t = request.match_info.get('type')
         data['t'] = t
     except:
+        logger.info(traceback.format_exc())
         return handleResult({'code': 6, 'msg': '请求参数有错', 'data': None}, 404)
     if (data['t'] == 'u'):
         if (data['p'] in list(localMusic.map.keys())):
