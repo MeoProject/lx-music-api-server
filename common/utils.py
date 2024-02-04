@@ -64,8 +64,10 @@ def filterFileName(filename):
     # 将不合法字符替换为下划线
     return re.sub(illegal_chars, '_', filename)
 
-def createMD5(s: str):
-    return handleCreateMD5(s.encode("utf-8")).hexdigest()
+def createMD5(s: (str, bytes)):
+    if (isinstance(s, str)):
+        s = s.encode("utf-8")
+    return handleCreateMD5(s).hexdigest()
 
 def readFile(path, mode = "text"):
     try:

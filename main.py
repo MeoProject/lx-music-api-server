@@ -11,18 +11,20 @@
 
 import sys
 
+from common.utils import createBase64Decode
+
 if ((sys.version_info.major == 3 and sys.version_info.minor < 6) or sys.version_info.major == 2):
     print('Python版本过低，请使用Python 3.6+ ')
     sys.exit(1)
 
-from common import config
+from common import config, localMusic
 from common import lxsecurity
 from common import log
 from common import Httpx
 from common import variable
 from common import scheduler
 from common import lx_script
-from aiohttp.web import Response
+from aiohttp.web import Response, FileResponse, StreamResponse
 import ujson as json
 import threading
 import traceback
@@ -33,6 +35,12 @@ import time
 import os
 
 def handleResult(dic, status = 200) -> Response:
+    if (not isinstance(dic, dict)):
+        dic = {
+            'code': 0,
+            'msg': 'success',
+            'data': dic
+        }
     return Response(body = json.dumps(dic, indent=2, ensure_ascii=False), content_type='application/json', status = status)
 
 logger = log.log("main")
@@ -99,7 +107,7 @@ async def handle_before_request(app, handler):
                     resp = handleResult(body, status)
                 else:
                     resp = Response(body = str(body), content_type='text/plain', status = status)
-            elif (not isinstance(resp, Response)):
+            elif (not isinstance(resp, (Response, FileResponse, StreamResponse))):
                 resp = Response(body = str(resp), content_type='text/plain', status = 200)
             aiologger.info(f'{request.remote_addr + ("" if (request.remote == request.remote_addr) else f"|proxy@{request.remote}")} - {request.method} "{request.path}", {resp.status}')
             return resp
@@ -142,6 +150,48 @@ async def handle(request):
 async def handle_404(request):
     return handleResult({'code': 6, 'msg': '未找到您所请求的资源', 'data': None}, 404)
 
+async def handle_local(request):
+    try:
+        query = dict(request.query)
+        data = query.get('q')
+        data = createBase64Decode(data.replace('-', '+').replace('_', '/'))
+        data = json.loads(data)
+        t = request.match_info.get('type')
+        data['t'] = t
+    except:
+        return handleResult({'code': 6, 'msg': '请求参数有错', 'data': None}, 404)
+    if (data['t'] == 'u'):
+        if (data['p'] in list(localMusic.map.keys())):
+            return await localMusic.generateAudioFileResonse(data['p'])
+        else:
+            return handleResult({'code': 6, 'msg': '未找到您所请求的资源', 'data': None}, 404)
+    if (data['t'] == 'l'):
+        if (data['p'] in list(localMusic.map.keys())):
+            return await localMusic.generateAudioLyricResponse(data['p'])
+        else:
+            return handleResult({'code': 6, 'msg': '未找到您所请求的资源', 'data': None}, 404)
+    if (data['t'] == 'p'):
+        if (data['p'] in list(localMusic.map.keys())):
+            return await localMusic.generateAudioCoverResonse(data['p'])
+        else:
+            return handleResult({'code': 6, 'msg': '未找到您所请求的资源', 'data': None}, 404)
+    if (data['t'] == 'c'):
+        if (not data['p'] in list(localMusic.map.keys())):
+            return {
+                'code': 0,
+                'msg': 'success',
+                'data': {
+                    'file': False,
+                    'cover': False,
+                    'lyric': False
+                }
+            }
+        return {
+            'code': 0,
+            'msg': 'success',
+            'data': localMusic.checkLocalMusic(data['p'])
+        }
+
 app = aiohttp.web.Application(middlewares=[handle_before_request])
 # mainpage
 app.router.add_get('/', main)
@@ -149,6 +199,7 @@ app.router.add_get('/', main)
 # api
 app.router.add_get('/{method}/{source}/{songId}/{quality}', handle)
 app.router.add_get('/{method}/{source}/{songId}', handle)
+app.router.add_get('/local/{type}', handle_local)
 
 if (config.read_config('common.allow_download_script')):
     app.router.add_get('/script', lx_script.generate_script_response)
@@ -225,6 +276,7 @@ async def run_app():
 async def initMain():
     await scheduler.run()
     variable.aioSession = aiohttp.ClientSession(trust_env=True)
+    localMusic.initMain()
     try:
         await run_app()
         logger.info("服务器启动成功，请按下Ctrl + C停止")

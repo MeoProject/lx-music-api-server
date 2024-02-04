@@ -108,6 +108,11 @@ default = {
                 "mg": ["128k"],
             }
         },
+        "local_music": {
+            "desc": "服务器侧本地音乐相关配置，请确保你的带宽足够",
+            "audio_path": "./audio",
+            "temp_path": "./temp",
+        }
     },
     "security": {
         "rate_limit": {
@@ -153,7 +158,7 @@ default = {
                 "enable": True,
                 "length": 86400 * 7,  # 七天
             },
-        },
+        }
     },
     "module": {
         "kg": {
