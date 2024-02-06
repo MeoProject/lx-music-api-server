@@ -167,7 +167,7 @@ def getAudioMeta(filepath):
             if (album):
                 album = album.text
             if (lyric):
-                lyric = lyric.text
+                lyric = [lyric.text]
             if (not lyric):
                 if (os.path.isfile(os.path.splitext(filepath)[0] + '.lrc')):
                     with open(os.path.splitext(filepath)[0] + '.lrc', 'r', encoding='utf-8') as f:
@@ -286,7 +286,14 @@ def getAudioCover(filepath):
         audio = mutagen.File(filepath)
         if not audio:
             return None
-        return convertCover(audio.get('APIC:').data)
+        if (filepath.lower().endswith('mp3')):
+            return audio.get('APIC:').data
+        else:
+            if (readFileCheckCover(filepath)):
+                return getAudioCoverFromFFMpeg(filepath)
+            else:
+                return None
+        
     except:
         logger.error(f"get audio cover error: {filepath}")
         logger.error(traceback.format_exc())
