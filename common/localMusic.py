@@ -148,11 +148,18 @@ def getAudioMeta(filepath):
             cover = audio.get('APIC:')
             if (cover):
                 cover = convertCover(cover.data)
-            
+            lrc_key = None
+            for k in list(audio.keys()):
+                if (k.startswith('USLT')):
+                    lrc_key = k
+                    break
             title = audio.get('TIT2')
             artist = audio.get('TPE1')
             album = audio.get('TALB')
-            lyric = audio.get('TLRC')
+            if (lrc_key):
+                lyric = audio.get(lrc_key)
+            else:
+                lyric = None
             if (title):
                 title = title.text
             if (artist):
