@@ -126,7 +126,7 @@ async def handle(request):
     songId = request.match_info.get('songId')
     quality = request.match_info.get('quality')
     if (config.read_config("security.key.enable") and request.host.split(':')[0] not in config.read_config('security.whitelist_host')):
-        if (request.headers.get("X-Request-Key")) != config.read_config("security.key.value"):
+        if (request.headers.get("X-Request-Key")) not in config.read_config("security.key.values"):
             if (config.read_config("security.key.ban")):
                 config.ban_ip(request.remote_addr)
             return handleResult({"code": 1, "msg": "key验证失败", "data": None}, 403)

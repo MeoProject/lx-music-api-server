@@ -68,7 +68,7 @@ async def get_script():
         logger.warning('请求源脚本内容失败')
 
 async def generate_script_response(request):
-    if (request.query.get('key') != config.read_config('security.key.value') and config.read_config('security.key.enable')):
+    if (request.query.get('key') not in config.read_config('security.key.values') and config.read_config('security.key.enable')):
         return {'code': 6, 'msg': 'key验证失败', 'data': None}, 403
     try:
         with open('./lx-music-source-example.js', 'r', encoding='utf-8') as f:
@@ -83,13 +83,13 @@ async def generate_script_response(request):
         if (line.startswith('const API_URL')):
             newScriptLines.append(f'''const API_URL = "{'https' if config.read_config('common.ssl_info.is_https') else 'http'}://{request.host}"''')
         elif (line.startswith('const API_KEY')):
-            newScriptLines.append(f'const API_KEY = "{config.read_config("security.key.value")}"')
+            newScriptLines.append(f"""const API_KEY = `{request.query.get("key") if request.query.get("key") else ''''''}`""")
         elif (line.startswith("* @name")):
             newScriptLines.append(" * @name " + config.read_config("common.download_config.name"))
         elif (line.startswith("* @description")):
             newScriptLines.append(" * @description " + config.read_config("common.download_config.intro"))
         elif (line.startswith("* @author")):
-            newScriptLines.append((" * @author helloplhm-qwq & Folltoshe & " + config.read_config("common.download_config.author")) if config.read_config("common.download_config.author") else " * @author helloplhm-qwq & Folltoshe")
+            newScriptLines.append(" * @author " + config.read_config("common.download_config.author"))
         elif (line.startswith("* @version")):
             newScriptLines.append(" * @version " + config.read_config("common.download_config.version"))
         elif (line.startswith("const DEV_ENABLE ")):
