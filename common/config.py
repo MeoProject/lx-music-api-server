@@ -124,7 +124,7 @@ default = {
             "enable": False,
             "_enable-desc": "是否开启请求key，开启后只有请求头中包含key，且值一样时可以访问API",
             "ban": True,
-            "value": "114514",
+            "values": ["114514"],
         },
         "whitelist_host": [
             "localhost",
