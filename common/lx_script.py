@@ -105,7 +105,7 @@ async def generate_script_response(request):
                         'Content-Disposition': f'''attachment; filename={
                             config.read_config("common.download_config.filename")
                             if config.read_config("common.download_config.filename").endswith(".js")
-                            else (config.read_config("common.download_config.filename" + ".js"))}'''
+                            else (config.read_config("common.download_config.filename") + ".js")}'''
                     })
 
 if (config.read_config('common.allow_download_script')):
