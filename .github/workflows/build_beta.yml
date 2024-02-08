@@ -13,7 +13,7 @@ jobs:
   build:
     strategy:
       matrix:
-        runs-on: [windows-latest, macos-latest, ubuntu-latest]
+        runs-on: [windows-latest, macos-latest, ubuntu-latest, ubuntu-20.04]
     runs-on: ${{ matrix.runs-on }}
     steps:
       - name: Checkout git repo
