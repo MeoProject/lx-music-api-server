@@ -1573,7 +1573,7 @@ def main(page: flet.Page):
                 [
                     flet.Container(
                         content=flet.Text(
-                            "在下方配置你的config", size=30, font_family="LXGW WenKai"
+                            "在下方配置你的config", size=30
                         ),
                         alignment=flet.alignment.center,
                     ),
@@ -1632,7 +1632,7 @@ def main(page: flet.Page):
                 )
 
         elif page.route != "/":
-            print(page.route)
+            # print(page.route)
             page.views.append(
                 flet.View(
                     f"/404",
