@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![lx-music-api-server-python](https://socialify.git.ci/lxmusics/lx-music-api-server-python/image?description=1&font=Inter&forks=1&issues=1&language=1&name=1&owner=1&pulls=1&stargazers=1&theme=Auto)
+![lx-music-api-server-python](https://socialify.git.ci/lxmusics/lx-music-api-server-python?description=1&forks=1&issues=1&logo=https%3A%2F%2Fraw.githubusercontent.com%2Flxmusics%2Flx-music-api-server-python%2Fmain%2Ficon.png&owner=1&pulls=1&stargazers=1&theme=Auto)
 
 ![GitHub Repo Size](https://img.shields.io/github/repo-size/lxmusics/lx-music-api-server-python?style=for-the-badge)
 [![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/lxmusics/lx-music-api-server-python/build_beta.yml?style=for-the-badge)](https://github.com/lxmusics/lx-music-api-server-python/actions/workflows/build_beta.yml)
