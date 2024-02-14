@@ -108,7 +108,7 @@ If you are using linux, you command maybe python3, please replace it yourself.
 
 Required environment: Docker
 
-This method **has not been tested**, and we don't know the required Docker version, so you can try whether the existing Docker version can be run by yourself.
+This method cannot load the QRC decryption library, the local song requires ffmpeg installed in the container , and this will be improved later, We don't know the Docker version you need, you can try whether the existing Docker version can be used by yourself.
 
 1. Update package
 
@@ -125,16 +125,8 @@ This method **has not been tested**, and we don't know the required Docker versi
 3. Create container
 
     ```bash
-    docker run  --name lx-music-api-server-python -p 9763:9763 -d ikun0014/lx-music-api-server-python:latest
+    docker run  --name lx-music-api-server-python -p 9763:9763 -v /root/lx-music-api-server-python:/app/data -d ikun0014/lx-music-api-server-python:latest
     ```
-
-4. Get container directory
-
-    ```bash
-    docker inspect lx-music-api-server-python
-    ```
-
-5. Go to the `/app` directory in the container directory and modify `config.json`.
 
 ## 📖Return code description
 
