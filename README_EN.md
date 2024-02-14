@@ -108,7 +108,7 @@ If you are using linux, you command maybe python3, please replace it yourself.
 
 Required environment: Docker
 
-This method cannot use the QRC decryption library, the local song needs to install ffmpeg in the container by itself, and later improved, I don't know the Docker version you need, you can try whether the existing Docker version can be used by yourself.
+This method cannot load the QRC decryption library, the local song requires ffmpeg installed in the container , and this will be improved later, We don't know the Docker version you need, you can try whether the existing Docker version can be used by yourself.
 
 1. Update package
 
