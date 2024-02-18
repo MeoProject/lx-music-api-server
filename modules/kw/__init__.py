@@ -19,6 +19,10 @@ tools = {
         '320k': '320kmp3',
         'flac': '2000kflac',
         'flac24bit': '4000kflac',
+        '128kmp3': '128kmp3',
+        '320kmp3': '320kmp3',
+        "2000kflac": "2000kflac",
+        "4000kflac": "4000kflac",
     },
     'qualityMapReverse': {
         128: '128k',
