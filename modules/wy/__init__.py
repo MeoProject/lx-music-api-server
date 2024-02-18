@@ -38,7 +38,7 @@ tools = {
         'lossless': 'flac',
         'hires': 'flac24bit',
         "jyeffect": "dolby",
-        "jysky": "sky",
+        "sky": "sky",
         "jymaster": "master",
     },
 }
@@ -58,7 +58,7 @@ async def url(songId, quality):
         'headers': {
             'Cookie': config.read_config('module.wy.user.cookie') if (not variable.use_cookie_pool) else random.choice(config.read_config('module.cookiepool.wy'))['cookie'],
         },
-        'form': eapiEncrypt(path, json.dumps())
+        'form': eapiEncrypt(path, json.dumps(requestBody))
     })
     body = req.json()
     if (not body.get("data") or (not body.get("data")) or (not body.get("data")[0].get("url"))):
