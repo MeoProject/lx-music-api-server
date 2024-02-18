@@ -17,15 +17,23 @@ import ujson as json
 tools = {
     'qualityMap': {
         '128k': 'standard',
+        "192k": "higher",
         '320k': 'exhigh',
         'flac': 'lossless',
         'flac24bit': 'hires',
         "dolby": "jyeffect",
-        "sky": "jysky",
+        "sky": "sky",
         "master": "jymaster",
+        "standard": "standard",
+        "exhigh": "exhigh",
+        "lossless": "lossless",
+        "hires": "hires",
+        "jyeffect": "jyeffect",
+        "jymaster": "jymaster",
     },
     'qualityMapReverse': {
         'standard': '128k',
+        "higher": "192k",
         'exhigh': '320k',
         'lossless': 'flac',
         'hires': 'flac24bit',
@@ -38,16 +46,19 @@ tools = {
 async def url(songId, quality):
     path = '/api/song/enhance/player/url/v1'
     requestUrl = 'https://interface.music.163.com/eapi/song/enhance/player/url/v1'
+    requestBody = {
+        "ids": json.dumps([songId]),
+        "level": tools["qualityMap"][quality],
+        "encodeType": "flac",
+    }
+    if (quality == "sky"):
+        requestBody["immerseType"] = "c51"
     req = await Httpx.AsyncRequest(requestUrl, {
         'method': 'POST',
         'headers': {
             'Cookie': config.read_config('module.wy.user.cookie') if (not variable.use_cookie_pool) else random.choice(config.read_config('module.cookiepool.wy'))['cookie'],
         },
-        'form': eapiEncrypt(path, json.dumps({
-            "ids": json.dumps([songId]),
-            "level": tools["qualityMap"][quality],
-            "encodeType": "flac",
-        }))
+        'form': eapiEncrypt(path, json.dumps())
     })
     body = req.json()
     if (not body.get("data") or (not body.get("data")) or (not body.get("data")[0].get("url"))):
