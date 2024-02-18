@@ -25,6 +25,7 @@ tools = {
         "sky": "sky",
         "master": "jymaster",
         "standard": "standard",
+        "higher": "higher",
         "exhigh": "exhigh",
         "lossless": "lossless",
         "hires": "hires",
