@@ -80,7 +80,7 @@ jobs:
         run: |
           mv ./dist/dist-windows-latest/lx-music-api-server_${{ env.PACKAGE_VERSION }}.exe ./dist/lx-music-api-server_${{ env.PACKAGE_VERSION }}_windows.exe
           mv ./dist/dist-macos-latest/lx-music-api-server_${{ env.PACKAGE_VERSION }} ./dist/lx-music-api-server_${{ env.PACKAGE_VERSION }}_macos
-          mv ./dist/dist-ubuntu-latest/lx-music-api-server_${{ env.PACKAGE_VERSION }} ./dist/lx-music-api-server_${{ env.PACKAGE_VERSION }}_linux
+          mv ./dist/dist-ubuntu-latest/lx-music-api-server_${{ env.PACKAGE_VERSION }} ./dist/lx-music-api-server_${{ env.PACKAGE_VERSION }}_ubuntu
       
       # - name: Generate Changelog
       #   run: python build.py changelog >> ./changelog.md
@@ -95,6 +95,6 @@ jobs:
           files: |
             ./dist/lx-music-api-server_${{ env.PACKAGE_VERSION }}_windows.exe
             ./dist/lx-music-api-server_${{ env.PACKAGE_VERSION }}_macos
-            ./dist/lx-music-api-server_${{ env.PACKAGE_VERSION }}_linux
+            ./dist/lx-music-api-server_${{ env.PACKAGE_VERSION }}_ubuntu
         env:
           GITHUB_TOKEN: ${{ github.token }}
