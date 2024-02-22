@@ -93,19 +93,19 @@ def _Save(page: flet.Page, args):
     # print(args)
 
     try:
-        with open("config.json", "r+", encoding="utf-8") as f:
+        with open("./data/config.json", "r+", encoding="utf-8") as f:
             config = json.loads(f.read())
         config = update_nested_json(config, args)
 
         i = 1
         while 1:
             try:
-                os.rename("config.json", f"config{i}.bak")
+                os.rename("./data/config.json", f"config{i}.bak")
                 break
             except:
                 i += 1
 
-        with open("config.json", "w+", encoding="utf-8") as f:
+        with open("./data/config.json", "w+", encoding="utf-8") as f:
             f.write(
                 json.dumps(
                     config, indent=4, ensure_ascii=False, escape_forward_slashes=False
@@ -1648,7 +1648,7 @@ def main(page: flet.Page):
 
 if __name__ == "__main__":
     try:
-        with open("config.json", "r+", encoding="utf-8") as f:
+        with open("./data/config.json", "r+", encoding="utf-8") as f:
             config = json.loads(f.read())
     except:
         print("无法找到config.json,请先运行main.py生成config.json")
