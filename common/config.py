@@ -22,6 +22,8 @@ logger = log('config_manager')
 # 创建线程本地存储对象
 local_data = threading.local()
 
+if not os.path.exists('data'):
+    os.mkdir('data')
 
 def get_data_connection():
     # 检查线程本地存储对象是否存在连接对象，如果不存在则创建一个新的连接对象
@@ -643,7 +645,7 @@ def initConfig():
     variable.log_length_limit = read_config('common.log_length_limit')
     variable.debug_mode = read_config('common.debug_mode')
     logger.debug("配置文件加载成功")
-    conn = sqlite3.connect('cache.db')
+    conn = sqlite3.connect('./data/cache.db')
 
     # 创建一个游标对象
     cursor = conn.cursor()
@@ -657,7 +659,7 @@ data TEXT NOT NULL)''')
 
     conn.close()
 
-    conn2 = sqlite3.connect('data.db')
+    conn2 = sqlite3.connect('./data/data.db')
 
     # 创建一个游标对象
     cursor2 = conn2.cursor()
