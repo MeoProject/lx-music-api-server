@@ -12,7 +12,7 @@ import ujson as _json
 
 def _read_config_file():
     try:
-        with open("./config.json", "r", encoding = "utf-8") as f:
+        with open("./data/config.json", "r", encoding = "utf-8") as f:
             return _json.load(f)
     except:
         pass
