@@ -15,7 +15,7 @@ def _read_config_file():
         with open("./config/config.json", "r", encoding = "utf-8") as f:
             return _json.load(f)
     except:
-        pass
+        return {}
 
 def _read_config(key):
     try:
@@ -41,7 +41,7 @@ _lm = _read_config("common.log_file")
 _ll = _read_config("common.log_length_limit")
 debug_mode = _dm if (_dm) else False
 log_length_limit = _ll if (_ll) else 500
-log_file = _lm if (not isinstance(_lm , type(None))) else True
+log_file = _lm if (isinstance(_lm , bool)) else True
 running = True
 config = {}
 workdir = _os.getcwd()
