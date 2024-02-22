@@ -23,21 +23,10 @@ logger = log('config_manager')
 # 创建线程本地存储对象
 local_data = threading.local()
 
-if not os.path.exists('config'):
-    os.mkdir('config')
-
-if not os.path.exists('data'):
-    os.mkdir('data')
-
-if os.path.exists('config.json' and 'data.db' and 'cache.db'):
-    shutil.move('config.json','config')
-    shutil.move('cache.db','data')
-    shutil.move('data.db','data')
-
 def get_data_connection():
     # 检查线程本地存储对象是否存在连接对象，如果不存在则创建一个新的连接对象
-    if not hasattr(local_data, 'connection'):
-        local_data.connection = sqlite3.connect('./data/data.db')
+    if (not hasattr(local_data, 'connection')):
+        local_data.connection = sqlite3.connect('./config/data.db')
     return local_data.connection
 
 
@@ -48,7 +37,7 @@ local_cache = threading.local()
 def get_cache_connection():
     # 检查线程本地存储对象是否存在连接对象，如果不存在则创建一个新的连接对象
     if not hasattr(local_cache, 'connection'):
-        local_cache.connection = sqlite3.connect('./data/cache.db')
+        local_cache.connection = sqlite3.connect('./cache.db')
     return local_cache.connection
 
 
@@ -631,6 +620,13 @@ def write_data(key, value):
 
 
 def initConfig():
+    if (not os.path.exists('./config')):
+        os.mkdir('config')
+        if (os.path.exists('./config.json')):
+            shutil.move('config.json','./config')
+        if (os.path.exists('./data.db')):
+            shutil.move('./data.db','./config')
+
     try:
         with open("./config/config.json", "r", encoding="utf-8") as f:
             try:
