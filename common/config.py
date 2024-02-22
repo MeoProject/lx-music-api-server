@@ -13,6 +13,7 @@ import os
 import traceback
 import sys
 import sqlite3
+import shutil
 from . import variable
 from .log import log
 import threading
@@ -22,8 +23,16 @@ logger = log('config_manager')
 # 创建线程本地存储对象
 local_data = threading.local()
 
+if not os.path.exists('config'):
+    os.mkdir('config')
+
 if not os.path.exists('data'):
     os.mkdir('data')
+
+if os.path.exists('config.json' and 'data.db' and 'cache.db'):
+    shutil.move('config.json','config')
+    shutil.move('cache.db','data')
+    shutil.move('data.db','data')
 
 def get_data_connection():
     # 检查线程本地存储对象是否存在连接对象，如果不存在则创建一个新的连接对象
@@ -322,7 +331,7 @@ default = {
 
 
 def handle_default_config():
-    with open("./data/config.json", "w", encoding="utf-8") as f:
+    with open("./config/config.json", "w", encoding="utf-8") as f:
         f.write(json.dumps(default, indent=2, ensure_ascii=False,
                 escape_forward_slashes=False))
         f.close()
@@ -514,7 +523,7 @@ def push_to_list(key, obj):
 
 def write_config(key, value):
     config = None
-    with open('./data/config.json', 'r', encoding='utf-8') as f:
+    with open('./config/config.json', 'r', encoding='utf-8') as f:
         config = json.load(f)
 
     keys = key.split('.')
@@ -526,7 +535,7 @@ def write_config(key, value):
 
     current[keys[-1]] = value
     variable.config = config
-    with open('./data/config.json', 'w', encoding='utf-8') as f:
+    with open('./config/config.json', 'w', encoding='utf-8') as f:
         json.dump(config, f, indent=2, ensure_ascii=False,
                   escape_forward_slashes=False)
         f.close()
@@ -623,18 +632,18 @@ def write_data(key, value):
 
 def initConfig():
     try:
-        with open("./data/config.json", "r", encoding="utf-8") as f:
+        with open("./config/config.json", "r", encoding="utf-8") as f:
             try:
                 variable.config = json.loads(f.read())
                 if (not isinstance(variable.config, dict)):
                     logger.warning('配置文件并不是一个有效的字典，使用默认值')
                     variable.config = default
-                    with open("./data/config.json", "w", encoding="utf-8") as f:
+                    with open("./config/config.json", "w", encoding="utf-8") as f:
                         f.write(json.dumps(variable.config, indent=2,
                                 ensure_ascii=False, escape_forward_slashes=False))
                         f.close()
             except:
-                if os.path.getsize("./data/config.json") != 0:
+                if os.path.getsize("./config/config.json") != 0:
                     logger.error("配置文件加载失败，请检查是否遵循JSON语法规范")
                     sys.exit(1)
                 else:
