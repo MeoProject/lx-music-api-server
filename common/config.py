@@ -650,7 +650,7 @@ def initConfig():
     variable.log_length_limit = read_config('common.log_length_limit')
     variable.debug_mode = read_config('common.debug_mode')
     logger.debug("配置文件加载成功")
-    conn = sqlite3.connect('./data/cache.db')
+    conn = sqlite3.connect('./cache.db')
 
     # 创建一个游标对象
     cursor = conn.cursor()
@@ -664,7 +664,7 @@ data TEXT NOT NULL)''')
 
     conn.close()
 
-    conn2 = sqlite3.connect('./data/data.db')
+    conn2 = sqlite3.connect('./config/data.db')
 
     # 创建一个游标对象
     cursor2 = conn2.cursor()
