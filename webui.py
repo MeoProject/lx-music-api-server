@@ -100,7 +100,7 @@ def _Save(page: flet.Page, args):
         i = 1
         while 1:
             try:
-                os.rename("./config/config.json", f"config{i}.bak")
+                os.rename("./config/config.json", f"./config/config{i}.bak")
                 break
             except:
                 i += 1
