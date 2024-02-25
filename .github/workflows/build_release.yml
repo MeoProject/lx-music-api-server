@@ -59,6 +59,11 @@ jobs:
         run: |
           python -m pip install toml
           echo PACKAGE_VERSION=`python -c 'import toml; print(toml.load("./pyproject.toml")["tool"]["poetry"]["version"])'` >> $GITHUB_ENV
+          
+      - name: Generate Changelog
+        run: |
+          git fetch --prune --unshallow --tags
+          python build.py changelog >> ./changelog.md
       
       - name: Create git tag
         uses: pkgdeps/git-tag-action@v2
@@ -76,14 +81,11 @@ jobs:
           pattern: dist-*
           merge-multiple: false
 
-      - name: Rename File
+      - name: Rename Files
         run: |
           mv ./dist/dist-windows-latest/lx-music-api-server_${{ env.PACKAGE_VERSION }}.exe ./dist/lx-music-api-server_${{ env.PACKAGE_VERSION }}_windows.exe
           mv ./dist/dist-macos-latest/lx-music-api-server_${{ env.PACKAGE_VERSION }} ./dist/lx-music-api-server_${{ env.PACKAGE_VERSION }}_macos
           mv ./dist/dist-ubuntu-latest/lx-music-api-server_${{ env.PACKAGE_VERSION }} ./dist/lx-music-api-server_${{ env.PACKAGE_VERSION }}_ubuntu
-      
-      # - name: Generate Changelog
-      #   run: python build.py changelog >> ./changelog.md
       
       - name: Release
         uses: softprops/action-gh-release@v1
