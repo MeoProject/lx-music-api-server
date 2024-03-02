@@ -52,3 +52,6 @@ aioSession = None
 qdes_lib_loaded = False
 use_cookie_pool = False
 running_ports = []
+use_proxy = False
+http_proxy = ''
+https_proxy = ''
