@@ -264,7 +264,7 @@ async def run_app():
 
             return
         except OSError as e:
-            if str(e).startswith("[Errno 98]"):
+            if (str(e).startswith("[Errno 98]") or str(e).startswith('[Errno 10048]')):
                 logger.error("端口已被占用，请检查\n" + str(e))
                 logger.info('服务器将在10s后再次尝试启动...')
                 await asyncio.sleep(10)
