@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "lx-music-api-server-python"
-version = "2.0.0.beta-9"
+version = "2.0.0.beta-10"
 description = "一个适配 LX Music 的 API 后端实现"
 authors = ["helloplhm-qwq", "lerdb", "Folltoshe"]
 license = "MIT"
