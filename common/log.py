@@ -110,7 +110,7 @@ def highlight_error(e):
 
                 if (p.startswith('<') or not os.path.isfile(p)):
                     final.append(i)
-                    final.append("    " if (lines[lines.index(l) + 1].startswith("File") else ("        " + lines[lines.index(l) + 1]))
+                    final.append("    " if (lines[lines.index(l) + 1].startswith("File")) else ("        " + lines[lines.index(l) + 1]))
                     continue
 
                 code = read_code(p, l)
