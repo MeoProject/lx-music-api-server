@@ -108,7 +108,7 @@ def request(url: str, options = {}) -> requests.Response:
 
     # 获取请求方法，没有则默认为GET请求
     try:
-        method = options['method']
+        method = options['method'].upper()
         options.pop('method')
     except Exception as e:
         method = 'GET'
@@ -277,14 +277,14 @@ async def AsyncRequest(url, options = {}) -> ClientResponse:
     logger.debug(f'HTTP Request: {url}\noptions: {options}')
     # 转换body/form参数为原生的data参数，并为form请求追加Content-Type头
     if (method == 'POST') or (method == 'PUT'):
-        if options.get('body'):
+        if (options.get('body') is not None):
             options['data'] = options['body']
             options.pop('body')
-        if options.get('form'):
+        if (options.get('form') is not None):
             options['data'] = convert_dict_to_form_string(options['form'])
             options.pop('form')
             options['headers']['Content-Type'] = 'application/x-www-form-urlencoded'
-        if (isinstance(options['data'], dict)):
+        if (isinstance(options.get('data'), dict)):
             options['data'] = json.dumps(options['data'])
     # 进行请求
     try:

@@ -234,11 +234,15 @@ default = {
         "mg": {
             "desc": "咪咕音乐相关配置",
             "user": {
-                "desc": "研究不深，后两项自行抓包获取，在header里",
-                "aversionid": "",
-                "token": "",
-                "osversion": "10",
+                "desc": "研究不深，后两项自行抓包获取，网页端cookie",
+                "by": "",
+                "session": "",
                 "useragent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.82 Safari/537.36",
+                "refresh_login": {
+                    "enable": False,
+                    "interval": 86400,
+                    "desc": "进行cookie保活"
+                }
             },
         },
         "kw": {
@@ -301,10 +305,13 @@ default = {
             ],
             'mg': [
                 {
-                    'aversionid': '',
-                    'token': '',
-                    'osversion': '10',
+                    'by': '',
+                    'session': '',
                     'useragent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.82 Safari/537.36',
+                    "refresh_login": {
+                        "enable": False,
+                        "interval": 86400
+                    }
                 }
             ],
             'kw': [
