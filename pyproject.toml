@@ -17,6 +17,7 @@ Pygments = "^2.17.2"
 xmltodict = "^0.13.0"
 pillow = "^10.2.0"
 mutagen = "^1.47.0"
+colorama = "^0.4.6"
 
 [build-system]
 requires = ["poetry-core"]
