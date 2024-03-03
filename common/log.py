@@ -40,7 +40,7 @@ class Color:
 color = Color()
 
 def is_rubbish(input_string):
-    return bool(re.match(r'^\^*$', input_string))
+    return bool(re.match(r'^(\~|\^)*$', input_string))
 
 def stack_error(exception):
     stack_trace = traceback.format_exception(type(exception), exception, exception.__traceback__)
@@ -108,19 +108,23 @@ def highlight_error(e):
                 p, l, f = stack_info(i)
                 p = p[1:-1]
 
-                if (p.startswith('<')):
-                    final.append("    " + i + '' if (not (lines[lines.index(i) + 1]).startswith("File")) else f"\n{python_highlight(lines[lines.index(i) + 1])}")
+                if (p.startswith('<') or not os.path.isfile(p)):
+                    final.append(i)
+                    final.append("    " if (lines[lines.index(l) + 1].startswith("File") else ("        " + lines[lines.index(l) + 1]))
                     continue
 
                 code = read_code(p, l)
                 cc = []
-                for c in code['result']:
-                    if (c.startswith(code['current'])):
-                        cc.append((' ' * (10 - len(str(l))) + f'{l} >|' + c))
+                viewed = False
+                for i in len(code['result']):
+                    c = code["result"][i]
+                    if (c.startswith(code['current']) and (i <= 3)):
+                        viewed = True
+                        cc.append((' ' * (10 - len(str(l))) + f'{color.red(str(l))} >|' + python_highlight(c)))
                     else:
                         line_number = l + (code["result"].index(c) - 3)
-                        cc.append((' ' * (10 - len(str(line_number))) + f'{line_number}  |' + c))
-                code = python_highlight("\n".join(cc))
+                        cc.append((' ' * (10 - len(str(line_number))) + f'{color.blue(str(line_number))}  |' + python_highlight(c)))
+                code = "\n".join(cc)
                 p = '"' + p + '"'
                 final.append(f"    File {color.yellow(f'{p}')} in {color.cyan(f)}()\n\n\n{code}\n")
             else:
@@ -138,7 +142,7 @@ def highlight_error(e):
                     final.append(i)
         return "\n".join(final).replace('\n\n', '\n')
     except:
-        logger.error('格式化错误失败，使用默认格式\n' + traceback.format_exc())
+        sys.stderr.write('格式化错误失败，使用默认格式\n' + traceback.format_exc())
         if (isinstance(e, Exception)):
             return stack_error(e)
         else:
@@ -242,9 +246,10 @@ class log:
         self._logger.info(message)
 
     def warning(self, message):
-        if (message.startswith('Traceback')):
-            self._logger.error('\n' + highlight_error(message))
-        self._logger.warning(message)
+        if (message.strip().startswith('Traceback')):
+            self._logger.warning('\n' + highlight_error(message))
+        else:
+            self._logger.warning(message)
 
     def error(self, message):
         if (message.startswith('Traceback')):
