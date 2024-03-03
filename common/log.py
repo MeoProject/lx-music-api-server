@@ -84,58 +84,65 @@ def stack_info(stack_trace_line):
         sys.stderr.write(f"日志模块出错，本次日志可能无法记录，请报告给开发者: \n" + traceback.format_exc())
 
 def highlight_error(e):
-    if (isinstance(e, Exception)):
-        error = stack_error(e)
-    else:
-        error = e
-    lines = [i.strip() for i in error.split("\n") if i.strip()]
-    final = []
-    ign = False
-    for i in lines:
-        if (ign):
-            ign = False
-            continue
-
-        if (i.startswith("Traceback (most recent call last):")):
-            final.append(color.cyan(i))
-        elif (i.startswith("During handling of the above exception, another exception occurred:")):
-            final.append(color.cyan(i))
-        elif (i.startswith("The above exception was the direct cause of the following exception:")):
-            final.append(color.cyan(i))
-        elif (i.startswith("File")):
-            ign = True
-            p, l, f = stack_info(i)
-            p = p[1:-1]
-
-            if (p.startswith('<')):
-                final.append("    " + i + '' if (not (lines[lines.index(i) + 1]).startswith("File")) else f"\n{python_highlight(lines[lines.index(i) + 1])}")
+    try:
+        if (isinstance(e, Exception)):
+            error = stack_error(e)
+        else:
+            error = e
+        lines = [i.strip() for i in error.split("\n") if i.strip()]
+        final = []
+        ign = False
+        for i in lines:
+            if (ign):
+                ign = False
                 continue
 
-            code = read_code(p, l)
-            cc = []
-            for c in code['result']:
-                if (c.startswith(code['current'])):
-                    cc.append((' ' * (10 - len(str(l))) + f'{l} >|' + c))
-                else:
-                    line_number = l + (code["result"].index(c) - 3)
-                    cc.append((' ' * (10 - len(str(line_number))) + f'{line_number}  |' + c))
-            code = python_highlight("\n".join(cc))
-            p = '"' + p + '"'
-            final.append(f"    File {color.yellow(f'{p}')} in {color.cyan(f)}()\n\n\n{code}\n")
-        else:
-            try:
-                if (is_rubbish(i)):
+            if (i.startswith("Traceback (most recent call last):")):
+                final.append(color.cyan(i))
+            elif (i.startswith("During handling of the above exception, another exception occurred:")):
+                final.append(color.cyan(i))
+            elif (i.startswith("The above exception was the direct cause of the following exception:")):
+                final.append(color.cyan(i))
+            elif (i.startswith("File")):
+                ign = True
+                p, l, f = stack_info(i)
+                p = p[1:-1]
+
+                if (p.startswith('<')):
+                    final.append("    " + i + '' if (not (lines[lines.index(i) + 1]).startswith("File")) else f"\n{python_highlight(lines[lines.index(i) + 1])}")
                     continue
-                if (issubclass(require(("builtins." if ("." not in i.split(":")[0]) else "") + i.split(":")[0]), Exception)):
-                    exc = i.split(":")[0]
-                    desc = "" if (len(i.split(":")) == 1) else ':'.join(i.split(":")[1:]).strip()
-                    final.append(color.red(exc) + (": " + color.yellow(desc)) if (desc) else "")
-                else:
-                    final.append(color.cyan(i))
-            except:
-                # traceback.print_exc()
-                final.append(i)
-    return "\n".join(final).replace('\n\n', '\n')
+
+                code = read_code(p, l)
+                cc = []
+                for c in code['result']:
+                    if (c.startswith(code['current'])):
+                        cc.append((' ' * (10 - len(str(l))) + f'{l} >|' + c))
+                    else:
+                        line_number = l + (code["result"].index(c) - 3)
+                        cc.append((' ' * (10 - len(str(line_number))) + f'{line_number}  |' + c))
+                code = python_highlight("\n".join(cc))
+                p = '"' + p + '"'
+                final.append(f"    File {color.yellow(f'{p}')} in {color.cyan(f)}()\n\n\n{code}\n")
+            else:
+                try:
+                    if (is_rubbish(i)):
+                        continue
+                    if (issubclass(require(("builtins." if ("." not in i.split(":")[0]) else "") + i.split(":")[0]), Exception)):
+                        exc = i.split(":")[0]
+                        desc = "" if (len(i.split(":")) == 1) else ':'.join(i.split(":")[1:]).strip()
+                        final.append(color.red(exc) + (": " + color.yellow(desc)) if (desc) else "")
+                    else:
+                        final.append(color.cyan(i))
+                except:
+                    # traceback.print_exc()
+                    final.append(i)
+        return "\n".join(final).replace('\n\n', '\n')
+    except:
+        logger.error('格式化错误失败，使用默认格式\n' + traceback.format_exc())
+        if (isinstance(e, Exception)):
+            return stack_error(e)
+        else:
+            return e
 
 class LogHelper(logging.Handler):
     # 日志转接器
