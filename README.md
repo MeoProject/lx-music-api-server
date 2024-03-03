@@ -110,7 +110,7 @@ linux 命令如果为 python3 请自行替换
 
 环境要求：Docker
 
-该方法无法使用QRC解密库，本地歌曲需自行于容器中安装ffmpeg，后期改进，不知道需要的 Docker 版本，可以自己尝试现有的 Docker 版本是否可以使用
+不知道需要的 Docker 版本，可以自己尝试现有的 Docker 版本是否可以使用
 
 1. 更新软件包
 
@@ -127,8 +127,12 @@ linux 命令如果为 python3 请自行替换
 3. 创建容器
 
     ```bash
-    docker run  --name lx-music-api-server-python -p 9763:9763 -v /root/lx-music-api-server-python:/app/data -d ikun0014/lx-music-api-server-python:latest
+    docker run --name lx-music-api-server-python -p 9763:9763 -v /root/lx-music-api-server-python/config:/lxapidocker/lx-music-api-server-python/config -v /root/lx-music-api-server-python/logs:/lxapidocker/lx-music-api-server-python/logs --restart always -d ikun0014/lx-music-api-server-python:latest
     ```
+
+4. 填写配置
+
+前往/root/lx-music-api-server-python/config填写 (权限不足可修改创建容器命令)
 
 ## 📖返回码说明
 
