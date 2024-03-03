@@ -116,7 +116,7 @@ def highlight_error(e):
                 code = read_code(p, l)
                 cc = []
                 viewed = False
-                for i in len(code['result']):
+                for i in range(len(code['result'])):
                     c = code["result"][i]
                     if (c.startswith(code['current']) and (i <= 3)):
                         viewed = True
