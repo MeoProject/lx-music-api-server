@@ -22,6 +22,8 @@ test.*
 */test.*
 logs
 config.json
+/config/config.json
+/config/data.db
 *.log
 *.bak
 *.tmp
