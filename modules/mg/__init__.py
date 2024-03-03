@@ -12,48 +12,52 @@ from common import Httpx
 from common import config
 from common import variable
 from common.exceptions import FailedException
+from . import refresh_login
 
 tools = {
-    'url': 'https://app.c.nf.migu.cn/MIGUM2.0/strategy/listen-url/v2.4?toneFlag=__quality__&songId=__songId__&resourceType=2',
     'qualityMap': {
-        '128k': 'PQ',
-        '320k': 'HQ',
-        'flac': 'SQ',
-        'flac24bit': 'ZQ',
+        '128k': '1',
+        '320k': '2',
+        'flac': '3',
+        'flac24bit': '4',
+        "master": "5"
     },
     'qualityMapReverse': {
-        'PQ': '128k',
-        'HQ': '320k',
-        'SQ': 'flac',
-        'ZQ': 'flac24bit',
+        '000009': '128k',
+        '020010': '320k',
+        '011002': 'flac',
+        '011005': 'flac24bit',
     },
 }
 
-async def url(songId, quality):
+async def url(songmid, quality):
+    info_url = f"http://app.c.nf.migu.cn/MIGUM2.0/v1.0/content/resourceinfo.do?resourceType=2&copyrightId=" + songmid
+    info_request = await Httpx.AsyncRequest(info_url, {"method": "POST", "cache": 259200})
+    infobody = info_request.json()
+    if infobody["code"] != "000000":
+        raise FailedException("failed to fetch song info")
     user_info = config.read_config('module.mg.user') if (not variable.use_cookie_pool) else random.choice(config.read_config('module.cookiepool.mg'))
-    req = await Httpx.AsyncRequest(tools['url'].replace('__quality__', tools['qualityMap'][quality]).replace('__songId__', songId), {
+    req = await Httpx.AsyncRequest(f'https://m.music.migu.cn/migumusic/h5/play/auth/getSongPlayInfo?type={tools["qualityMap"][quality]}&copyrightId={infobody["resource"][0]["copyrightId"]}', {
         'method': 'GET',
         'headers': {
             'User-Agent': user_info['useragent'],
-            'aversionid': user_info['aversionid'],
-            'token': user_info['token'],
-            'channel': '0146832',
-            'language': 'Chinese',
-            'ua': 'Android_migu',
-            'mode': 'android',
-            'os': 'Android ' + user_info['osversion'],
+            "by": user_info["by"],
+            "Cookie": "SESSION=" + user_info["session"],
+            "Referer": "https://m.music.migu.cn/v4/",
+            "Origin": "https://m.music.migu.cn",
         },
     })
     try:
         body = req.json()
-        data = body['data']
 
-        if ((not int(body['code']) == 0) or ( not data['url'])):
-            raise FailedException('failed')
+        if (int(body['code']) != 200 or (not body.get("data")) or (not body["data"]["playUrl"])):
+            raise FailedException(body.get("msg") if body.get("msg") else "failed")
+
+        data = body["data"]
 
         return {
-            'url': data['url'].split('?')[0],
-            'quality': tools['qualityMapReverse'][data['audioFormatType']],
+            'url': body["data"]["playUrl"].split("?")[0] if body["data"]["playUrl"].split("?")[0].startswith("http") else "http:" + body["data"]["playUrl"].split("?")[0],
+            'quality': tools['qualityMapReverse'].get(data['formatId']) if (tools['qualityMapReverse'].get(data['formatId'])) else "unknown",
         }
     except:
         raise FailedException('failed')
