@@ -20,7 +20,7 @@ tools = {
         "192k": "higher",
         '320k': 'exhigh',
         'flac': 'lossless',
-        'flac24bit': 'hires',
+        'flac24bit': 'lossless',
         "dolby": "jyeffect",
         "sky": "sky",
         "master": "jymaster",
