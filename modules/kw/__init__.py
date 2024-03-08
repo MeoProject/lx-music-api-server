@@ -42,7 +42,7 @@ async def url(songId, quality):
     proto = config.read_config('module.kw.proto')
     if (proto == 'bd-api'):
         user_info = config.read_config('module.kw.user') if (not variable.use_cookie_pool) else random.choice(config.read_config('module.cookiepool.kw'))
-        target_url = f'''https://bd-api.kuwo.cn/api/service/music/downloadInfo/{songId}?isMv=0&format={tools['extMap'][quality]}&br={tools['qualityMap'][quality]}&uin={user_info['uid']}&token={user_info['token']}'''
+        target_url = f'''https://bd-api.kuwo.cn/api/service/music/downloadInfo/{songId}?isMv=0&format={tools['extMap'][quality]}&br={tools['qualityMap'][quality]}&uid={user_info['uid']}&token={user_info['token']}'''
         req = await Httpx.AsyncRequest(target_url, {
             'method': 'GET',
             'headers': {
