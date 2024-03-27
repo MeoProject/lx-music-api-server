@@ -127,7 +127,7 @@ linux 命令如果为 python3 请自行替换
 3. 创建容器
 
     ```bash
-    docker run --name lx-music-api-server-python -p 9763:9763 -v /root/lx-music-api-server-python/config:/lxapidocker/lx-music-api-server-python/config -v /root/lx-music-api-server-python/logs:/lxapidocker/lx-music-api-server-python/logs --restart always -d ikun0014/lx-music-api-server-python:latest
+    docker run --name lx-music-api-server-python -p 9763:9763 -v /root/lx-music-api-server-python/config:/work/config -v /root/lx-music-api-server-python/logs:/work/logs --restart always -d ikun0014/lx-music-api-docker
     ```
 
 4. 填写配置

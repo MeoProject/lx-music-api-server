@@ -125,7 +125,7 @@ We don't know the Docker version you need, you can try whether the existing Dock
 3. Create container
 
     ```bash
-    docker run  --name lx-music-api-server-python -p 9763:9763 -v /root/lx-music-api-server-python:/app/data -d ikun0014/lx-music-api-server-python:latest
+    docker run --name lx-music-api-server-python -p 9763:9763 -v /root/lx-music-api-server-python/config:/work/config -v /root/lx-music-api-server-python/logs:/work/logs --restart always -d ikun0014/lx-music-api-docker
     ```
 
 ## 📖Return code description
