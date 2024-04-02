@@ -15,7 +15,7 @@ requests = "^2.31.0"
 colorlog = "^6.8.2"
 Pygments = "^2.17.2"
 xmltodict = "^0.13.0"
-pillow = "^10.2.0"
+pillow = "^10.3.0"
 mutagen = "^1.47.0"
 colorama = "^0.4.6"
 
