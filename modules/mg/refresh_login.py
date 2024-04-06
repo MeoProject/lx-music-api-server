@@ -43,7 +43,7 @@ if (variable.use_cookie_pool):
             "interval": 86400
         }
         if (ref["enable"]):
-            scheduler.append("migu_refresh_login_pooled_" + users["by"], do_account_refresh, ref["interval"], {"user_info": u})
+            scheduler.append("migu_refresh_login_pooled_" + u["by"], do_account_refresh, ref["interval"], {"user_info": u})
 else:
     u = config.read_config("module.mg.user")
     ref = config.read_config("module.mg.user.refresh_login")
