@@ -22,6 +22,7 @@ from common.exceptions import FailedException
 from common import Httpx
 from common import utils
 import asyncio
+from . import refresh_token
 
 async def info(hash_):
     tasks = []
