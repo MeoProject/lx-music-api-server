@@ -201,6 +201,12 @@ default = {
                         "desc": "mix_songmid的获取方式, 默认auto, 可以改成一个数字手动",
                         "value": "auto"
                     }
+                },
+                "refresh_token": {
+                  "desc": "酷狗token保活相关配置，30天不刷新token会失效，enable是否启动，interval刷新间隔。默认appid=1005时有效，3116需要更换signatureKey",
+                  "enable": False,
+                  "interval": 86000,
+                  "login_url": "http://login.user.kugou.com/v4/login_by_token"
                 }
             }
         },
