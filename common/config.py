@@ -14,7 +14,7 @@ import traceback
 import sys
 import sqlite3
 import shutil
-import ruamel.yaml as yaml
+import ruamel.yaml as yaml_
 from . import variable
 from .log import log
 from . import default_config
@@ -46,7 +46,7 @@ def get_cache_connection():
 class ConfigReadException(Exception):
     pass
 
-
+yaml = yaml_.YAML()
 default_str = default_config.default
 default = yaml.load(default_str)
 
@@ -243,7 +243,7 @@ def push_to_list(key, obj):
 def write_config(key, value):
     config = None
     with open('./config/config.yml', 'r', encoding='utf-8') as f:
-        config = yaml.YAML().load(f)
+        config = yaml_.YAML().load(f)
 
     keys = key.split('.')
     current = config
@@ -255,7 +255,7 @@ def write_config(key, value):
     current[keys[-1]] = value
 
     # 设置保留注释和空行的参数
-    y = yaml.YAML()
+    y = yaml_.YAML()
     y.preserve_quotes = True
     y.preserve_blank_lines = True
 

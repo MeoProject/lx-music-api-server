@@ -7,11 +7,6 @@ license = "MIT"
 readme = "README.md"
 package-mode = false
 
-[[tool.poetry.source]]
-name = "ali"
-priority = "primary"
-url = "https://mirrors.aliyun.com/pypi/simple/"
-
 [tool.poetry.dependencies]
 python = "^3.8"
 aiohttp = "^3.9.4"
@@ -25,6 +20,7 @@ pillow = "^10.3.0"
 mutagen = "^1.47.0"
 colorama = "^0.4.6"
 ruamel-yaml = "^0.18.6"
+pybind11 = "^2.12.0"
 
 [build-system]
 requires = ["poetry-core"]
