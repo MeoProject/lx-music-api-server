@@ -37,8 +37,8 @@ async def get_response(retry = 0):
     if (retry > 21):
         logger.warning('请求源脚本内容失败')
         return
-    baseurl = '/lxmusics/lx-music-api-server/main/lx-music-source-example.js'
-    jsdbaseurl = '/gh/lxmusics/lx-music-api-server@main/lx-music-source-example.js'
+    baseurl = '/MeoProject/lx-music-api-server/main/lx-music-source-example.js'
+    jsdbaseurl = '/gh/MeoProject/lx-music-api-server@main/lx-music-source-example.js'
     try:
         i = retry
         if (i > 10):

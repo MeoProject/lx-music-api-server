@@ -12,12 +12,14 @@ import colorlog
 import os
 import sys
 import re
+import io
 import traceback
+import time
 from pygments import highlight
 from pygments.lexers import PythonLexer
 from pygments.formatters import TerminalFormatter
-from .utils import filterFileName, addToGlobalNamespace
-from .variable import debug_mode, log_length_limit, log_file
+from .utils import filterFileName, setGlobal
+from .variable import debug_mode, log_length_limit, log_file, log_files
 from colorama import Fore, Back, Style
 from colorama import init as clinit
 
@@ -159,10 +161,19 @@ class LogHelper(logging.Handler):
         log_message = self.format(record)
         self.custom_logger.info(log_message)
 
+class fileWriter(logging.Handler):
+    def __init__(self, f: io.TextIOWrapper, f2: logging.Formatter):
+        self.file = f
+        self.formatter = f2
+
+    def emit(self, record: logging.LogRecord):
+        self.file.write(self.format(record) + '\n')
+        self.file.flush()
 
 class log:
     # 主类
     def __init__(self, module_name='Not named logger', output_level='INFO', filename=''):
+        self.name = module_name
         self._logger = logging.getLogger(module_name)
         if not output_level.upper() in dir(logging):
             raise NameError('Unknown loglevel: '+output_level)
@@ -181,21 +192,12 @@ class log:
                 'CRITICAL': 'red,bg_white',
             })
         if log_file:
-            file_formatter = logging.Formatter(
-                '%(asctime)s|[%(name)s/%(levelname)s]|%(message)s',
-                datefmt='%Y-%m-%d %H:%M:%S'
-            )
             if filename:
                 filename = filterFileName(filename)
             else:
                 filename = './logs/' + module_name + '.log'
-            file_handler = logging.FileHandler(filename, encoding="utf-8")
-            file_handler.setFormatter(file_formatter)
-            file_handler_ = logging.FileHandler(
-                "./logs/console_full.log", encoding="utf-8")
-            file_handler_.setFormatter(file_formatter)
-            self._logger.addHandler(file_handler_)
-            self._logger.addHandler(file_handler)
+            self.file = open(filename, 'a+', encoding='utf-8')
+            log_files.append(self.file)
         console_handler = logging.StreamHandler()
         console_handler.setFormatter(formatter)
         self.module_name = module_name
@@ -204,61 +206,55 @@ class log:
         debug_handler.setFormatter(formatter)
 
     def debug(self, message, allow_hidden=True):
-        if self.module_name == "flask" and "\n" in message:
-            if message.startswith("Error"):
-                return self._logger.error(message)
-            for m in message.split("\n"):
-                if "WARNING" in m:
-                    self._logger.warning(m)
-                else:
-                    self._logger.info(m)
-            return
+        if (log_file):
+            self.file.write('{time}|[{name}/DEBUG]{msg}'.format(time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), name = self.module_name, msg = message) + '\n')
+
         if len(str(message)) > log_length_limit and allow_hidden:
             message = str(message)[:log_length_limit] + " ..."
         self._logger.debug(message)
 
     def log(self, message, allow_hidden=True):
-        if self.module_name == "flask" and "\n" in message:
-            if message.startswith("Error"):
-                return self._logger.error(message)
-            for m in message.split("\n"):
-                if "WARNING" in m:
-                    self._logger.warning(m)
-                else:
-                    self._logger.info(m)
-            return
+        if (log_file):
+            self.file.write('{time}|[{name}/INFO]{msg}'.format(time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), name = self.module_name, msg = message) + '\n')
+
         if len(str(message)) > log_length_limit and allow_hidden:
             message = str(message)[:log_length_limit] + " ..."
         self._logger.info(message)
 
     def info(self, message, allow_hidden=True):
-        if self.module_name == "flask" and "\n" in message:
-            if message.startswith("Error"):
-                return self._logger.error(message)
-            for m in message.split("\n"):
-                if "WARNING" in m:
-                    self._logger.warning(m)
-                else:
-                    self._logger.info(m)
-            return
+        if (log_file):
+            self.file.write('{time}|[{name}/INFO]{msg}'.format(time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), name = self.module_name, msg = message) + '\n')
+
         if len(str(message)) > log_length_limit and allow_hidden:
             message = str(message)[:log_length_limit] + "..."
         self._logger.info(message)
 
     def warning(self, message):
+        if (log_file):
+            self.file.write('{time}|[{name}/WARNING]{msg}'.format(time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), name = self.module_name, msg = message) + '\n')
+
         if (message.strip().startswith('Traceback')):
             self._logger.warning('\n' + highlight_error(message))
         else:
             self._logger.warning(message)
 
     def error(self, message):
+        if (log_file):
+            self.file.write('{time}|[{name}/ERROR]{msg}'.format(time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), name = self.module_name, msg = message) + '\n')
+
         if (message.startswith('Traceback')):
             self._logger.error('\n' + highlight_error(message))
         else:
             self._logger.error(message)
 
     def critical(self, message):
-        self._logger.critical(message)
+        if (log_file):
+            self.file.write('{time}|[{name}/CRITICAL]{msg}'.format(time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), name = self.module_name, msg = message) + '\n')
+
+        if (message.startswith('Traceback')):
+            self._logger.critical('\n' + highlight_error(message))
+        else:
+            self._logger.critical(message)
 
     def set_level(self, loglevel):
         loglevel_upper = loglevel.upper()
@@ -280,4 +276,4 @@ def logprint(*args, sep=' ', end='', file=None, flush=None):
     printlogger.info(sep.join(str(arg) for arg in args), allow_hidden=False)
 
 
-addToGlobalNamespace('print', logprint)
+setGlobal(logprint, 'print')

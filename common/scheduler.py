@@ -40,6 +40,9 @@ class taskWrapper:
             logger.error(f"task {self.name} run failed, waiting for next execute...")
             logger.error(traceback.format_exc())
 
+    def __str__(self):
+        return f'SchedulerTaskWrapper(name="{self.name}", interval={self.interval}, function={self.function}, args={self.args}, latest_execute={self.latest_execute})'
+
 def append(name, task, interval = 86400, args = {}):
     global tasks
     wrapper = taskWrapper(name, task, interval, args)
