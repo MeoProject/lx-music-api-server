@@ -1,6 +1,6 @@
 {
   "name": "lx-music-api-server-python",
-  "version": "1.0.0",
+  "version": "2.0.0.beta-11",
   "description": "一个适配 LX Music 的 API 后端实现",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
