@@ -9,3 +9,4 @@ toml
 mutagen
 pillow
 colorama
+ruamel-yaml
