@@ -48,7 +48,7 @@ class ConfigReadException(Exception):
 
 
 default_str = default_config.default
-default = yaml.safe_load(default_str)
+default = yaml.load(default_str)
 
 
 def handle_default_config():
@@ -370,7 +370,7 @@ def initConfig():
     try:
         with open("./config/config.yml", "r", encoding="utf-8") as f:
             try:
-                variable.config = yaml.safe_load(f.read())
+                variable.config = yaml.load(f.read())
                 if (not isinstance(variable.config, dict)):
                     logger.warning('配置文件并不是一个有效的字典，使用默认值')
                     variable.config = default
