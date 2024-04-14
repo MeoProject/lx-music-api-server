@@ -1,0 +1,13 @@
+{
+  "name": "lx-music-api-server-python",
+  "version": "1.0.0",
+  "description": "一个适配 LX Music 的 API 后端实现",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "poetry run python poetry_run.py development",
+    "prod": "poetry run python poetry_run.py production",
+    "development": "poetry run python poetry_run.py development",
+    "production": "poetry run python poetry_run.py production",
+    "install": "poetry install"
+  }
+}
