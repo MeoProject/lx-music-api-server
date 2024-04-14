@@ -14,8 +14,10 @@ import traceback
 import sys
 import sqlite3
 import shutil
+import ruamel.yaml as yaml
 from . import variable
 from .log import log
+from . import default_config
 import threading
 
 logger = log('config_manager')
@@ -45,302 +47,17 @@ class ConfigReadException(Exception):
     pass
 
 
-default = {
-    "common": {
-        "host": "0.0.0.0",
-        "_host-desc": "服务器启动时所使用的HOST地址",
-        "ports": [ 9763 ],
-        "_ports-desc": "服务器启动时所使用的端口",
-        "ssl_info": {
-            "desc": "服务器https配置，is_https是这个服务器是否是https服务器，如果你使用了反向代理来转发这个服务器，如果它使用了https，也请将它设置为true",
-            "is_https": False,
-            "enable": False,
-            "ssl_ports": [ 443 ],
-            "path": {
-                "desc": "ssl证书的文件地址",
-                "cert": "/path/to/your/cer",
-                "privkey": "/path/to/your/private/key",
-            },
-        },
-        "reverse_proxy": {
-            "desc": "针对类似于nginx一类的反代的配置",
-            "allow_proxy": True,
-            "_allow_proxy-desc": "是否允许反代",
-            "proxy_whitelist_remote": [
-                "反代时允许的ip来源列表，通常为127.0.0.1",
-                "127.0.0.1"
-            ],
-            "real_ip_header": 'X-Real-IP',
-            "_real_ip_header-desc": "反代来源ip的来源头，不懂请保持默认",
-        },
-        "debug_mode": False,
-        "_debug_mode-desc": "是否开启调试模式",
-        "log_length_limit": 500,
-        "_log_length_limit-desc": "单条日志长度限制",
-        "fakeip": "1.0.1.114",
-        "_fakeip-desc": "服务器在海外时的IP伪装值",
-        "proxy": {
-            "enable": False,
-            "http_value": "http://127.0.0.1:7890",
-            "https_value": "http://127.0.0.1:7890",
-        },
-        "_proxy-desc": "代理配置，HTTP与HTTPS协议需分开配置",
-        "log_file": True,
-        "_log_file-desc": "是否开启日志文件",
-        'cookiepool': False,
-        '_cookiepool-desc': '是否开启cookie池，这将允许用户配置多个cookie并在请求时随机使用一个，启用后请在module.cookiepool中配置cookie，在user处配置的cookie会被忽略，cookiepool中格式统一为列表嵌套user处的cookie的字典',
-        "allow_download_script": True,
-        '_allow_download_script-desc': '是否允许直接从服务端下载脚本，开启后可以直接访问 /script?key=你的请求key 下载脚本',
-        "download_config": {
-            "desc": "源脚本的相关配置，dev为是否启用开发模式",
-            "name": "修改为你的源脚本名称",
-            "intro": "修改为你的源脚本描述",
-            "author": "修改为你的源脚本作者",
-            "version": "修改为你的源版本",
-            "filename": "lx-music-source.js",
-            "_filename-desc": "客户端保存脚本时的文件名（可能因浏览器不同出现不一样的情况）",
-            "dev": True,
-            "quality": {
-                "kw": ["128k"],
-                "kg": ["128k"],
-                "tx": ["128k"],
-                "wy": ["128k"],
-                "mg": ["128k"],
-            }
-        },
-        "local_music": {
-            "desc": "服务器侧本地音乐相关配置，请确保你的带宽足够",
-            "audio_path": "./audio",
-            "temp_path": "./temp",
-        }
-    },
-    "security": {
-        "rate_limit": {
-            "global": 0,
-            "ip": 0,
-            "desc": "请求速率限制，global为全局，ip为单个ip，填入的值为至少间隔多久才能进行一次请求，单位：秒，不限制请填为0"
-        },
-        "key": {
-            "enable": False,
-            "_enable-desc": "是否开启请求key，开启后只有请求头中包含key，且值一样时可以访问API",
-            "ban": True,
-            "values": ["114514"],
-        },
-        "whitelist_host": [
-            "localhost",
-            "0.0.0.0",
-            "127.0.0.1",
-        ],
-        "_whitelist_host-desc": "强制白名单HOST，不需要加端口号（即不受其他安全设置影响的HOST）",
-        "check_lxm": False,
-        "_check_lxm-desc": "是否检查lxm请求头（正常的LX Music请求时都会携带这个请求头）",
-        "lxm_ban": True,
-        "_lxm_ban-desc": "lxm请求头不存在或不匹配时是否将用户IP加入黑名单",
-        "allowed_host": {
-            "desc": "HOST允许列表，启用后只允许列表内的HOST访问服务器，不需要加端口号",
-            "enable": False,
-            "blacklist": {
-                "desc": "当用户访问的HOST并不在允许列表中时是否将请求IP加入黑名单，长度单位：秒",
-                "enable": False,
-                "length": 0,
-            },
-            "list": [
-                "localhost",
-                "0.0.0.0",
-                "127.0.0.1",
-            ],
-        },
-        "banlist": {
-            "desc": "是否启用黑名单（全局设置，关闭后已存储的值并不受影响，但不会再检查）",
-            "enable": True,
-            "expire": {
-                "desc": "是否启用黑名单IP过期（关闭后其他地方的配置会失效）",
-                "enable": True,
-                "length": 86400 * 7,  # 七天
-            },
-        }
-    },
-    "module": {
-        "kg": {
-            "desc": "酷狗音乐相关配置",
-            "client": {
-                "desc": "客户端请求配置，不懂请保持默认，修改请统一为字符串格式",
-                "appid": "1005",
-                "_appid-desc": "酷狗音乐的appid，官方安卓为1005，官方PC为1001",
-                "signatureKey": "OIlwieks28dk2k092lksi2UIkp",
-                "_signatureKey-desc": "客户端signature采用的key值，需要与appid对应",
-                "clientver": "12029",
-                "_clientver-desc": "客户端versioncode，pidversionsecret可能随此值而变化",
-                "pidversionsecret": "57ae12eb6890223e355ccfcb74edf70d",
-                "_pidversionsecret-desc": "获取URL时所用的key值计算验证值",
-                "pid": "2",
-            },
-            "tracker": {
-                "desc": "trackerapi请求配置，不懂请保持默认，修改请统一为字符串格式",
-                "host": "https://gateway.kugou.com",
-                "path": "/v5/url",
-                "version": "v5",
-                "x-router": {
-                    "desc": "当host为gateway.kugou.com时需要追加此头，为tracker类地址时则不需要",
-                    "enable": True,
-                    "value": "tracker.kugou.com",
-                },
-                "extra_params": {},
-                "_extra_params-desc": "自定义添加的param，优先级大于默认，填写类型为普通的JSON数据，会自动转换为请求param",
-            },
-            "user": {
-                "desc": "此处内容请统一抓包获取，需要vip账号来获取会员歌曲，如果没有请留为空值，mid必填，可以瞎填一段数字",
-                "token": "",
-                "userid": "0",
-                "mid": "114514",
-                "lite_sign_in": {
-                    "desc": "是否启用概念版自动签到，仅在appid=3116时运行",
-                    "enable": False,
-                    "interval": 86400,
-                    "mixsongmid": {
-                        "desc": "mix_songmid的获取方式, 默认auto, 可以改成一个数字手动",
-                        "value": "auto"
-                    }
-                },
-                "refresh_token": {
-                  "desc": "酷狗token保活相关配置，30天不刷新token会失效，enable是否启动，interval刷新间隔。默认appid=1005时有效，3116需要更换signatureKey",
-                  "enable": False,
-                  "interval": 86000,
-                  "login_url": "http://login.user.kugou.com/v4/login_by_token"
-                }
-            }
-        },
-        "tx": {
-            "desc": "QQ音乐相关配置",
-            "vkeyserver": {
-                "desc": "请求官方api时使用的guid，uin等信息，不需要与cookie中信息一致",
-                "guid": "114514",
-                "uin": "10086",
-            },
-            "user": {
-                "desc": "用户数据，可以通过浏览器获取，需要vip账号来获取会员歌曲，如果没有请留为空值，qqmusic_key可以从Cookie中/客户端的请求体中（comm.authst）获取",
-                "qqmusic_key": "",
-                "uin": "",
-                "_uin-desc": "key对应的QQ号",
-                'refresh_login': {
-                    'desc': '刷新登录相关配置，enable是否启动，interval刷新间隔',
-                    'enable': False,
-                    'interval': 86000
-                }
-            },
-            "cdnaddr": "http://ws.stream.qqmusic.qq.com/",
-        },
-        "wy": {
-            "desc": "网易云音乐相关配置",
-            "user": {
-                "desc": "账号cookie数据，可以通过浏览器获取，需要vip账号来获取会员歌曲，如果没有请留为空值",
-                "cookie": ""
-            },
-        },
-        "mg": {
-            "desc": "咪咕音乐相关配置",
-            "user": {
-                "desc": "研究不深，后两项自行抓包获取，网页端cookie",
-                "by": "",
-                "session": "",
-                "useragent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.82 Safari/537.36",
-                "refresh_login": {
-                    "enable": False,
-                    "interval": 86400,
-                    "desc": "进行cookie保活"
-                }
-            },
-        },
-        "kw": {
-            "desc": "酷我音乐相关配置，proto支持值：['bd-api', 'kuwodes']",
-            "proto": "bd-api",
-            "user": {
-                "uid": "0",
-                "token": "",
-                "device_id": "0",
-            },
-            "des": {
-                "desc": "kuwodes接口（mobi, nmobi）一类的加密相关配置",
-                "f": "kuwo",
-                "need_encrypt": True,
-                "param填写注释": "{songId}为歌曲id, {map_quality}为map后的歌曲音质（酷我规范）, {raw_quality}为请求时的歌曲音质（LX规范）, {ext}为歌曲文件扩展名",
-                "params": "type=convert_url_with_sign&rid={songId}&quality={map_quality}&ext={ext}",
-                "host": "nmobi.kuwo.cn",
-                "path": "mobi.s",
-                "response_types": ['这里是reponse_type的所有支持值，当设置为json时会使用到下面的两个值来获取url/bitrate，如果为text，则为传统的逐行解析方式', 'json', 'text'],
-                "response_type": "json",
-                "url_json_path": "data.url",
-                "bitrate_json_path": "data.bitrate",
-                "headers": {
-                    "User-Agent": 'okhttp/3.10.0'
-                }
-            }
-        },
-        'cookiepool': {
-            'kg': [
-                {
-                    'userid': '0',
-                    'token': '',
-                    'mid': '114514',
-                    "lite_sign_in": {
-                        "desc": "是否启用概念版自动签到，仅在appid=3116时运行",
-                        "enable": False,
-                        "interval": 86400,
-                        "mixsongmid": {
-                            "desc": "mix_songmid的获取方式, 默认auto, 可以改成一个数字手动",
-                            "value": "auto"
-                        }
-                    }
-                },
-            ],
-            'tx': [
-                {
-                    'qqmusic_key': '',
-                    'uin': '',
-                    'refresh_login': {
-                        'desc': 'cookie池中对于此账号刷新登录的配置，账号间互不干扰',
-                        'enable': False,
-                        'interval': 86000,
-                    }
-                }
-            ],
-            'wy': [
-                {
-                    'cookie': '',
-                }
-            ],
-            'mg': [
-                {
-                    'by': '',
-                    'session': '',
-                    'useragent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.82 Safari/537.36',
-                    "refresh_login": {
-                        "enable": False,
-                        "interval": 86400
-                    }
-                }
-            ],
-            'kw': [
-                {
-                    "uid": "0",
-                    "token": "",
-                    "device_id": "0",
-                },
-            ]
-        },
-    },
-}
+default_str = default_config.default
+default = yaml.safe_load(default_str)
 
 
 def handle_default_config():
-    with open("./config/config.json", "w", encoding="utf-8") as f:
-        f.write(json.dumps(default, indent=2, ensure_ascii=False,
-                escape_forward_slashes=False))
-        f.close()
+    with open("./config/config.yml", "w", encoding="utf-8") as f:
+        f.write(default_str)
         if (not os.getenv('build')):
             logger.info('首次启动或配置文件被删除，已创建默认配置文件')
             logger.info(
-                f'\n建议您到{variable.workdir + os.path.sep}config.json修改配置后重新启动服务器')
+                f'\n建议您到{variable.workdir + os.path.sep}config.yml修改配置后重新启动服务器')
         return default
 
 
@@ -525,8 +242,8 @@ def push_to_list(key, obj):
 
 def write_config(key, value):
     config = None
-    with open('./config/config.json', 'r', encoding='utf-8') as f:
-        config = json.load(f)
+    with open('./config/config.yml', 'r', encoding='utf-8') as f:
+        config = yaml.YAML().load(f)
 
     keys = key.split('.')
     current = config
@@ -536,11 +253,15 @@ def write_config(key, value):
         current = current[k]
 
     current[keys[-1]] = value
-    variable.config = config
-    with open('./config/config.json', 'w', encoding='utf-8') as f:
-        json.dump(config, f, indent=2, ensure_ascii=False,
-                  escape_forward_slashes=False)
-        f.close()
+
+    # 设置保留注释和空行的参数
+    y = yaml.YAML()
+    y.preserve_quotes = True
+    y.preserve_blank_lines = True
+
+    # 写入配置并保留注释和空行
+    with open('./config/config.yml', 'w', encoding='utf-8') as f:
+        y.dump(config, f)
 
 
 def read_default_config(key):
@@ -639,21 +360,26 @@ def initConfig():
             shutil.move('config.json','./config')
         if (os.path.exists('./data.db')):
             shutil.move('./data.db','./config')
+        if (os.path.exists('./config/config.json')):
+            os.rename('./config/config.json', './config/config.json.bak')
+            handle_default_config()
+            logger.warning('json配置文件已不再使用，已将其重命名为config.json.bak')
+            logger.warning('配置文件不会自动更新（因为变化太大），请手动修改配置文件重启服务器')
+            sys.exit(0)
 
     try:
-        with open("./config/config.json", "r", encoding="utf-8") as f:
+        with open("./config/config.yml", "r", encoding="utf-8") as f:
             try:
-                variable.config = json.loads(f.read())
+                variable.config = yaml.safe_load(f.read())
                 if (not isinstance(variable.config, dict)):
                     logger.warning('配置文件并不是一个有效的字典，使用默认值')
                     variable.config = default
-                    with open("./config/config.json", "w", encoding="utf-8") as f:
-                        f.write(json.dumps(variable.config, indent=2,
-                                ensure_ascii=False, escape_forward_slashes=False))
+                    with open("./config/config.yml", "w", encoding="utf-8") as f:
+                        yaml.dump(variable.config, f)
                         f.close()
             except:
-                if os.path.getsize("./config/config.json") != 0:
-                    logger.error("配置文件加载失败，请检查是否遵循JSON语法规范")
+                if os.path.getsize("./config/config.yml") != 0:
+                    logger.error("配置文件加载失败，请检查是否遵循YAML语法规范")
                     sys.exit(1)
                 else:
                     variable.config = handle_default_config()

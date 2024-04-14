@@ -16,6 +16,7 @@ import zlib
 import time
 import re
 import xmltodict
+import ipaddress
 from urllib.parse import quote, unquote, urlparse
 
 def createBase64Encode(data_bytes):
@@ -51,8 +52,8 @@ def require(module):
             index += 1
     return _module
 
-def addToGlobalNamespace(key, data):
-    setattr(builtins, key, data)
+def setGlobal(obj, key = ''):
+    setattr(builtins, obj.__name__ if (not key) else key, obj)
 
 def filterFileName(filename):
     if platform.system() == 'Windows' or platform.system() == 'Cygwin':
@@ -198,5 +199,11 @@ def timestamp_format(t):
         t = int(t)
     return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(t))
 
-addToGlobalNamespace('require', require)
+def is_local_ip(ip):
+    try:
+        i = ipaddress.ip_address(ip)
+        return i.is_private
+    except:
+        return False
 
+setGlobal(require)

@@ -30,7 +30,7 @@ def get_changelog():
     noticeMsg = []
     unknownMsg = []
     for msg in res:
-        if (re.match('[a-f0-9]*.(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert|notice)\(?.*?\)?\:', msg[1:-1])):
+        if (re.match('[a-f0-9]*.(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert|notice).*?\(?.*?\)?\:', msg[1:-1])):
             msg = msg[1:-1]
             if msg[8:].startswith('notice'):
                 noticeMsg.append(msg)

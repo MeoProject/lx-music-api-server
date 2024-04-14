@@ -22,6 +22,7 @@ test.*
 */test.*
 logs
 config.json
+config.yml
 /config/config.json
 /config/data.db
 *.log
@@ -41,3 +42,6 @@ config.json
 
 # temp script
 lx-music-source-example.js
+
+# dumprecord
+dumprecord_*.txt

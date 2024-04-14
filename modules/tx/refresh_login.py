@@ -22,6 +22,7 @@ async def refresh():
         return
     if (not config.read_config('module.tx.user.refresh_login.enable')):
         return
+    print(config.read_config('module.tx.user.qqmusic_key'))
     if (config.read_config('module.tx.user.qqmusic_key').startswith('W_X')):
         options = {
             'method': 'POST',
