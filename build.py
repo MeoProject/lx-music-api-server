@@ -30,17 +30,17 @@ def get_changelog():
     noticeMsg = []
     unknownMsg = []
     for msg in res:
-        if (re.match('[a-f0-9]*.(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert|notice)\:', msg[1:-1])):
+        if (re.match('[a-f0-9]*.(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert|notice)\(?.*?\)?\:', msg[1:-1])):
             msg = msg[1:-1]
-            if msg[8:].startswith('notice:'):
+            if msg[8:].startswith('notice'):
                 noticeMsg.append(msg)
-            elif msg[8:].startswith('feat:'):
+            elif msg[8:].startswith('feat'):
                 featMsg.append(msg)
-            elif msg[8:].startswith('fix:'):
+            elif msg[8:].startswith('fix'):
                 fixMsg.append(msg)
-            elif msg[8:].startswith('docs:'):
+            elif msg[8:].startswith('docs'):
                 docsMsg.append(msg)
-            elif msg[8:].startswith('build:'):
+            elif msg[8:].startswith('build'):
                 buildMsg.append(msg)
             else:
                 otherMsg.append(msg)
