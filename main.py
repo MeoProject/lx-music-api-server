@@ -71,7 +71,7 @@ async def handle_before_request(app, handler):
             if (config.read_config('common.reverse_proxy.allow_proxy')):
                 if (request.headers.get(config.read_config('common.reverse_proxy.real_ip_header'))):
                     # proxy header
-                    if (config.read_config('common.reverse_proxy.allow_public_ip') and (not utils.is_private_ip(request.remote))):
+                    if (config.read_config('common.reverse_proxy.allow_public_ip') and (not utils.is_local_ip(request.remote))):
                         request.remote_addr = request.headers.get(
                             config.read_config('common.reverse_proxy.real_ip_header'))
                     else:
