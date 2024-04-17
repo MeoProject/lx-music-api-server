@@ -12,6 +12,7 @@ from common import Httpx
 from common import config
 from common import variable
 from common.exceptions import FailedException
+from . import refresh_login # 删了这个定时任务会寄掉
 
 tools = {
     'qualityMap': {
