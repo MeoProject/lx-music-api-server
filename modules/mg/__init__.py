@@ -12,7 +12,6 @@ from common import Httpx
 from common import config
 from common import variable
 from common.exceptions import FailedException
-from . import refresh_login
 
 tools = {
     'qualityMap': {
