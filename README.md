@@ -127,12 +127,12 @@ linux 命令如果为 python3 请自行替换
 3. 创建容器
 
     ```bash
-    docker run --name lx-music-api-server-python -p 9763:9763 -v /root/lx-music-api-server-python/config:/work/config -v /root/lx-music-api-server-python/logs:/work/logs --restart always -d ikun0014/lx-music-api-docker
+    docker run --name lx-music-api-server -p 9763:9763 -v /root/lx-music-api-server/config:/app/server/config -v /root/lx-music-api-server/logs:/app/server/logs -v /root/lx-music-api-server/audio:/app/server/audio --restart always -d ikun0014/lx-music-api-docker
     ```
 
 4. 填写配置
 
-前往/root/lx-music-api-server-python/config填写 (权限不足可修改创建容器命令)
+前往/root/lx-music-api-server/config填写 (权限不足可修改创建容器命令)
 
 ## 📖返回码说明
 
