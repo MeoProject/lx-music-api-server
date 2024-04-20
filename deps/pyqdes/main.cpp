@@ -1,6 +1,6 @@
 #include "des.cpp"
-#include <Python.h>
-#define PY_SSIZE_T_CLEAN
+#include <pybind11/pybind11.h>
+
 unsigned char KEY1[] = "!@#)(NHLiuy*$%^&";
 unsigned char KEY2[] = "123ZXC!@#)(*$%^&";
 unsigned char KEY3[] = "!@#)(*$%^&abcDEF";
@@ -30,38 +30,27 @@ void LyricDecode_(unsigned char *content, int len)
   func_ddes(content, KEY3, len);
 }
 
-static PyObject* lyric_decode(PyObject* self, PyObject* args) {
-    const char* content;
-    int len;
+namespace py = pybind11;
 
-    // Parse arguments
-    if (!PyArg_ParseTuple(args, "s#", &content, &len)) {
-        return NULL;
-    }
+// 修改 LyricDecode 函数，接受和返回字节数组
+py::bytes LyricDecode(py::bytes input)
+{
+    // 获取输入字节数组的指针和长度
+    const char *input_ptr = PyBytes_AsString(input.ptr());
+    Py_ssize_t input_len = PyBytes_Size(input.ptr());
 
-    // Call the C function
-    LyricDecode_((unsigned char*)content, len);
+    // 复制输入数据以便修改
+    std::vector<unsigned char> data(input_ptr, input_ptr + input_len);
 
-    // Return the result as bytes
-    return Py_BuildValue("y#", content, len);
+    // 调用 LyricDecode 函数进行解密
+    LyricDecode_(data.data(), data.size());
+
+    // 创建输出字节数组
+    py::bytes output(reinterpret_cast<const char *>(data.data()), data.size());
+
+    return output;
 }
 
-// Method table
-static PyMethodDef module_methods[] = {
-    {"LyricDecode", lyric_decode, METH_VARARGS, "QRC Decrypt."},
-    {NULL, NULL, 0, NULL} /* Sentinel */
-};
-
-// Module initialization function
-static struct PyModuleDef lyric_decoder_module = {
-    PyModuleDef_HEAD_INIT,
-    "qdes",
-    NULL,
-    -1,
-    module_methods
-};
-
-// Module initialization
-PyMODINIT_FUNC PyInit_qdes(void) {
-    return PyModule_Create(&lyric_decoder_module);
+PYBIND11_MODULE(qdes, m) {
+    m.def("LyricDecode", &LyricDecode, "Decrypt a string");
 }
