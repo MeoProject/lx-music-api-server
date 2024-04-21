@@ -210,8 +210,8 @@ async def handle_local(request):
             'data': localMusic.checkLocalMusic(data['p'])
         }
 
-app = Application(middlewares=[handle_before_request])
-utils.setGlobal(app, "app")
+app = aiohttp.web.Application(middlewares=[handle_before_request])
+utils.setGlobal(app)
 
 # mainpage
 app.router.add_get('/', main)
