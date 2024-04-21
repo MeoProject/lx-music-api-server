@@ -211,7 +211,7 @@ async def handle_local(request):
         }
 
 app = aiohttp.web.Application(middlewares=[handle_before_request])
-utils.setGlobal(app)
+utils.setGlobal(app, "app")
 
 # mainpage
 app.router.add_get('/', main)
