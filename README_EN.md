@@ -23,7 +23,6 @@ You can find the corresponding available source scripts in the original reposito
   - [ ] All APIs (playlist, search)
   - [ ] Netease Cloud Refresh Login
   - [ ] Client plays music on webdav
-  - [ ] WebUI
   - [x] Client plays local music on the server
   - [x] Cookie pool
   - [x] HTTPS listening, multi port listening
