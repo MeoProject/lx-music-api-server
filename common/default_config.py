@@ -155,6 +155,15 @@ module:
       headers:
         User-Agent: okhttp/3.10.0
 
+  gcsp: # 歌词适配后端配置
+    # 请注意只允许私用，不要给原作者带来麻烦，谢谢
+    enable: false # 是否启用歌词适配后端
+    path: /client/cgi-bin/api.fcg # 后端接口地址
+    enable_verify: false # 是否启用后端验证
+    package_md5: "" # apk包的md5值，用于验证
+    salt_1: "NDRjZGIzNzliNzEe" # 后端验证参数1
+    salt_2: "6562653262383463363633646364306534333668" # 后端验证参数2
+
   cookiepool:
     kg:
     - userid: '0'

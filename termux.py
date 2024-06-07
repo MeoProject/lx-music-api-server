@@ -1,3 +1,9 @@
+# for installing the dependencies on Termux.
+# ruamel-yaml-clib need to build from source, but it will throw an error during 
+# the build process in default configuration. To fix this, we need to set 
+# CFLAGS environment variable to "-Wno-incompatible-function-pointer-types".
+# Resolution from: https://github.com/termux/termux-packages/issues/16746
+
 import os
 import subprocess
 

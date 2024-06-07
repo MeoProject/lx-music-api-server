@@ -65,7 +65,7 @@ def filterFileName(filename):
     # 将不合法字符替换为下划线
     return re.sub(illegal_chars, '_', filename)
 
-def createMD5(s: (str, bytes)):
+def createMD5(s: (str | bytes)):
     if (isinstance(s, str)):
         s = s.encode("utf-8")
     return hashlib.md5(s).hexdigest()

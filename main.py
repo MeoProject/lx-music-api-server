@@ -15,7 +15,7 @@ import asyncio
 import traceback
 import threading
 import ujson as json
-from aiohttp.web import Response, FileResponse, StreamResponse
+from aiohttp.web import Response, FileResponse, StreamResponse, Application
 from io import TextIOWrapper
 import sys
 import os
@@ -35,6 +35,7 @@ from common import Httpx
 from common import variable
 from common import scheduler
 from common import lx_script
+from common import gcsp
 import modules
 
 def handleResult(dic, status=200) -> Response:
@@ -209,7 +210,7 @@ async def handle_local(request):
             'data': localMusic.checkLocalMusic(data['p'])
         }
 
-app = aiohttp.web.Application(middlewares=[handle_before_request])
+app = Application(middlewares=[handle_before_request])
 utils.setGlobal(app, "app")
 
 # mainpage
@@ -222,6 +223,9 @@ app.router.add_get('/local/{type}', handle_local)
 
 if (config.read_config('common.allow_download_script')):
     app.router.add_get('/script', lx_script.generate_script_response)
+
+if (config.read_config('module.gcsp.enable')):
+    app.router.add_route('*', config.read_config('module.gcsp.path'), gcsp.handle_gcsp)
 
 # 404
 app.router.add_route('*', '/{tail:.*}', handle_404)
@@ -286,7 +290,7 @@ async def run_app_host(host):
                                 https_runner, host, port, ssl_context=ssl_context)
                             await https_site.start()
                             variable.running_ports.append(f'{host}_{port}')
-                            logger.info(f"""监听 -> http://{
+                            logger.info(f"""监听 -> https://{
                                 host if (':' not in host)
                                 else '[' + host + ']'
                             }:{port}""")
