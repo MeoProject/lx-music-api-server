@@ -225,7 +225,7 @@ if (config.read_config('common.allow_download_script')):
     app.router.add_get('/script', lx_script.generate_script_response)
 
 if (config.read_config('module.gcsp.enable')):
-    app.router.add_route('*', config.read_config('module.gcsp.path'), gcsp.handle_gcsp)
+    app.router.add_route('*', config.read_config('module.gcsp.path'), gcsp.handle_request)
 
 # 404
 app.router.add_route('*', '/{tail:.*}', handle_404)
