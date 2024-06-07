@@ -47,7 +47,7 @@ sourceExpirationTime = {
 }
 
 
-async def url(source, songId, quality, query):
+async def url(source, songId, quality, query = {}):
     if (not quality):
         return {
             'code': 2,
