@@ -14,7 +14,7 @@ import ujson as json
 import modules
 from .utils import createMD5 as hashMd5
 from . import config
-from aiohttp.web import Response
+from aiohttp.web import Response, Request
 
 PACKAGE = config.read_config("module.gcsp.package_md5") # pkg md5
 SALT_1 = config.read_config("module.gcsp.salt_1") # salt 1
@@ -72,9 +72,15 @@ async def handleGcspBody(body):
     else:
         return zlib.compress(json.dumps({"code": "403", "error_msg": "内部系统错误，请稍后再试", "data": None}, ensure_ascii = False).encode("utf-8")), 200
 
-async def handle_request(request):
+async def handle_request(request: Request):
     if (request.method == "POST"):
-        body = await request.body()
+        content_size = request.content_length
+        if (content_size > 5 * 1024): # 5kb
+            return Response(
+                body = "Request Entity Too Large",
+                status = 413
+            )
+        body = await request.read()
         return Response(
             body = await handleGcspBody(body),
             content_type = "application/octet-stream"
