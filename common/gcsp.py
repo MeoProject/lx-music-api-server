@@ -65,7 +65,7 @@ async def handleGcspBody(body):
 
     data["te"] = json.loads(data["text_1"])
 
-    body = modules.url(pm[data["te"]["platform"]], data["te"]["t1"], qm[data["te"]["t2"]])
+    body = await modules.url(pm[data["te"]["platform"]], data["te"]["t1"], qm[data["te"]["t2"]])
 
     if (body["code"] == 0):
         return zlib.compress(json.dumps({"code": "200", "error_msg": "success", "data": body["data"] if (pm[data["te"]["platform"]] != "kw") else {"bitrate": "123", "url": body["data"]}}, ensure_ascii = False).encode("utf-8")), 200
