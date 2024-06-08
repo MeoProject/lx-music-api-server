@@ -61,16 +61,16 @@ async def handleGcspBody(body):
     data = decode(body)
     result = verify(data)
     if (result != "success"):
-        return zlib.compress(json.dumps({"code": "403", "error_msg": internal_trans[result], "data": None}, ensure_ascii = False).encode("utf-8")), 200
+        return zlib.compress(json.dumps({"code": "403", "error_msg": internal_trans[result], "data": None}, ensure_ascii = False).encode("utf-8"))
 
     data["te"] = json.loads(data["text_1"])
 
     body = await modules.url(pm[data["te"]["platform"]], data["te"]["t1"], qm[data["te"]["t2"]])
 
     if (body["code"] == 0):
-        return zlib.compress(json.dumps({"code": "200", "error_msg": "success", "data": body["data"] if (pm[data["te"]["platform"]] != "kw") else {"bitrate": "123", "url": body["data"]}}, ensure_ascii = False).encode("utf-8")), 200
+        return zlib.compress(json.dumps({"code": "200", "error_msg": "success", "data": body["data"] if (pm[data["te"]["platform"]] != "kw") else {"bitrate": "123", "url": body["data"]}}, ensure_ascii = False).encode("utf-8"))
     else:
-        return zlib.compress(json.dumps({"code": "403", "error_msg": "内部系统错误，请稍后再试", "data": None}, ensure_ascii = False).encode("utf-8")), 200
+        return zlib.compress(json.dumps({"code": "403", "error_msg": "内部系统错误，请稍后再试", "data": None}, ensure_ascii = False).encode("utf-8"))
 
 async def handle_request(request: Request):
     if (request.method == "POST"):
@@ -83,7 +83,8 @@ async def handle_request(request: Request):
         body = await request.read()
         return Response(
             body = await handleGcspBody(body),
-            content_type = "application/octet-stream"
+            content_type = "application/octet-stream",
+            status = 200
         )
     else:
         return Response(
