@@ -1,8 +1,8 @@
 /*!
  * @name 替换为你的音乐源名称
  * @description 替换为你的音乐源介绍
- * @version v2.0.0
- * @author Folltoshe & helloplhm-qwq
+ * @version v2.0.1
+ * @author Folltoshe & helloplhm-qwq & lerdb
  * @repository https://github.com/lxmusics/lx-music-api-server
  */
 
@@ -29,6 +29,9 @@ MUSIC_SOURCE.push('local')
  * 下面的东西就不要修改了
  */
 const { EVENT_NAMES, request, on, send, utils, env, version } = globalThis.lx
+
+// MD5值,用来检查更新
+const SCRIPT_MD5 = ''
 
 /**
  * URL请求
@@ -214,6 +217,26 @@ const handleGetMusicLyric = async (source, musicInfo) => {
   }
 }
 
+// 检查源脚本是否有更新
+const checkUpdate = async () => {
+  const request = await httpFetch(`${API_URL}/script?key=${API_KEY}&checkUpdate=${SCRIPT_MD5}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'User-Agent': `${env ? `lx-music-${env}/${version}` : `lx-music-request/${version}`}`
+    },
+  })
+  const { body } = request
+
+  if (!body || body.code !== 0) console.log('checkUpdate failed')
+  else {
+    console.log('checkUpdate success')
+    if (body.data != null) {
+      globalThis.lx.send(lx.EVENT_NAMES.updateAlert, { log: body.data.updateMsg, updateUrl: body.data.updateUrl })
+    }
+  }
+}
+
 // 生成歌曲信息
 const musicSources = {}
 MUSIC_SOURCE.forEach(item => {
@@ -257,5 +280,7 @@ on(EVENT_NAMES.request, ({ action, source, info }) => {
   }
 })
 
+// 检查更新
+checkUpdate()
 // 向 LX Music 发送初始化成功事件
 send(EVENT_NAMES.inited, { status: true, openDevTools: DEV_ENABLE, sources: musicSources })
