@@ -8,6 +8,8 @@
 
 // 是否开启开发模式
 const DEV_ENABLE = true
+// 是否开启更新提醒
+const UPDATE_ENABLE = true
 // 服务端地址
 const API_URL = 'http://127.0.0.1:9763'
 // 服务端配置的请求key
@@ -281,6 +283,6 @@ on(EVENT_NAMES.request, ({ action, source, info }) => {
 })
 
 // 检查更新
-checkUpdate()
+if (UPDATE_ENABLE) checkUpdate()
 // 向 LX Music 发送初始化成功事件
 send(EVENT_NAMES.inited, { status: true, openDevTools: DEV_ENABLE, sources: musicSources })
