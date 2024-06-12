@@ -36,6 +36,12 @@ common:
     version: 修改为你的源版本
     filename: lx-music-source.js # 客户端保存脚本时的文件名（可能因浏览器不同出现不一样的情况）
     dev: true # 是否启用开发模式
+    update: true # 是否开启脚本更新提醒
+    # 可用参数
+    # {updateUrl}为更新地址(带请求key)
+    # {url}为请求时的url(不带请求的param)
+    # {key}为请求时携带的key
+    updateMsg: "源脚本有更新啦，更新地址:\n{updateUrl}"
     quality:
       kw: [128k]
       kg: [128k]
