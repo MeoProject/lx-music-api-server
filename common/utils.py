@@ -18,6 +18,7 @@ import re
 import xmltodict
 import ipaddress
 from urllib.parse import quote, unquote, urlparse
+from typing import Union
 
 def createBase64Encode(data_bytes):
     encoded_data = base64.b64encode(data_bytes)
@@ -65,7 +66,7 @@ def filterFileName(filename):
     # 将不合法字符替换为下划线
     return re.sub(illegal_chars, '_', filename)
 
-def createMD5(s: (str | bytes)):
+def createMD5(s: Union[str, bytes]):
     if (isinstance(s, str)):
         s = s.encode("utf-8")
     return hashlib.md5(s).hexdigest()
