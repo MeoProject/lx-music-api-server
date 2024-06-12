@@ -14,6 +14,7 @@ from .log import log
 from aiohttp.web import Response
 import ujson as json
 import re
+from common.utils import createMD5
 
 logger = log('lx_script')
 
@@ -99,7 +100,16 @@ async def generate_script_response(request):
     r = '\n'.join(newScriptLines)
     
     r = re.sub(r'const MUSIC_QUALITY = {[^}]+}', f'const MUSIC_QUALITY = JSON.parse(\'{json.dumps(config.read_config("common.download_config.quality"))}\')', r)
-
+    
+    # 用于检查更新
+    md5 = createMD5(r)
+    r = r.replace(r"const SCRIPT_MD5 = ''", f"const SCRIPT_MD5 = '{md5}'")
+    if (request.query.get('checkUpdate')):
+        if (request.query.get('checkUpdate') == md5):
+            return {'code': 0, 'msg': 'success', 'data': None}, 200
+        updateUrl = f"{'https' if config.read_config('common.ssl_info.is_https') else 'http'}://{request.host}/script{('?key=' + request.query.get('key')) if request.query.get('key') else ''}"
+        return {'code': 0, 'msg': 'success', 'data': {'updateMsg': f'源脚本有更新啦,更新地址:\n{updateUrl}', 'updateUrl': updateUrl}}, 200
+    
     return Response(text = r, content_type = 'text/javascript',
                     headers = {
                         'Content-Disposition': f'''attachment; filename={
