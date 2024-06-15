@@ -2,18 +2,16 @@ English | [简体中文](README.md)
 
 <div align="center">
 
-![lx-music-api-server-python](https://socialify.git.ci/lxmusics/lx-music-api-server-python/image?description=1&forks=1&issues=1&logo=https%3A%2F%2Fraw.githubusercontent.com%2Flxmusics%2Flx-music-api-server-python%2Fmain%2Ficon.png&owner=1&pulls=1&stargazers=1&theme=Auto)
+![lx-music-api-server](https://socialify.git.ci/MeoProject/lx-music-api-server/image?description=1&forks=1&issues=1&logo=https%3A%2F%2Fraw.githubusercontent.com%2FMeoProject%2Flx-music-api-server%2Fmain%2Ficon.png&owner=1&pulls=1&stargazers=1&theme=Auto)
 
-![GitHub Repo Size](https://img.shields.io/github/repo-size/lxmusics/lx-music-api-server-python?style=for-the-badge)
-[![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/lxmusics/lx-music-api-server-python/build_beta.yml?style=for-the-badge)](https://github.com/lxmusics/lx-music-api-server-python/actions/workflows/build_beta.yml)
-[![GitHub Release (with filter)](https://img.shields.io/github/v/release/lxmusics/lx-music-api-server-python?style=for-the-badge)](https://github.com/lxmusics/lx-music-api-server-python/releases/latest)
-[![GitHub All Releases](https://img.shields.io/github/downloads/lxmusics/lx-music-api-server-python/total?style=for-the-badge&color=violet)](https://github.com/lxmusics/lx-music-api-server-python/releases)
-[![GitHub License](https://img.shields.io/github/license/lxmusics/lx-music-api-server-python?style=for-the-badge)](https://github.com/lxmusics/lx-music-api-server/blob/main/LICENSE)
+![GitHub Repo Size](https://img.shields.io/github/repo-size/MeoProject/lx-music-api-server?style=for-the-badge)
+[![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/MeoProject/lx-music-api-server/build_beta.yml?style=for-the-badge)](https://github.com/MeoProject/lx-music-api-server/actions/workflows/build_beta.yml)
+[![GitHub Release (with filter)](https://img.shields.io/github/v/release/MeoProject/lx-music-api-server?style=for-the-badge)](https://github.com/MeoProject/lx-music-api-server/releases/latest)
+[![GitHub All Releases](https://img.shields.io/github/downloads/MeoProject/lx-music-api-server/total?style=for-the-badge&color=violet)](https://github.com/MeoProject/lx-music-api-server/releases)
+[![GitHub License](https://img.shields.io/github/license/MeoProject/lx-music-api-server?style=for-the-badge)](https://github.com/MeoProject/lx-music-api-server/blob/main/LICENSE)
 
 </div>
-
-Original Repo: [lx-music-api-server](https://github.com/lxmusics/lx-music-api-server)  
-You can find the corresponding available source scripts in the original repository.
+This project [Document](https://apidoc.zcmonety.xyz)  
 
 **Ban** and other situations caused by the use of this project have **nothing** to do with this project.
 
@@ -36,7 +34,7 @@ You can find the corresponding available source scripts in the original reposito
 
 ### Use Release (recommended)
 
-1. Download the executable file corresponding to your system from [Releases](https://github.com/lxmusics/lx-music-api-server-python/releases) or [Actions](https://github.com/lxmusics/lx-music-api-server-python/actions)
+1. Download the executable file corresponding to your system from [Releases](https://github.com/MeoProject/lx-music-api-server/releases) or [Actions](https://github.com/MeoProject/lx-music-api-server/actions)
 
 2. Run the downloaded executable file (maybe you need to unzip the downloaded file if it is a compressed files)
 
@@ -55,8 +53,8 @@ Required environment: Python 3.8+
 2. Clone this project and enter the project directory
 
     ```bash
-    git clone https://github.com/lxmusics/lx-music-api-server-python.git
-    cd lx-music-api-server-python
+    git clone https://github.com/MeoProject/lx-music-api-server.git
+    cd lx-music-api-server
     ```
 
 3. Install requirements
@@ -85,8 +83,8 @@ If you are using linux, you command maybe python3, please replace it yourself.
 1. Clone this project and enter the project directory
 
     ```bash
-    git clone https://github.com/lxmusics/lx-music-api-server-python.git
-    cd lx-music-api-server-python
+    git clone https://github.com/MeoProject/lx-music-api-server.git
+    cd lx-music-api-server
     ```
 
 2. Install requirements
@@ -99,32 +97,6 @@ If you are using linux, you command maybe python3, please replace it yourself.
 
     ```bash
     python main.py
-    ```
-
----
-
-### Use Docker
-
-Required environment: Docker
-
-We don't know the Docker version you need, you can try whether the existing Docker version can be used by yourself.
-
-1. Update package
-
-    ```bash
-    sudo apt-get update
-    ```
-
-2. install Docker (skip if you already have it)
-
-    ```bash
-    sudo apt-get install -y docker.io
-    ```
-
-3. Create container
-
-    ```bash
-    docker run --name lx-music-api-server-python -p 9763:9763 -v /root/lx-music-api-server-python/config:/work/config -v /root/lx-music-api-server-python/logs:/work/logs --restart always -d ikun0014/lx-music-api-docker
     ```
 
 ## 📖Return code description
@@ -231,7 +203,7 @@ The code meaning of `statuscode` returned by the interface.
 
 4. Module does not split
 
-    Details at [config.py](https://github.com/lxmusics/lx-music-api-server-python/tree/main/common/config.py)
+    Details at [config.py](https://github.com/MeoProject/lx-music-api-server/tree/main/common/config.py)
 
 5. Unknown variable name
 
@@ -248,7 +220,7 @@ The code meaning of `statuscode` returned by the interface.
 
 ## 📄Project agreement
 
-This project is issued under [MIT](https://github.com/lxmusics/lx-music-api-server/blob/main/LICENSE) license. The following agreement is a supplement to the original MIT agreement. In case of conflict, the following agreement shall prevail.
+This project is issued under [MIT](https://github.com/MeoProject/lx-music-api-server/blob/main/LICENSE) license. The following agreement is a supplement to the original MIT agreement. In case of conflict, the following agreement shall prevail.
 
 Word agreement: "this project" in this agreement refers to this audio source project; "User" means the user who signed this Agreement; "Official Music Platform" refers to the official platforms built in this project, including Cool Me, Cool Dog, Mi Gu and other music sources; "Copyright data" refers to data of which others have copyright, including but not limited to images, audio, names, etc.
 
@@ -268,8 +240,8 @@ folltoshe+foxmail.com
 
 ## ✨Star trend chart
 
-[![Stargazers over time](https://starchart.cc/lxmusics/lx-music-api-server-python.svg)](https://starchart.cc/lxmusics/lx-music-api-server-python)
+[![Stargazers over time](https://starchart.cc/MeoProject/lx-music-api-server.svg)](https://starchart.cc/MeoProject/lx-music-api-server)
 
 ## ⚙️Contributor
 
-[![Contributor](https://contrib.rocks/image?repo=lxmusics/lx-music-api-server-python)](https://github.com/lxmusics/lx-music-api-server-python/graphs/contributors)
+[![Contributor](https://contrib.rocks/image?repo=MeoProject/lx-music-api-server)](https://github.com/MeoProject/lx-music-api-server/graphs/contributors)

@@ -2,18 +2,17 @@
 
 <div align="center">
 
-![lx-music-api-server-python](https://socialify.git.ci/lxmusics/lx-music-api-server-python/image?description=1&forks=1&issues=1&logo=https%3A%2F%2Fraw.githubusercontent.com%2Flxmusics%2Flx-music-api-server-python%2Fmain%2Ficon.png&owner=1&pulls=1&stargazers=1&theme=Auto)
+![lx-music-api-server](https://socialify.git.ci/MeoProject/lx-music-api-server/image?description=1&forks=1&issues=1&logo=https%3A%2F%2Fraw.githubusercontent.com%2FMeoProject%2Flx-music-api-server%2Fmain%2Ficon.png&owner=1&pulls=1&stargazers=1&theme=Auto)
 
-![GitHub Repo Size](https://img.shields.io/github/repo-size/lxmusics/lx-music-api-server-python?style=for-the-badge)
-[![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/lxmusics/lx-music-api-server-python/build_beta.yml?style=for-the-badge)](https://github.com/lxmusics/lx-music-api-server-python/actions/workflows/build_beta.yml)
-[![GitHub Release (with filter)](https://img.shields.io/github/v/release/lxmusics/lx-music-api-server-python?style=for-the-badge)](https://github.com/lxmusics/lx-music-api-server-python/releases/latest)
-[![GitHub All Releases](https://img.shields.io/github/downloads/lxmusics/lx-music-api-server-python/total?style=for-the-badge&color=violet)](https://github.com/lxmusics/lx-music-api-server-python/releases)
-[![GitHub License](https://img.shields.io/github/license/lxmusics/lx-music-api-server-python?style=for-the-badge)](https://github.com/lxmusics/lx-music-api-server/blob/main/LICENSE)
+![GitHub Repo Size](https://img.shields.io/github/repo-size/MeoProject/lx-music-api-server?style=for-the-badge)
+[![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/MeoProject/lx-music-api-server/build_beta.yml?style=for-the-badge)](https://github.com/MeoProject/lx-music-api-server/actions/workflows/build_beta.yml)
+[![GitHub Release (with filter)](https://img.shields.io/github/v/release/MeoProject/lx-music-api-server?style=for-the-badge)](https://github.com/MeoProject/lx-music-api-server/releases/latest)
+[![GitHub All Releases](https://img.shields.io/github/downloads/MeoProject/lx-music-api-server/total?style=for-the-badge&color=violet)](https://github.com/MeoProject/lx-music-api-server/releases)
+[![GitHub License](https://img.shields.io/github/license/MeoProject/lx-music-api-server?style=for-the-badge)](https://github.com/MeoProject/lx-music-api-server/blob/main/LICENSE)
 
 </div>
 
-原仓库：[lx-music-api-server](https://github.com/lxmusics/lx-music-api-server)  
-你可以在原仓库中找到对应的可用源脚本
+本项目[文档](https://apidoc.zcmonety.xyz)  
 
 由于使用此项目导致的**封号**等情况**与本项目无关**
 
@@ -36,8 +35,8 @@
 
 ### Release 部署（推荐）
 
-1. 从 [Releases](https://github.com/lxmusics/lx-music-api-server-python/releases)
-   或 [Actions](https://github.com/lxmusics/lx-music-api-server-python/actions)
+1. 从 [Releases](https://github.com/MeoProject/lx-music-api-server/releases)
+   或 [Actions](https://github.com/MeoProject/lx-music-api-server/actions)
    下载对应你系统的可执行文件 (从 GitHub Actions 下载需要登录 GitHub 账号)
 
 2. 运行可执行文件（如果下载的文件是压缩包请先解压）
@@ -57,8 +56,8 @@
 2. clone本项目并进入项目目录
 
     ```bash
-    git clone https://github.com/lxmusics/lx-music-api-server-python.git
-    cd lx-music-api-server-python
+    git clone https://github.com/MeoProject/lx-music-api-server.git
+    cd lx-music-api-server
     ```
 
 3. 安装依赖
@@ -87,8 +86,8 @@ linux 命令如果为 python3 请自行替换
 1. clone本项目并进入项目目录
 
     ```bash
-    git clone https://github.com/lxmusics/lx-music-api-server-python.git
-    cd lx-music-api-server-python
+    git clone https://github.com/MeoProject/lx-music-api-server.git
+    cd lx-music-api-server
     ```
 
 2. 安装依赖
@@ -102,36 +101,6 @@ linux 命令如果为 python3 请自行替换
     ```bash
     python main.py
     ```
-
----
-
-### Docker 部署
-
-环境要求：Docker
-
-不知道需要的 Docker 版本，可以自己尝试现有的 Docker 版本是否可以使用
-
-1. 更新软件包
-
-    ```bash
-    sudo apt-get update
-    ```
-
-2. 安装Docker，已有跳过
-
-    ```bash
-    sudo apt-get install -y docker.io
-    ```
-
-3. 创建容器
-
-    ```bash
-    docker run --name lx-music-api-server -p 9763:9763 -v /root/lx-music-api-server/config:/app/server/config -v /root/lx-music-api-server/logs:/app/server/logs -v /root/lx-music-api-server/audio:/app/server/audio --restart always -d ikun0014/lx-music-api-docker
-    ```
-
-4. 填写配置
-
-前往/root/lx-music-api-server/config填写 (权限不足可修改创建容器命令)
 
 ## 📖返回码说明
 
@@ -237,7 +206,7 @@ linux 命令如果为 python3 请自行替换
 
 4. 模块不拆分
 
-    详见[config.py](https://github.com/lxmusics/lx-music-api-server-python/tree/main/common/config.py)
+    详见[config.py](https://github.com/MeoProject/lx-music-api-server/tree/main/common/config.py)
 
 5. 不明所以的变量名
 
@@ -254,7 +223,7 @@ linux 命令如果为 python3 请自行替换
 
 ## 📄项目协议
 
-本项目基于 [MIT](https://github.com/lxmusics/lx-music-api-server/blob/main/LICENSE) 许可证发行，以下协议是对于 MIT 原协议的补充，如有冲突，以以下协议为准。
+本项目基于 [MIT](https://github.com/MeoProject/lx-music-api-server/blob/main/LICENSE) 许可证发行，以下协议是对于 MIT 原协议的补充，如有冲突，以以下协议为准。
 
 词语约定：本协议中的“本项目”指本音源项目；“使用者”指签署本协议的使用者；“官方音乐平台”指对本项目内置的包括酷我、酷狗、咪咕等音乐源的官方平台统称；“版权数据”指包括但不限于图像、音频、名字等在内的他人拥有所属版权的数据。
 
@@ -274,8 +243,8 @@ folltoshe+foxmail.com
 
 ## ✨Star 趋势图
 
-[![Stargazers over time](https://starchart.cc/lxmusics/lx-music-api-server-python.svg)](https://starchart.cc/lxmusics/lx-music-api-server-python)
+[![Stargazers over time](https://starchart.cc/MeoProject/lx-music-api-server.svg)](https://starchart.cc/MeoProject/lx-music-api-server)
 
 ## ⚙️贡献者
 
-[![Contributor](https://contrib.rocks/image?repo=lxmusics/lx-music-api-server-python)](https://github.com/lxmusics/lx-music-api-server-python/graphs/contributors)
+[![Contributor](https://contrib.rocks/image?repo=MeoProject/lx-music-api-server)](https://github.com/MeoProject/lx-music-api-server/graphs/contributors)
