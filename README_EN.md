@@ -15,6 +15,8 @@ This project [Document](https://apidoc.zcmonety.xyz)
 
 **Ban** and other situations caused by the use of this project have **nothing** to do with this project.
 
+This project does not accept private customization, and the problems that occur in the non-**Github release of this project** have nothing to do with this project**
+
 ## 💡Feature
 
 - [ ] Functions
