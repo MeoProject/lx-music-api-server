@@ -9,7 +9,7 @@ package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.8"
-aiohttp = "^3.10.1"
+aiohttp = "^3.10.3"
 pycryptodome = "^3.20.0"
 ujson = "^5.10.0"
 requests = "^2.32.3"
