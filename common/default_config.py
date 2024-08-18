@@ -181,7 +181,6 @@ module:
             value: auto
         refresh_login: # cookie池中对于此账号刷新登录的配置，账号间互不干扰
           enable: false
-          interval: 604800
           login_url: http://login.user.kugou.com/v4/login_by_token
 
     tx:
