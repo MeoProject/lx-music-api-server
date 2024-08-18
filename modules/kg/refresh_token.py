@@ -141,7 +141,7 @@ async def refresh_login_for_pool(user_info):
             'KG-Rec': '1',
             'KG-RC': '1',
         }
-        login_url = config.read_config('module.kg.user.refresh_token.login_url')
+        login_url = user_info["refresh_login"]["login_url"]
         req = await signRequest(login_url, params, {'method': 'POST', 'json': data, 'headers': headers})
         body = req.json()
         if body['error_code'] != 0:
@@ -180,7 +180,7 @@ async def refresh_login_for_pool(user_info):
             'KG-Rec': '1',
             'KG-RC': '1',
         }
-        login_url = config.read_config('module.kg.user.refresh_token.login_url')
+        login_url = user_info["refresh_login"]["login_url"]
         req = await signRequest(login_url, params, {'method': 'POST', 'json': data, 'headers': headers})
         body = req.json()
         if body['error_code'] != 0:
@@ -203,7 +203,7 @@ def reg_refresh_login_pool_task():
     for user_info in user_info_pool:
         if (user_info['refresh_login'].get('enable')):
             scheduler.append(
-                f'kgmusic_refresh_login_pooled_{user_info["userid"]}', refresh_login_for_pool, user_info['refresh_login']['interval'], args = {'user_info': user_info})
+                f'kgmusic_refresh_login_pooled_{user_info["userid"]}', refresh_login_for_pool, int(604800), args = {'user_info': user_info})
 
 if (variable.use_cookie_pool):
     reg_refresh_login_pool_task()
