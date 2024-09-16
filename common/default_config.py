@@ -123,6 +123,9 @@ module:
         enable: false
         interval: 86000
     cdnaddr: http://ws.stream.qqmusic.qq.com/
+    vkey_api: # 第三方Vkey获取API
+      use_vkey_api: false
+      vkey_api_url: "xxx"
 
   wy: # 网易云音乐相关配置
     user: # 账号cookie数据，可以通过浏览器获取，需要vip账号来获取会员歌曲，如果没有请留为空值
