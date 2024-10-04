@@ -62,7 +62,7 @@ def read_code(file_path, target_line_number):
                 'current': lines[target_line_number - 1],
                 'result': lines[start:end]
             }
-            print(lineMap)
+            # print(lineMap)
             return lineMap
     except FileNotFoundError:
         sys.stderr.write("日志模块出错，本次日志可能无法记录，请报告给开发者: 处理错误语法高亮时找不到源文件")
