@@ -18,9 +18,9 @@ import time
 from pygments import highlight
 from pygments.lexers import PythonLexer
 from pygments.formatters import TerminalFormatter
-from .utils import filterFileName, setGlobal
+from .utils import filterFileName, setGlobal, require
 from .variable import debug_mode, log_length_limit, log_file, log_files
-from colorama import Fore, Back, Style
+from colorama import Fore, Style
 from colorama import init as clinit
 
 clinit()  # 初始化 colorama
@@ -40,6 +40,7 @@ class Color:
         return lambda x: f"{getattr(Fore, k.upper())}{x}{Style.RESET_ALL}"
 
 color = Color()
+# purple_parentheses = color.purple('(') + '{}' + color.purple(')')
 
 def is_rubbish(input_string):
     return bool(re.match(r'^(\~|\^)*$', input_string))
@@ -47,14 +48,6 @@ def is_rubbish(input_string):
 def stack_error(exception):
     stack_trace = traceback.format_exception(type(exception), exception, exception.__traceback__)
     return ''.join(stack_trace)
-
-def find_function(file_name, line_number):
-    with open(file_name, 'r') as file:
-        lines = file.readlines()
-    target_line = lines[line_number - 1]  # 获取目标行内容
-    for name, obj in inspect.getmembers(inspect.currentframe().f_back.f_globals):
-        if (inspect.isfunction(obj)):#  and target_line.lstrip().startswith('def '+obj.__name__)):
-            return obj.__name__, inspect.getsourcelines(obj)[1]
 
 def python_highlight(code):
     return highlight(code, PythonLexer(), TerminalFormatter())
@@ -69,6 +62,7 @@ def read_code(file_path, target_line_number):
                 'current': lines[target_line_number - 1],
                 'result': lines[start:end]
             }
+            print(lineMap)
             return lineMap
     except FileNotFoundError:
         sys.stderr.write("日志模块出错，本次日志可能无法记录，请报告给开发者: 处理错误语法高亮时找不到源文件")
@@ -118,17 +112,22 @@ def highlight_error(e):
                 code = read_code(p, l)
                 cc = []
                 viewed = False
+                firstLineNumber = max(l - 3, 1)
+                line_number = firstLineNumber
                 for i in range(len(code['result'])):
                     c = code["result"][i]
-                    if (c.startswith(code['current']) and (i <= 3)):
+                    if (c.startswith(code['current']) and (not viewed) and (i <= 3)):
                         viewed = True
+                        line_number = line_number + 1
+                        # print(line_number)
                         cc.append((' ' * (10 - len(str(l))) + f'{color.red(str(l))} >|' + python_highlight(c)))
                     else:
-                        line_number = l + (code["result"].index(c) - 3)
                         cc.append((' ' * (10 - len(str(line_number))) + f'{color.blue(str(line_number))}  |' + python_highlight(c)))
+                        line_number = line_number + 1
+                        # print(line_number)
                 code = "\n".join(cc)
                 p = '"' + p + '"'
-                final.append(f"    File {color.yellow(f'{p}')} in {color.cyan(f)}()\n\n\n{code}\n")
+                final.append(f"    File {color.yellow(f'{p}')} in {color.cyan(f) + '()' if (not f.startswith('<')) else ''}\n\n\n{code}\n")
             else:
                 try:
                     if (is_rubbish(i)):
@@ -143,6 +142,41 @@ def highlight_error(e):
                     # traceback.print_exc()
                     final.append(i)
         return "\n".join(final).replace('\n\n', '\n')
+        '''
+        lines = [i for i in error.split("\n") if (i.strip() and not is_rubbish(i))]
+
+        final = []
+        ispass = False # pass handle next line
+        for index in range(len(lines)):
+            i = lines[index]
+            i2 = i.strip()
+            if (ispass):
+                ispass = False
+                continue
+            if (i2.startswith("Traceback (most recent call last):")):
+                final.append(color.cyan(i))
+            elif (i2.startswith("During handling of the above exception, another exception occurred:")):
+                final.append(color.cyan(i))
+            elif (i2.startswith("The above exception was the direct cause of the following exception:")):
+                final.append(color.cyan(i))
+            elif (i2.startswith("File")):
+                p, l, f = stack_info(i2)
+                p = p[1:-1]
+                if (p.startswith('<') or not os.path.isfile(p)):
+                    final.append(f'    File {color.yellow("\"" + p + "\"")} in {color.cyan(f)}() [line {color.blue(l)}]\n')
+                    _probably_err_name = lines[index + 1].split(':')[0]
+                    if not (lines.get(index + 1, '').strip().startswith("File") or require(
+                        ('builtins.' + _probably_err_name) if ("." not in _probably_err_name) else _probably_err_name
+                    ) is Exception):
+                        final.append(f"    > {color.red(l)} |" + python_highlight(lines[index + 1]))
+                        ispass = True
+                    continue
+                codeMap = read_code(p, l)
+                line_length = len(codeMap['result'])
+
+                '''
+
+
     except:
         sys.stderr.write('格式化错误失败，使用默认格式\n' + traceback.format_exc())
         if (isinstance(e, Exception)):
