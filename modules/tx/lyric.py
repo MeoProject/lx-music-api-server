@@ -26,70 +26,66 @@ class ParseTools:
             'timeLabelFixRxp': re.compile(r'(?:\.0+|0+)$'),
         }
 
-    def ms_format(self, time_ms):
-        if not time_ms:
+    def msFormat(self, timeMs):
+        if isinstance(timeMs, float) and timeMs.is_nan():
             return ''
-        ms = time_ms % 1000
-        time_ms /= 1000
-        m = str(int(time_ms / 60)).zfill(2)
-        time_ms %= 60
-        s = str(int(time_ms)).zfill(2)
-        return f"[{m}:{s}.{str(ms).zfill(3)}]"
+        ms = timeMs % 1000
+        timeMs //= 1000
+        m = str(int(timeMs // 60)).zfill(2)
+        s = str(int(timeMs % 60)).zfill(2)
+        return f'[{m}:{s}.{str(ms).zfill(3)}]'
 
-    def parse_lyric(self, lrc):
-        lrc = lrc.strip()
-        lrc = lrc.replace('\r', '')
+    def parseLyric(self, lrc):
+        lrc = lrc.strip().replace('\r', '')
         if not lrc:
             return {'lyric': '', 'lxlyric': ''}
+        # print(lrc)
+        
         lines = lrc.split('\n')
-
-        lxlrc_lines = []
-        lyric_lines = []
+        lxlrcLines = []
+        lrcLines = []
 
         for line in lines:
             line = line.strip()
             result = self.rxps['lineTime'].match(line)
             if not result:
                 if line.startswith('[offset'):
-                    lxlrc_lines.append(line)
-                    lyric_lines.append(line)
-                if self.rxps['lineTime2'].search(line):
-                    lyric_lines.append(line)
+                    lxlrcLines.append(line)
+                    lrcLines.append(line)
+                if self.rxps['lineTime2'].match(line):
+                    lrcLines.append(line)
                 continue
 
-            start_ms_time = int(result.group(1))
-            start_time_str = self.ms_format(start_ms_time)
-            if not start_time_str:
+            startMsTime = int(result.group(1))
+            startTimeStr = self.msFormat(startMsTime)
+            if not startTimeStr:
                 continue
 
             words = re.sub(self.rxps['lineTime'], '', line)
 
-            lyric_lines.append(f"{start_time_str}{re.sub(self.rxps['wordTimeAll'], '', words)}")
+            lrcLines.append(f'{startTimeStr}{re.sub(self.rxps["wordTimeAll"], "", words)}')
 
             times = re.findall(self.rxps['wordTimeAll'], words)
             if not times:
                 continue
-            times = [
-                f"<{max(int(match.group(1)) - start_ms_time, 0)},{match.group(2)}>"
-                for match in re.finditer(r'\((\d+),(\d+)\)', words)
-            ]
-            word_arr = re.split(self.rxps['wordTime'], words)
-            new_words = ''.join([f"{time}{word}" for time, word in zip(times, word_arr)])
-            lxlrc_lines.append(f"{start_time_str}{new_words}")
+            _rxp = r"\((\d+),(\d+)\)"
+            times = [f'''<{max(int(re.search(_rxp, time).group(1)) - startMsTime, 0)},{re.search(_rxp, time).group(2)}>''' for time in times]
+            wordArr = re.split(self.rxps['wordTime'], words)
+            newWords = ''.join([f'{time}{wordArr[index]}' for index, time in enumerate(times)])
+            lxlrcLines.append(f'{startTimeStr}{newWords}')
 
         return {
-            'lyric': '\n'.join(lyric_lines),
-            'lxlyric': '\n'.join(lxlrc_lines),
+            'lyric': '\n'.join(lrcLines),
+            'lxlyric': '\n'.join(lxlrcLines),
         }
 
-    def parse_rlyric(self, lrc):
-        lrc = lrc.strip()
-        lrc = lrc.replace('\r', '')
+    def parseRlyric(self, lrc):
+        lrc = lrc.strip().replace('\r', '')
         if not lrc:
             return {'lyric': '', 'lxlyric': ''}
-        lines = lrc.split('\n')
 
-        lyric_lines = []
+        lines = lrc.split('\n')
+        lrcLines = []
 
         for line in lines:
             line = line.strip()
@@ -97,91 +93,104 @@ class ParseTools:
             if not result:
                 continue
 
-            start_ms_time = int(result.group(1))
-            start_time_str = self.ms_format(start_ms_time)
-            if not start_time_str:
+            startMsTime = int(result.group(1))
+            startTimeStr = self.msFormat(startMsTime)
+            if not startTimeStr:
                 continue
 
             words = re.sub(self.rxps['lineTime'], '', line)
+            lrcLines.append(f'{startTimeStr}{re.sub(self.rxps["wordTimeAll"], "", words)}')
 
-            lyric_lines.append(f"{start_time_str}{re.sub(self.rxps['wordTimeAll'], '', words)}")
+        return '\n'.join(lrcLines)
 
-        return '\n'.join(lyric_lines)
-
-    def remove_tag(self, string):
+    def removeTag(self, string):
         return re.sub(r'^[\S\s]*?LyricContent="', '', string).replace('"\/>[\S\s]*?$', '')
 
-    def get_intv(self, interval):
+    def getIntv(self, interval):
+        if not interval:
+            return 0
         if '.' not in interval:
             interval += '.0'
-        arr = re.split(':|\.', interval.ljust(8, '0'))[:3]
-        m, s, ms = map(int, arr)
-        return m * 3600000 + s * 1000 + ms
+        arr = re.split(r':|\.', interval)
+        while len(arr) < 3:
+            arr.insert(0, '0')
+        m, s, ms = arr
+        return int(m) * 3600000 + int(s) * 1000 + int(ms)
 
-    def fix_rlrc_time_tag(self, rlrc, lrc):
-        rlrc_lines = rlrc.split('\n')
-        lrc_lines = lrc.split('\n')
-        new_lrc = []
-        for line in rlrc_lines:
-            result = self.rxps['lineTime2'].search(line)
+    def fixRlrcTimeTag(self, rlrc, lrc):
+        rlrcLines = rlrc.split('\n')
+        lrcLines = lrc.split('\n')
+        newLrc = []
+
+        for line in rlrcLines:
+            result = self.rxps['lineTime2'].match(line)
             if not result:
                 continue
             words = re.sub(self.rxps['lineTime2'], '', line)
             if not words.strip():
                 continue
-            t1 = self.get_intv(result.group(1))
-            while lrc_lines:
-                lrc_line = lrc_lines.pop(0)
-                lrc_line_result = self.rxps['lineTime2'].search(lrc_line)
-                if not lrc_line_result:
-                    continue
-                t2 = self.get_intv(lrc_line_result.group(1))
-                if abs(t1 - t2) < 100:
-                    new_lrc.append(re.sub(self.rxps['lineTime2'], lrc_line_result.group(0), line))
-                    break
-        return '\n'.join(new_lrc)
+            t1 = self.getIntv(result.group(1))
 
-    def fix_tlrc_time_tag(self, tlrc, lrc):
-        tlrc_lines = tlrc.split('\n')
-        lrc_lines = lrc.split('\n')
-        new_lrc = []
-        time_tag_rxp = r'^\[[\d:.]+\]'
-        
-        for line in tlrc_lines:
-            result = re.match(time_tag_rxp, line)
+            while lrcLines:
+                lrcLine = lrcLines.pop(0)
+                lrcLineResult = self.rxps['lineTime2'].match(lrcLine)
+                if not lrcLineResult:
+                    continue
+                t2 = self.getIntv(lrcLineResult.group(1))
+                if abs(t1 - t2) < 100:
+                    newLrc.append(re.sub(self.rxps['lineTime2'], lrcLineResult.group(0), line))
+                    break
+
+        return '\n'.join(newLrc)
+
+    def fixTlrcTimeTag(self, tlrc, lrc):
+        tlrcLines = tlrc.split('\n')
+        lrcLines = lrc.split('\n')
+        newLrc = []
+
+        for line in tlrcLines:
+            result = self.rxps['lineTime2'].match(line)
             if not result:
                 continue
-            words = re.sub(time_tag_rxp, '', line)
+            words = re.sub(self.rxps['lineTime2'], '', line)
             if not words.strip():
                 continue
-            tag = re.sub(r'\[\d+:\d+\.\d+\]', '', result.group(0))
+            time = result.group(1)
+            if '.' in time:
+                time += '0' * (3 - len(time.split('.')[1]))
 
-            while lrc_lines:
-                lrc_line = lrc_lines.pop(0)
-                lrc_line_result = re.match(time_tag_rxp, lrc_line)
-                if not lrc_line_result:
+            t1 = self.getIntv(time)
+
+            while lrcLines:
+                lrcLine = lrcLines.pop(0)
+                lrcLineResult = self.rxps['lineTime2'].match(lrcLine)
+                if not lrcLineResult:
                     continue
-                if tag in lrc_line_result.group(0):
-                    new_lrc.append(re.sub(time_tag_rxp, lrc_line_result.group(0), line))
+                t2 = self.getIntv(lrcLineResult.group(1))
+                if abs(t1 - t2) < 100:
+                    newLrc.append(re.sub(self.rxps['lineTime2'], lrcLineResult.group(0), line))
                     break
-        
-        return '\n'.join(new_lrc)
 
-    def parse(self, lrc, tlrc, rlrc):
+        return '\n'.join(newLrc)
+
+    def parse(self, lrc, tlrc=None, rlrc=None):
         info = {
             'lyric': '',
             'tlyric': '',
             'rlyric': '',
             'lxlyric': '',
         }
+
         if lrc:
-            lyric_info = self.parse_lyric(self.remove_tag(lrc))
-            info['lyric'] = lyric_info['lyric']
-            info['lxlyric'] = lyric_info['lxlyric']
+            parsed_lrc = self.parseLyric(self.removeTag(lrc))
+            info['lyric'] = parsed_lrc['lyric']
+            info['lxlyric'] = parsed_lrc['lxlyric']
+
         if rlrc:
-            info['rlyric'] = self.fix_rlrc_time_tag(self.parse_rlyric(self.remove_tag(rlrc)), info['lyric'])
+            info['rlyric'] = self.fixRlrcTimeTag(self.parseRlyric(self.removeTag(rlrc)), info['lyric'])
+
         if tlrc:
-            info['tlyric'] = self.fix_tlrc_time_tag(tlrc, info['lyric'])
+            info['tlyric'] = self.fixTlrcTimeTag(tlrc, info['lyric'])
 
         return info
 
