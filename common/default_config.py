@@ -128,8 +128,11 @@ module:
       vkey_api_url: "xxx"
 
   wy: # 网易云音乐相关配置
-    user: # 账号cookie数据，可以通过浏览器获取，需要vip账号来获取会员歌曲，如果没有请留为空值
-      cookie: ""
+    user:
+      cookie: "" # 账号cookie数据，可以通过浏览器获取，需要vip账号来获取会员歌曲，如果没有请留为空值
+      refresh_login:
+        enable: false
+        interval: 86400
 
   mg: # 咪咕音乐相关配置
     user: # 研究不深，后两项自行抓包获取，网页端cookie
@@ -195,6 +198,9 @@ module:
 
     wy:
       - cookie: ""
+        refresh_login: # cookie池中对于此账号刷新登录的配置，账号间互不干扰
+          enable: false
+          interval: 86400
 
     mg:
       - by: ""
