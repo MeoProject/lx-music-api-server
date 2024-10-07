@@ -41,7 +41,7 @@ common:
     # {updateUrl}为更新地址(带请求key)
     # {url}为请求时的url(不带请求的param)
     # {key}为请求时携带的key
-    updateMsg: "源脚本有更新啦，更新地址:\n{updateUrl}"
+    updateMsg: "源脚本有更新啦，更新地址:\\n{updateUrl}"
     quality:
       kw: [128k]
       kg: [128k]
