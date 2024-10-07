@@ -46,6 +46,7 @@ async def refresh(cookie:str):
     
     @param cookie: 网易云音乐cookie
     """
+    cookie = cookieStr2Dict(cookie)
     headers = {
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 Edg/124.0.0.0"
     }
@@ -91,9 +92,9 @@ if (variable.use_cookie_pool):
             "interval": 86400
         }
         if (ref["enable"]):
-            scheduler.append("wy_refresh_login_pooled_" + c["cookie"][:32], refresh, ref["interval"], c["cookie"])
+            scheduler.append("wy_refresh_login_pooled_" + c["cookie"][:32], refresh, ref["interval"], {"cookie": c["cookie"]})
 else:
     c = config.read_config("module.wy.user.cookie")
     ref = config.read_config("module.wy.user.refresh_login")
     if (ref["enable"]):
-        scheduler.append("wy_refresh_login", refresh, ref["interval"], c)
+        scheduler.append("wy_refresh_login", refresh, ref["interval"], {"cookie": c})
