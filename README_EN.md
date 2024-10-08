@@ -21,7 +21,7 @@ This project does not accept private customization, and the problems that occur 
 
 - [ ] Functions
   - [ ] All APIs (playlist, search)
-  - [ ] Netease Cloud Refresh Login
+  - [x] Netease Cloud Refresh Login
   - [ ] Client plays music on webdav
   - [x] Client plays local music on the server
   - [x] Cookie pool
