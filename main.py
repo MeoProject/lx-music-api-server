@@ -20,7 +20,7 @@ from io import TextIOWrapper
 import sys
 import os
 
-if ((sys.version_info.major == 3 and sys.version_info.minor < 6) or sys.version_info.major == 2):
+if sys.version_info < (3, 6):
     print('Python版本过低，请使用Python 3.6+ ')
     sys.exit(1)
 
@@ -52,7 +52,7 @@ logger = log.log("main")
 aiologger = log.log('aiohttp_web')
 
 stopEvent = None
-if (sys.version_info.minor < 8 and sys.version_info.major == 3):
+if sys.version_info < (3, 8):
     logger.warning('您使用的Python版本已经停止更新，不建议继续使用')
     import concurrent
     stopEvent = concurrent.futures._base.CancelledError
@@ -69,16 +69,12 @@ def start_checkcn_thread() -> None:
 async def handle_before_request(app, handler):
     async def handle_request(request):
         try:
-            if (config.read_config('common.reverse_proxy.allow_proxy')):
-                if (request.headers.get(config.read_config('common.reverse_proxy.real_ip_header'))):
-                    # proxy header
-                    if (config.read_config('common.reverse_proxy.allow_public_ip') or utils.is_local_ip(request.remote)):
-                        request.remote_addr = request.headers.get(
-                            config.read_config('common.reverse_proxy.real_ip_header'))
-                    else:
-                        return handleResult({"code": 1, "msg": "不允许的公网ip转发", "data": None}, 403)
-                else:
-                    request.remote_addr = request.remote
+            if config.read_config("common.reverse_proxy.allow_proxy") and request.headers.get(
+                config.read_config("common.reverse_proxy.real_ip_header")):
+                if not config.read_config("common.reverse_proxy.allow_public_ip") or utils.is_local_ip(request.remote):
+                    return handleResult({"code": 1, "msg": "不允许的公网ip转发", "data": None}, 403)
+                # proxy header
+                request.remote_addr = request.headers.get(config.read_config("common.reverse_proxy.real_ip_header"))
             else:
                 request.remote_addr = request.remote
             # check ip
