@@ -6,11 +6,11 @@ import os
 
 
 def get_latest_tag():
-    t = subprocess.check_output(['git', 'tag']).decode('utf-8').strip().split("\n")
+    t = subprocess.check_output(['git', 'tag', '--sort=v:refname']).decode('utf-8').strip().split("\n")
     return t[-1] if (t[-1] != toml.load("./pyproject.toml")["tool"]["poetry"]["version"]) else t[-2]
 
 def get_specified_tag(index):
-    r = subprocess.check_output(['git', 'tag']).decode('utf-8').strip().split("\n")
+    r = subprocess.check_output(['git', 'tag', '--sort=v:refname']).decode('utf-8').strip().split("\n")
     n = []
     for i in r:
         if (i):
