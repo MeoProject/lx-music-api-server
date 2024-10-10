@@ -71,7 +71,7 @@ async def handle_before_request(app, handler):
         try:
             if config.read_config("common.reverse_proxy.allow_proxy") and request.headers.get(
                 config.read_config("common.reverse_proxy.real_ip_header")):
-                if not config.read_config("common.reverse_proxy.allow_public_ip") or utils.is_local_ip(request.remote):
+                if not (config.read_config("common.reverse_proxy.allow_public_ip") or utils.is_local_ip(request.remote)):
                     return handleResult({"code": 1, "msg": "不允许的公网ip转发", "data": None}, 403)
                 # proxy header
                 request.remote_addr = request.headers.get(config.read_config("common.reverse_proxy.real_ip_header"))
