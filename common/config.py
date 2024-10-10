@@ -55,9 +55,7 @@ def handle_default_config():
     with open("./config/config.yml", "w", encoding="utf-8") as f:
         f.write(default_str)
         if (not os.getenv('build')):
-            logger.info('首次启动或配置文件被删除，已创建默认配置文件')
-            logger.info(
-                f'\n建议您到{variable.workdir + os.path.sep}config.yml修改配置后重新启动服务器')
+            logger.info(f'首次启动或配置文件被删除，已创建默认配置文件\n建议您到{variable.workdir + os.path.sep}config.yml修改配置后重新启动服务器')
         return default
 
 
