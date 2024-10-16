@@ -1,7 +1,7 @@
 # ----------------------------------------
 # - mode: python -
 # - author: helloplhm-qwq - (feat. Huibq and ikun0014)
-# - name: refresh_token.py -
+# - name: refresh_login.py -
 # - project: lx-music-api-server -
 # - license: MIT -
 # ----------------------------------------
@@ -14,13 +14,13 @@ from common import log
 from .utils import signRequest, tools, aes_sign
 import ujson as json
 
-logger = log.log('kg_refresh_token')
+logger = log.log('kg_refresh_login')
 
 
 async def refresh():
     if (not config.read_config('module.kg.user.token')):
         return
-    if (not config.read_config('module.kg.user.refresh_token.enable')):
+    if (not config.read_config('module.kg.user.refresh_login.enable')):
         return
     
     user_id = config.read_config('module.kg.user.userid')
@@ -49,7 +49,7 @@ async def refresh():
             'KG-Rec': '1',
             'KG-RC': '1',
         }
-        login_url = config.read_config('module.kg.user.refresh_token.login_url')
+        login_url = config.read_config('module.kg.user.refresh_login.login_url')
         req = await signRequest(login_url, params, {'method': 'POST', 'json': data, 'headers': headers})
         body = req.json()
         if body['error_code'] != 0:
@@ -87,7 +87,7 @@ async def refresh():
             'KG-Rec': '1',
             'KG-RC': '1',
         }
-        login_url = config.read_config('module.kg.user.refresh_token.login_url')
+        login_url = config.read_config('module.kg.user.refresh_login.login_url')
         req = await signRequest(login_url, params, {'method': 'POST', 'json': data, 'headers': headers})
         body = req.json()
         if body['error_code'] != 0:
@@ -105,15 +105,15 @@ async def refresh():
 
 if (not variable.use_cookie_pool):
     kgconfig = config.read_config('module.kg')
-    refresh_login_info = kgconfig.get('refresh_token')
+    refresh_login_info = kgconfig.get('refresh_login')
     if (refresh_login_info):
-        kgconfig['user']['refresh_token'] = refresh_login_info
+        kgconfig['user']['refresh_login'] = refresh_login_info
         kgconfig.pop('refresh_login')
         config.write_config('module.kg', kgconfig)
 
-if (config.read_config('module.kg.user.refresh_token.enable') and not variable.use_cookie_pool):
-    scheduler.append('kg_refresh_token', refresh,
-                     config.read_config('module.kg.user.refresh_token.interval'))
+if (config.read_config('module.kg.user.refresh_login.enable') and not variable.use_cookie_pool):
+    scheduler.append('kg_refresh_login', refresh,
+                     config.read_config('module.kg.user.refresh_login.interval'))
 
 async def refresh_login_for_pool(user_info):
     user_id = user_info["userid"]
