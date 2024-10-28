@@ -84,6 +84,7 @@ security:
 
 module:
   kg: # 酷狗音乐相关配置
+    enable: true # 是否开启本平台服务
     client: # 客户端请求配置，不懂请保持默认，修改请统一为字符串格式
       appid: "1005" # 酷狗音乐的appid，官方安卓为1005，官方PC为1001
       signatureKey: OIlwieks28dk2k092lksi2UIkp # 客户端signature采用的key值，需要与appid对应
@@ -113,6 +114,7 @@ module:
         login_url: http://login.user.kugou.com/v4/login_by_token
 
   tx: # QQ音乐相关配置
+    enable: true # 是否开启本平台服务
     vkeyserver: # 请求官方api时使用的guid，uin等信息，不需要与cookie中信息一致
       guid: "114514"
       uin: "10086"
@@ -128,6 +130,7 @@ module:
       vkey_api_url: "xxx"
 
   wy: # 网易云音乐相关配置
+    enable: true # 是否开启本平台服务
     user:
       cookie: "" # 账号cookie数据，可以通过浏览器获取，需要vip账号来获取会员歌曲，如果没有请留为空值
       refresh_login:
@@ -135,6 +138,7 @@ module:
         interval: 86400
 
   mg: # 咪咕音乐相关配置
+    enable: true # 是否开启本平台服务
     user: # 研究不深，后两项自行抓包获取，网页端cookie
       by: ""
       session: ""
@@ -144,6 +148,7 @@ module:
         interval: 86400
 
   kw: # 酷我音乐相关配置，proto支持值：['bd-api', 'kuwodes']
+    enable: true # 是否开启本平台服务
     proto: bd-api
     user:
       uid: "0"

@@ -150,6 +150,14 @@ async def handle(request):
     try:
         query = dict(request.query)
         if (method in dir(modules)):
+            source_enable = config.read_config(f'module.{source}.enable')
+            if not source_enable:
+                return handleResult({
+                    'code': 4,
+                    'msg': '此平台已停止服务',
+                    'data': None,
+                    "Your IP": request.remote_addr
+                }, 404)
             return handleResult(await getattr(modules, method)(source, songId, quality, query))
         else:
             return handleResult(await modules.other(method, source, songId, quality, query))
