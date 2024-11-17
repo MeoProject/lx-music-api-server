@@ -51,6 +51,18 @@ common:
   local_music: # 服务器侧本地音乐相关配置，如果需要使用此功能请确保你的带宽足够
     audio_path: ./audio
     temp_path: ./temp
+  # 缓存配置
+  cache:
+    # 适配器 [redis,sql]
+    adapter: sql
+    # redis 配置
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      db: 0
+      user: ""
+      password: ""
+      key_prefix: "LXAPISERVER"
 
 security:
   rate_limit: # 请求速率限制  填入的值为至少间隔多久才能进行一次请求，单位：秒，不限制请填为0
