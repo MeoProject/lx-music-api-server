@@ -9,16 +9,16 @@ except Exception:
     description = "Description not available"
 
 setup(
-    name='lx_music_api_server_setup',
+    name="lx_music_api_server_setup",
     version=version,
-    scripts=['poetry_run.py'],
-    author='helloplhm-qwq',
-    author_email='helloplhm-qwq@outlook.com',
+    scripts=["run.py"],
+    author="helloplhm-qwq",
+    author_email="helloplhm-qwq@outlook.com",
     description=description,
-    url='https://github.com/helloplhm-qwq/lx-music-api-server',
+    url="https://github.com/helloplhm-qwq/lx-music-api-server",
     classifiers=[
-        'Programming Language :: Python :: 3',
-        'License :: OSI Approved :: MIT License',
-        'Operating System :: OS Independent',
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
     ],
 )
