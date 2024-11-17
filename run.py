@@ -4,7 +4,7 @@ import subprocess
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(escription="Script to set environment variables and run different environments.")
+    parser = argparse.ArgumentParser(description="Script to set environment variables and run different environments.")
     parser.add_argument(
         "environment",
         choices=["production", "development"],
