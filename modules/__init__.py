@@ -95,18 +95,18 @@ async def url(source, songId, quality, query={}):
         logger.info(f'获取{source}_{songId}_{quality}成功，URL：{result["url"]}')
 
         canExpire = sourceExpirationTime[source]["expire"]
-        expireTime = sourceExpirationTime[source]["time"] + int(time.time())
-        canUseTime = int(expireTime - sourceExpirationTime[source]["time"] * 0.25)
+        expireTime = int(sourceExpirationTime[source]["time"] * 0.75)
+        expireAt = int(expireTime + time.time())
         config.updateCache(
             "urls",
             f"{source}_{songId}_{quality}",
             {
                 "expire": canExpire,
                 # 取有效期的75%作为链接可用时长
-                "time": canUseTime,
+                "time": expireAt,
                 "url": result["url"],
             },
-            canUseTime if canExpire else None,
+            expireTime if canExpire else None,
         )
         logger.debug(f'缓存已更新：{source}_{songId}_{quality}, URL：{result["url"]}, expire: {expireTime}')
 
@@ -121,7 +121,7 @@ async def url(source, songId, quality, query={}):
                     "result": result["quality"],
                 },
                 "expire": {
-                    "time": expireTime if canExpire else None,
+                    "time": expireAt if canExpire else None,
                     "canExpire": canExpire,
                 },
             },
@@ -149,13 +149,14 @@ async def lyric(source, songId, _, query):
         }
     try:
         result = await func(songId)
-        expireTime = int(time.time() + (86400 * 3))
+        expireTime = 86400 * 3
+        expireAt = int(time.time() + expireTime)
         config.updateCache(
             "lyric",
             f"{source}_{songId}",
             {
                 "data": result,
-                "time": expireTime,  # 歌词缓存3天
+                "time": expireAt,  # 歌词缓存3天
                 "expire": True,
             },
             expireTime,
