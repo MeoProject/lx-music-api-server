@@ -175,11 +175,12 @@ def request(url: str, options={}) -> requests.Response:
     # 缓存写入
     if cache_info and cache_info != "no-cache":
         cache_data = pickle.dumps(req)
-        expire_time = (cache_info if isinstance(cache_info, int) else 3600) + int(time.time())
+        expire_time = cache_info if isinstance(cache_info, int) else 3600
+        expire_at = int((time.time) + expire_time)
         config.updateCache(
             "httpx",
             cache_key,
-            {"expire": True, "time": expire_time, "data": utils.createBase64Encode(cache_data)},
+            {"expire": True, "time": expire_at, "data": utils.createBase64Encode(cache_data)},
             expire_time,
         )
         logger.debug("缓存已更新: " + url)
@@ -331,11 +332,12 @@ async def AsyncRequest(url, options={}) -> ClientResponse:
     # 缓存写入
     if cache_info and cache_info != "no-cache":
         cache_data = pickle.dumps(req)
-        expire_time = (cache_info if isinstance(cache_info, int) else 3600) + int(time.time())
+        expire_time = cache_info if isinstance(cache_info, int) else 3600
+        expire_at = int((time.time) + expire_time)
         config.updateCache(
             "httpx_async",
             cache_key,
-            {"expire": True, "time": expire_time, "data": utils.createBase64Encode(cache_data)},
+            {"expire": True, "time": expire_at, "data": utils.createBase64Encode(cache_data)},
             expire_time,
         )
         logger.debug("缓存已更新: " + url)
