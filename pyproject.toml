@@ -21,6 +21,8 @@ mutagen = "^1.47.0"
 colorama = "^0.4.6"
 ruamel-yaml = "^0.18.6"
 pybind11 = "^2.13.6"
+redis = "^5.2.0"
+hiredis = "^3.0.0"
 
 [build-system]
 requires = ["poetry-core"]
