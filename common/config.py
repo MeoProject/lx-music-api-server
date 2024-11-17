@@ -19,32 +19,51 @@ from . import variable
 from .log import log
 from . import default_config
 import threading
+import redis
 
-logger = log('config_manager')
+logger = log("config_manager")
 
 # 创建线程本地存储对象
 local_data = threading.local()
+local_cache = threading.local()
+local_redis = threading.local()
+
 
 def get_data_connection():
-    # 检查线程本地存储对象是否存在连接对象，如果不存在则创建一个新的连接对象
-    if (not hasattr(local_data, 'connection')):
-        local_data.connection = sqlite3.connect('./config/data.db')
     return local_data.connection
 
 
-# 创建线程本地存储对象
-local_cache = threading.local()
-
-
 def get_cache_connection():
-    # 检查线程本地存储对象是否存在连接对象，如果不存在则创建一个新的连接对象
-    if not hasattr(local_cache, 'connection'):
-        local_cache.connection = sqlite3.connect('./cache.db')
     return local_cache.connection
+
+
+def get_redis_connection():
+    return local_redis.connection
+
+
+def handle_connect_db():
+    try:
+        local_data.connection = sqlite3.connect("./config/data.db")
+        if read_config("common.cache.adapter") == "redis":
+            host = read_config("common.cache.redis.host")
+            port = read_config("common.cache.redis.port")
+            user = read_config("common.cache.redis.user")
+            password = read_config("common.cache.redis.password")
+            db = read_config("common.cache.redis.db")
+            client = redis.Redis(host=host, port=port, username=user, password=password, db=db)
+            if not client.ping():
+                raise
+            local_redis.connection = client
+        else:
+            local_cache.connection = sqlite3.connect("./cache.db")
+    except:
+        logger.error("连接数据库失败")
+        sys.exit(1)
 
 
 class ConfigReadException(Exception):
     pass
+
 
 yaml = yaml_.YAML()
 default_str = default_config.default
@@ -54,8 +73,10 @@ default = yaml.load(default_str)
 def handle_default_config():
     with open("./config/config.yml", "w", encoding="utf-8") as f:
         f.write(default_str)
-        if (not os.getenv('build')):
-            logger.info(f'首次启动或配置文件被删除，已创建默认配置文件\n建议您到{variable.workdir + os.path.sep}config.yml修改配置后重新启动服务器')
+        if not os.getenv("build"):
+            logger.info(
+                f"首次启动或配置文件被删除，已创建默认配置文件\n建议您到{variable.workdir + os.path.sep}config.yml修改配置后重新启动服务器"
+            )
         return default
 
 
@@ -96,8 +117,7 @@ def save_data(config_data):
 
         # Insert the new configuration data into the 'data' table
         for key, value in config_data.items():
-            cursor.execute(
-                "INSERT INTO data (key, value) VALUES (?, ?)", (key, json.dumps(value)))
+            cursor.execute("INSERT INTO data (key, value) VALUES (?, ?)", (key, json.dumps(value)))
 
         conn.commit()
 
@@ -106,51 +126,69 @@ def save_data(config_data):
         logger.error(traceback.format_exc())
 
 
+def handleBuildRedisKey(module, key):
+    prefix = read_config("common.cache.redis.key_prefix")
+    return f"{prefix}:{module}:{key}"
+
+
 def getCache(module, key):
     try:
-        # 连接到数据库（如果数据库不存在，则会自动创建）
-        conn = get_cache_connection()
-
-        # 创建一个游标对象
-        cursor = conn.cursor()
-
-        cursor.execute("SELECT data FROM cache WHERE module=? AND key=?",
-                       (module, key))
-
-        result = cursor.fetchone()
-        if result:
-            cache_data = json.loads(result[0])
-            cache_data["time"] = int(cache_data["time"])
-            if (not cache_data['expire']):
+        if read_config("common.cache.adapter") == "redis":
+            redis = get_redis_connection()
+            key = handleBuildRedisKey(module, key)
+            result = redis.get(key)
+            if result:
+                cache_data = json.loads(result)
                 return cache_data
-            if (int(time.time()) < int(cache_data['time'])):
-                return cache_data
+        else:
+            # 连接到数据库（如果数据库不存在，则会自动创建）
+            conn = get_cache_connection()
+
+            # 创建一个游标对象
+            cursor = conn.cursor()
+
+            cursor.execute("SELECT data FROM cache WHERE module=? AND key=?", (module, key))
+
+            result = cursor.fetchone()
+            if result:
+                cache_data = json.loads(result[0])
+                cache_data["time"] = int(cache_data["time"])
+                if not cache_data["expire"]:
+                    return cache_data
+                if int(time.time()) < int(cache_data["time"]):
+                    return cache_data
     except:
         pass
         # traceback.print_exc()
-    return False
+    return None
 
 
-def updateCache(module, key, data):
+def updateCache(module, key, data, expire=None):
     try:
-        # 连接到数据库（如果数据库不存在，则会自动创建）
-        conn = get_cache_connection()
-
-        # 创建一个游标对象
-        cursor = conn.cursor()
-
-        cursor.execute(
-            "SELECT data FROM cache WHERE module=? AND key=?", (module, key))
-        result = cursor.fetchone()
-        if result:
-            cursor.execute(
-                "UPDATE cache SET data = ? WHERE module = ? AND key = ?", (json.dumps(data), module, key))
+        if read_config("common.cache.adapter") == "redis":
+            redis = get_redis_connection()
+            key = handleBuildRedisKey(module, key)
+            redis.set(key, json.dumps(data), ex=expire if expire and expire > 0 else None)
         else:
-            cursor.execute(
-                "INSERT INTO cache (module, key, data) VALUES (?, ?, ?)", (module, key, json.dumps(data)))
-        conn.commit()
+            # 连接到数据库（如果数据库不存在，则会自动创建）
+            conn = get_cache_connection()
+
+            # 创建一个游标对象
+            cursor = conn.cursor()
+
+            cursor.execute("SELECT data FROM cache WHERE module=? AND key=?", (module, key))
+            result = cursor.fetchone()
+            if result:
+                cursor.execute(
+                    "UPDATE cache SET data = ? WHERE module = ? AND key = ?", (json.dumps(data), module, key)
+                )
+            else:
+                cursor.execute(
+                    "INSERT INTO cache (module, key, data) VALUES (?, ?, ?)", (module, key, json.dumps(data))
+                )
+            conn.commit()
     except:
-        logger.error('缓存写入遇到错误…')
+        logger.error("缓存写入遇到错误…")
         logger.error(traceback.format_exc())
 
 
@@ -158,13 +196,13 @@ def resetRequestTime(ip):
     config_data = load_data()
     try:
         try:
-            config_data['requestTime'][ip] = 0
+            config_data["requestTime"][ip] = 0
         except KeyError:
-            config_data['requestTime'] = {}
-            config_data['requestTime'][ip] = 0
+            config_data["requestTime"] = {}
+            config_data["requestTime"][ip] = 0
         save_data(config_data)
     except:
-        logger.error('配置写入遇到错误…')
+        logger.error("配置写入遇到错误…")
         logger.error(traceback.format_exc())
 
 
@@ -172,20 +210,20 @@ def updateRequestTime(ip):
     try:
         config_data = load_data()
         try:
-            config_data['requestTime'][ip] = time.time()
+            config_data["requestTime"][ip] = time.time()
         except KeyError:
-            config_data['requestTime'] = {}
-            config_data['requestTime'][ip] = time.time()
+            config_data["requestTime"] = {}
+            config_data["requestTime"][ip] = time.time()
         save_data(config_data)
     except:
-        logger.error('配置写入遇到错误...')
+        logger.error("配置写入遇到错误...")
         logger.error(traceback.format_exc())
 
 
 def getRequestTime(ip):
     config_data = load_data()
     try:
-        value = config_data['requestTime'][ip]
+        value = config_data["requestTime"][ip]
     except:
         value = 0
     return value
@@ -193,7 +231,7 @@ def getRequestTime(ip):
 
 def read_data(key):
     config = load_data()
-    keys = key.split('.')
+    keys = key.split(".")
     value = config
     for k in keys:
         if k not in value and keys.index(k) != len(keys) - 1:
@@ -208,7 +246,7 @@ def read_data(key):
 def write_data(key, value):
     config = load_data()
 
-    keys = key.split('.')
+    keys = key.split(".")
     current = config
     for k in keys[:-1]:
         if k not in current:
@@ -223,7 +261,7 @@ def write_data(key, value):
 def push_to_list(key, obj):
     config = load_data()
 
-    keys = key.split('.')
+    keys = key.split(".")
     current = config
     for k in keys[:-1]:
         if k not in current:
@@ -240,10 +278,10 @@ def push_to_list(key, obj):
 
 def write_config(key, value):
     config = None
-    with open('./config/config.yml', 'r', encoding='utf-8') as f:
+    with open("./config/config.yml", "r", encoding="utf-8") as f:
         config = yaml_.YAML().load(f)
 
-    keys = key.split('.')
+    keys = key.split(".")
     current = config
     for k in keys[:-1]:
         if k not in current:
@@ -258,14 +296,14 @@ def write_config(key, value):
     y.preserve_blank_lines = True
 
     # 写入配置并保留注释和空行
-    with open('./config/config.yml', 'w', encoding='utf-8') as f:
+    with open("./config/config.yml", "w", encoding="utf-8") as f:
         y.dump(config, f)
 
 
 def read_default_config(key):
     try:
         config = default
-        keys = key.split('.')
+        keys = key.split(".")
         value = config
         for k in keys:
             if isinstance(value, dict):
@@ -286,7 +324,7 @@ def read_default_config(key):
 def _read_config(key):
     try:
         config = variable.config
-        keys = key.split('.')
+        keys = key.split(".")
         value = config
         for k in keys:
             if isinstance(value, dict):
@@ -307,7 +345,7 @@ def _read_config(key):
 def read_config(key):
     try:
         config = variable.config
-        keys = key.split('.')
+        keys = key.split(".")
         value = config
         for k in keys:
             if isinstance(value, dict):
@@ -323,23 +361,23 @@ def read_config(key):
         return value
     except:
         default_value = read_default_config(key)
-        if (isinstance(default_value, type(None))):
-            logger.warning(f'配置文件{key}不存在')
+        if isinstance(default_value, type(None)):
+            logger.warning(f"配置文件{key}不存在")
         else:
             for i in range(len(keys)):
-                tk = '.'.join(keys[:(i + 1)])
+                tk = ".".join(keys[: (i + 1)])
                 tkvalue = _read_config(tk)
-                logger.debug(f'configfix: 读取配置文件{tk}的值：{tkvalue}')
-                if ((tkvalue is None) or (tkvalue == {})):
+                logger.debug(f"configfix: 读取配置文件{tk}的值：{tkvalue}")
+                if (tkvalue is None) or (tkvalue == {}):
                     write_config(tk, read_default_config(tk))
-                    logger.info(f'配置文件{tk}不存在，已创建')
+                    logger.info(f"配置文件{tk}不存在，已创建")
                     return default_value
 
 
 def write_data(key, value):
     config = load_data()
 
-    keys = key.split('.')
+    keys = key.split(".")
     current = config
     for k in keys[:-1]:
         if k not in current:
@@ -351,26 +389,26 @@ def write_data(key, value):
     save_data(config)
 
 
-def initConfig():
-    if (not os.path.exists('./config')):
-        os.mkdir('config')
-        if (os.path.exists('./config.json')):
-            shutil.move('config.json','./config')
-        if (os.path.exists('./data.db')):
-            shutil.move('./data.db','./config')
-        if (os.path.exists('./config/config.json')):
-            os.rename('./config/config.json', './config/config.json.bak')
+def init_config():
+    if not os.path.exists("./config"):
+        os.mkdir("config")
+        if os.path.exists("./config.json"):
+            shutil.move("config.json", "./config")
+        if os.path.exists("./data.db"):
+            shutil.move("./data.db", "./config")
+        if os.path.exists("./config/config.json"):
+            os.rename("./config/config.json", "./config/config.json.bak")
             handle_default_config()
-            logger.warning('json配置文件已不再使用，已将其重命名为config.json.bak')
-            logger.warning('配置文件不会自动更新（因为变化太大），请手动修改配置文件重启服务器')
+            logger.warning("json配置文件已不再使用，已将其重命名为config.json.bak")
+            logger.warning("配置文件不会自动更新（因为变化太大），请手动修改配置文件重启服务器")
             sys.exit(0)
 
     try:
         with open("./config/config.yml", "r", encoding="utf-8") as f:
             try:
                 variable.config = yaml.load(f.read())
-                if (not isinstance(variable.config, dict)):
-                    logger.warning('配置文件并不是一个有效的字典，使用默认值')
+                if not isinstance(variable.config, dict):
+                    logger.warning("配置文件并不是一个有效的字典，使用默认值")
                     variable.config = default
                     with open("./config/config.yml", "w", encoding="utf-8") as f:
                         yaml.dump(variable.config, f)
@@ -384,125 +422,133 @@ def initConfig():
     except FileNotFoundError:
         variable.config = handle_default_config()
     # print(variable.config)
-    variable.log_length_limit = read_config('common.log_length_limit')
-    variable.debug_mode = read_config('common.debug_mode')
+    variable.log_length_limit = read_config("common.log_length_limit")
+    variable.debug_mode = read_config("common.debug_mode")
     logger.debug("配置文件加载成功")
-    conn = sqlite3.connect('./cache.db')
+
+    # 尝试连接数据库
+    handle_connect_db()
+
+    conn = sqlite3.connect("./cache.db")
 
     # 创建一个游标对象
     cursor = conn.cursor()
 
     # 创建一个表来存储缓存数据
-    cursor.execute('''CREATE TABLE IF NOT EXISTS cache
+    cursor.execute(
+        """CREATE TABLE IF NOT EXISTS cache
 (id INTEGER PRIMARY KEY AUTOINCREMENT,
 module TEXT NOT NULL,
 key TEXT NOT NULL,
-data TEXT NOT NULL)''')
+data TEXT NOT NULL)"""
+    )
 
     conn.close()
 
-    conn2 = sqlite3.connect('./config/data.db')
+    conn2 = sqlite3.connect("./config/data.db")
 
     # 创建一个游标对象
     cursor2 = conn2.cursor()
 
-    cursor2.execute('''CREATE TABLE IF NOT EXISTS data
+    cursor2.execute(
+        """CREATE TABLE IF NOT EXISTS data
 (key TEXT PRIMARY KEY,
-value TEXT)''')
+value TEXT)"""
+    )
 
     conn2.close()
 
-    logger.debug('数据库初始化成功')
+    logger.debug("数据库初始化成功")
 
     # handle data
-    all_data_keys = {'banList': [], 'requestTime': {}, 'banListRaw': []}
+    all_data_keys = {"banList": [], "requestTime": {}, "banListRaw": []}
     data = load_data()
-    if (data == {}):
-        write_data('banList', [])
-        write_data('requestTime', {})
-        logger.info('数据库内容为空，已写入默认值')
+    if data == {}:
+        write_data("banList", [])
+        write_data("requestTime", {})
+        logger.info("数据库内容为空，已写入默认值")
     for k, v in all_data_keys.items():
-        if (k not in data):
+        if k not in data:
             write_data(k, v)
-            logger.info(f'数据库中不存在{k}，已创建')
+            logger.info(f"数据库中不存在{k}，已创建")
 
     # 处理代理配置
-    if (read_config('common.proxy.enable')):
-        if (read_config('common.proxy.http_value')):
-            os.environ['http_proxy'] = read_config('common.proxy.http_value')
-            logger.info('HTTP协议代理地址: ' +
-                        read_config('common.proxy.http_value'))
-        if (read_config('common.proxy.https_value')):
-            os.environ['https_proxy'] = read_config('common.proxy.https_value')
-            logger.info('HTTPS协议代理地址: ' +
-                        read_config('common.proxy.https_value'))
-        logger.info('代理功能已开启，请确保代理地址正确，否则无法连接网络')
+    if read_config("common.proxy.enable"):
+        if read_config("common.proxy.http_value"):
+            os.environ["http_proxy"] = read_config("common.proxy.http_value")
+            logger.info("HTTP协议代理地址: " + read_config("common.proxy.http_value"))
+        if read_config("common.proxy.https_value"):
+            os.environ["https_proxy"] = read_config("common.proxy.https_value")
+            logger.info("HTTPS协议代理地址: " + read_config("common.proxy.https_value"))
+        logger.info("代理功能已开启，请确保代理地址正确，否则无法连接网络")
 
     # cookie池
-    if (read_config('common.cookiepool')):
-        logger.info('已启用cookie池功能，请确定配置的cookie都能正确获取链接')
-        logger.info('传统的源 - 单用户cookie配置将被忽略')
-        logger.info('所以即使某个源你只有一个cookie，也请填写到cookiepool对应的源中，否则将无法使用该cookie')
+    if read_config("common.cookiepool"):
+        logger.info("已启用cookie池功能，请确定配置的cookie都能正确获取链接")
+        logger.info("传统的源 - 单用户cookie配置将被忽略")
+        logger.info("所以即使某个源你只有一个cookie，也请填写到cookiepool对应的源中，否则将无法使用该cookie")
         variable.use_cookie_pool = True
 
     # 移除已经过期的封禁数据
-    banlist = read_data('banList')
-    banlistRaw = read_data('banListRaw')
+    banlist = read_data("banList")
+    banlistRaw = read_data("banListRaw")
     count = 0
     for b in banlist:
-        if (b['expire'] and (time.time() > b['expire_time'])):
+        if b["expire"] and (time.time() > b["expire_time"]):
             count += 1
             banlist.remove(b)
-            if (b['ip'] in banlistRaw):
-                banlistRaw.remove(b['ip'])
-    write_data('banList', banlist)
-    write_data('banListRaw', banlistRaw)
-    if (count != 0):
-        logger.info(f'已移除{count}条过期封禁数据')
+            if b["ip"] in banlistRaw:
+                banlistRaw.remove(b["ip"])
+    write_data("banList", banlist)
+    write_data("banListRaw", banlistRaw)
+    if count != 0:
+        logger.info(f"已移除{count}条过期封禁数据")
 
     # 处理旧版数据库的banListRaw
-    banlist = read_data('banList')
-    banlistRaw = read_data('banListRaw')
-    if (banlist != [] and banlistRaw == []):
+    banlist = read_data("banList")
+    banlistRaw = read_data("banListRaw")
+    if banlist != [] and banlistRaw == []:
         for b in banlist:
-            banlistRaw.append(b['ip'])
+            banlistRaw.append(b["ip"])
     return
 
 
 def ban_ip(ip_addr, ban_time=-1):
-    if read_config('security.banlist.enable'):
-        banList = read_data('banList')
-        banList.append({
-            'ip': ip_addr,
-            'expire': read_config('security.banlist.expire.enable'),
-            'expire_time': read_config('security.banlist.expire.length') if (ban_time == -1) else ban_time,
-        })
-        write_data('banList', banList)
-        banListRaw = read_data('banListRaw')
-        if (ip_addr not in banListRaw):
+    if read_config("security.banlist.enable"):
+        banList = read_data("banList")
+        banList.append(
+            {
+                "ip": ip_addr,
+                "expire": read_config("security.banlist.expire.enable"),
+                "expire_time": read_config("security.banlist.expire.length") if (ban_time == -1) else ban_time,
+            }
+        )
+        write_data("banList", banList)
+        banListRaw = read_data("banListRaw")
+        if ip_addr not in banListRaw:
             banListRaw.append(ip_addr)
-            write_data('banListRaw', banListRaw)
+            write_data("banListRaw", banListRaw)
     else:
-        if (variable.banList_suggest < 10):
+        if variable.banList_suggest < 10:
             variable.banList_suggest += 1
-            logger.warning('黑名单功能已被关闭，我们墙裂建议你开启这个功能以防止恶意请求')
+            logger.warning("黑名单功能已被关闭，我们墙裂建议你开启这个功能以防止恶意请求")
 
 
 def check_ip_banned(ip_addr):
-    if read_config('security.banlist.enable'):
-        banList = read_data('banList')
-        banlistRaw = read_data('banListRaw')
-        if (ip_addr in banlistRaw):
+    if read_config("security.banlist.enable"):
+        banList = read_data("banList")
+        banlistRaw = read_data("banListRaw")
+        if ip_addr in banlistRaw:
             for b in banList:
-                if (b['ip'] == ip_addr):
-                    if (b['expire']):
-                        if (b['expire_time'] > int(time.time())):
+                if b["ip"] == ip_addr:
+                    if b["expire"]:
+                        if b["expire_time"] > int(time.time()):
                             return True
                         else:
                             banList.remove(b)
-                            banlistRaw.remove(b['ip'])
-                            write_data('banListRaw', banlistRaw)
-                            write_data('banList', banList)
+                            banlistRaw.remove(b["ip"])
+                            write_data("banListRaw", banlistRaw)
+                            write_data("banList", banList)
                             return False
                     else:
                         return True
@@ -512,10 +558,10 @@ def check_ip_banned(ip_addr):
         else:
             return False
     else:
-        if (variable.banList_suggest <= 10):
+        if variable.banList_suggest <= 10:
             variable.banList_suggest += 1
-            logger.warning('黑名单功能已被关闭，我们墙裂建议你开启这个功能以防止恶意请求')
+            logger.warning("黑名单功能已被关闭，我们墙裂建议你开启这个功能以防止恶意请求")
         return False
 
 
-initConfig()
+init_config()

@@ -10,3 +10,5 @@ mutagen
 pillow
 colorama
 ruamel-yaml
+redis
+redis[hiredis]
