@@ -176,7 +176,7 @@ def request(url: str, options={}) -> requests.Response:
     if cache_info and cache_info != "no-cache":
         cache_data = pickle.dumps(req)
         expire_time = cache_info if isinstance(cache_info, int) else 3600
-        expire_at = int((time.time) + expire_time)
+        expire_at = int((time.time()) + expire_time)
         config.updateCache(
             "httpx",
             cache_key,
@@ -333,7 +333,7 @@ async def AsyncRequest(url, options={}) -> ClientResponse:
     if cache_info and cache_info != "no-cache":
         cache_data = pickle.dumps(req)
         expire_time = cache_info if isinstance(cache_info, int) else 3600
-        expire_at = int((time.time) + expire_time)
+        expire_at = int((time.time()) + expire_time)
         config.updateCache(
             "httpx_async",
             cache_key,
