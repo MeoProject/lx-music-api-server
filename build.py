@@ -105,7 +105,7 @@ def build_test(fileName):
                               'PyInstaller',
                               '-F',
                               '-i',
-                              'icon.ico',
+                              'res/icon.ico',
                               '--name',
                               fileName if fileName else f'lx-music-api-server_{sha}',
                               'main.py'])
@@ -140,7 +140,7 @@ def build_release(fileName = ''):
                               'PyInstaller',
                               '-F',
                               '-i',
-                              'icon.ico',
+                              'res/icon.ico',
                               '--name',
                               fileName if fileName else f'lx-music-api-server_{vername}',
                               'main.py'])

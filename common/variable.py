@@ -8,36 +8,34 @@
 # This file is part of the "lx-music-api-server" project.
 
 import os as _os
-import ujson as _json
+import ruamel.yaml as _yaml
+
+yaml = _yaml.YAML()
 
 
 def _read_config_file():
     try:
-        with open("./config/config.json", "r", encoding="utf-8") as f:
-            return _json.load(f)
+        with open(f"./config/config.yml", "r", encoding="utf-8") as f:
+            return yaml.load(f.read())
     except:
-        return {}
+        return []
 
 
 def _read_config(key):
-    try:
-        config = _read_config_file()
-        keys = key.split('.')
-        value = config
-        for k in keys:
-            if isinstance(value, dict):
-                if k not in value and keys.index(k) != len(keys) - 1:
-                    value[k] = {}
-                elif k not in value and keys.index(k) == len(keys) - 1:
-                    value = None
-                value = value[k]
-            else:
+    config = _read_config_file()
+    keys = key.split('.')
+    value = config
+    for k in keys:
+        if isinstance(value, dict):
+            if k not in value and keys.index(k) != len(keys) - 1:
+                value[k] = []
+            elif k not in value and keys.index(k) == len(keys) - 1:
                 value = None
-                break
-
-        return value
-    except:
-        return None
+            value = value[k]
+        else:
+            value = None
+            break
+    return value
 
 
 _dm = _read_config("common.debug_mode")
