@@ -62,6 +62,30 @@ async def url(songId, quality):
         },
         'form': eapiEncrypt(path, json.dumps(requestBody))
     })
+
+
+# 发 GET 请求给第三方 Netease Cloud Music API 服务器获取链接（多此一举）|| 其实是我个人莫名其妙拿不到 Hires 以上音质的一种无奈替代方案
+# 想自建服务器？可以参考这份教程：https://github.com/kirakirai8023/NeteaseCloudMusicApi
+# 总之，在我的测试环境下很神奇，这个版本的 /song/url/v1 接口才能获取到最高音质，最新版本的 NeteaseCloudMusicApi 也不行
+# 我懒得抓包了，等有缘人来改吧，哈哈
+
+'''
+async def url(songId, quality):
+    requestUrl = 'https://your-netease-api-server.com/song/url/v1'
+    params = {
+        "id": songId,
+        "level": tools["qualityMap"][quality],
+        "cookie": config.read_config('module.wy.user.cookie')
+                    if not variable.use_cookie_pool
+                    else random.choice(config.read_config('module.cookiepool.wy'))['cookie']
+    }
+
+    req = await Httpx.AsyncRequest(requestUrl, {
+        'method': 'GET',
+        'params': params,
+    })
+'''
+
     body = req.json()
     if (not body.get("data") or (not body.get("data")) or (not body.get("data")[0].get("url"))):
         raise FailedException("failed")
