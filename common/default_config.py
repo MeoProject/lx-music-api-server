@@ -141,13 +141,16 @@ module:
       use_vkey_api: false
       vkey_api_url: "xxx"
 
-  wy: # 网易云音乐相关配置
+  wy: # 网易云音乐相关配置, proto支持值: ['offcial', 'ncmapi']
     enable: true # 是否开启本平台服务
+    proto: offcial
     user:
       cookie: "" # 账号cookie数据，可以通过浏览器获取，需要vip账号来获取会员歌曲，如果没有请留为空值
       refresh_login:
         enable: false
         interval: 86400
+    ncmapi:
+      api_url: "" # NeteaseCloudMusicApi的URL, 自行参考https://gitlab.com/Binaryify/neteasecloudmusicapi搭建
 
   mg: # 咪咕音乐相关配置
     enable: true # 是否开启本平台服务
