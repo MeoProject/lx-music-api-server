@@ -137,9 +137,6 @@ module:
         enable: false
         interval: 86000
     cdnaddr: http://ws.stream.qqmusic.qq.com/
-    vkey_api: # 第三方Vkey获取API
-      use_vkey_api: false
-      vkey_api_url: "xxx"
 
   wy: # 网易云音乐相关配置, proto支持值: ['offcial', 'ncmapi']
     enable: true # 是否开启本平台服务
