@@ -46,22 +46,22 @@ async def url(songId, quality):
         return await vkeyUrl(songId, quality, infoBody)
     user_info = config.read_config('module.tx.user') if (not variable.use_cookie_pool) else random.choice(config.read_config('module.cookiepool.tx'))
     requestBody = {
-        'req_0': {
-            'module': 'vkey.GetVkeyServer',
-            'method': 'CgiGetVkey',
-            'param': {
-                'filename': [f"{tools.fileInfo[quality]['h']}{strMediaMid}{tools.fileInfo[quality]['e']}"],
-                'guid': config.read_config('module.tx.vkeyserver.guid'),
-                'songmid': [songId],
-                'songtype': [0],
-                'uin': str(user_info['uin']),
-                'loginflag': 1,
-                'platform': '20',
+        "req": {
+            "module": "music.vkey.GetVkey",
+            "method": "UrlGetVkey",
+            "param": {
+                "filename": [f"{tools.fileInfo[quality]['h']}{strMediaMid}{tools.fileInfo[quality]['e']}"],
+                "guid": config.read_config("module.tx.vkeyserver.guid"),
+                "songmid": [songId],
+                "songtype": [0],
+                "uin": str(user_info["uin"]),
+                "loginflag": 1,
+                "platform": "20",
             },
         },
-        'comm': {
-            "qq": str(user_info['uin']),
-            "authst": user_info['qqmusic_key'],
+        "comm": {
+            "qq": str(user_info["uin"]),
+            "authst": user_info["qqmusic_key"],
             "ct": "26",
             "cv": "2010101",
             "v": "2010101"
@@ -69,7 +69,7 @@ async def url(songId, quality):
     }
     req = await signRequest(requestBody)
     body = createObject(req.json())
-    data = body.req_0.data.midurlinfo[0]
+    data = body.req.data.midurlinfo[0]
     url = data['purl']
 
     if (not url):
