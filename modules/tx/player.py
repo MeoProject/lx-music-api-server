@@ -16,34 +16,9 @@ import random
 
 createObject = utils.CreateObject
 
-index_map = {
-    'dolby': 4,
-    'master': 3
-}
-
-async def vkeyUrl(i, q, b):
-    apiNode = config.read_config("module.tx.vkey_api.vkey_api_url")
-    filename = b['track_info']['file']['media_mid']
-    if (q in index_map.keys()):
-        filename = b['track_info']['vs'][index_map[q]]
-    if (not filename): raise FailedException('未找到该音质')
-    filename = f"{tools.fileInfo[q]['h']}{filename}{tools.fileInfo[q]['e']}"
-    src = f"{tools.fileInfo[q]['h']}{i}{tools.fileInfo[q]['e']}"
-    url = apiNode + f'?filename={filename}&guid={config.read_config("module.tx.vkeyserver.guid")}&uin={config.read_config("module.tx.vkeyserver.uin")}&src={src}'
-    req = await Httpx.AsyncRequest(url)
-    body = req.json()
-    purl = body['data'][0]['purl']
-    
-    return {
-        'url': tools.cdnaddr + purl,
-        'quality': q
-    }
-
 async def url(songId, quality):
     infoBody = await getMusicInfo(songId)
     strMediaMid = infoBody['track_info']['file']['media_mid']
-    if (config.read_config("module.tx.vkey_api.use_vkey_api")):
-        return await vkeyUrl(songId, quality, infoBody)
     user_info = config.read_config('module.tx.user') if (not variable.use_cookie_pool) else random.choice(config.read_config('module.cookiepool.tx'))
     requestBody = {
         "req": {
