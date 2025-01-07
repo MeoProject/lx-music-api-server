@@ -982,13 +982,13 @@ use-chardet-on-py3 = ["chardet (>=3.0.2,<6)"]
 
 [[package]]
 name = "ruamel-yaml"
-version = "0.18.7"
+version = "0.18.10"
 description = "ruamel.yaml is a YAML parser/emitter that supports roundtrip preservation of comments, seq/map flow style, and map key order"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "ruamel.yaml-0.18.7-py3-none-any.whl", hash = "sha256:adef56d72a97bc2a6a78952ef398c4054f248fba5698ddc3ab07434e7fc47983"},
-    {file = "ruamel.yaml-0.18.7.tar.gz", hash = "sha256:270638acec6659f7bb30f4ea40083c9a0d0d5afdcef5e63d666f11209091531a"},
+    {file = "ruamel.yaml-0.18.10-py3-none-any.whl", hash = "sha256:30f22513ab2301b3d2b577adc121c6471f28734d3d9728581245f1e76468b4f1"},
+    {file = "ruamel.yaml-0.18.10.tar.gz", hash = "sha256:20c86ab29ac2153f80a428e1254a8adf686d3383df04490514ca3b79a362db58"},
 ]
 
 [package.dependencies]
@@ -1298,4 +1298,4 @@ propcache = ">=0.2.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "00de94248e41b96bd0d5df09e2d2e3cb07558d81ff209ce00c93810204317354"
+content-hash = "38b50d1dee1810f4be0b5345efe3e1c66e6c12eb6b945f176b462e261b879524"
