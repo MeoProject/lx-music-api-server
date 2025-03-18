@@ -1,6 +1,6 @@
 {
   "name": "lx-music-api-server",
-  "version": "2.0.0.beta-12",
+  "version": "2.0.0",
   "description": "一个适配 LX Music 的 API 后端实现",
   "scripts": {
     "dev": "python run.py development",
