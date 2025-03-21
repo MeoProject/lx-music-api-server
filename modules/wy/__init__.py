@@ -72,9 +72,17 @@ async def url(songId, quality):
             raise FailedException("失败")
 
         data = body["data"][0]
-        if (data['level'] != tools['qualityMap'][quality]):
-            raise FailedException("reject unmatched quality")
-
+        
+        # 修正：映射服务器返回的 level 为标准化值
+        data_level = data['level']
+        expected_level = tools["qualityMap"][quality]
+    
+        # 检查客户端请求的 quality 与服务器返回的 level 是否匹配
+        if data_level != expected_level:
+            raise FailedException(
+                f"reject unmatched quality: expected={expected_level}, got={data_level}"
+            )
+        
         return {
             'url': data["url"].split("?")[0],
             'quality': tools['qualityMapReverse'][data['level']]
@@ -91,7 +99,7 @@ async def url(songId, quality):
             "params": requestBody
         })
         body = req.json()
-        if (body["code"] != 200) or (not body.get(data, "")):
+        if (body["code"] != 200) or (not body.get("data")):
             raise FailedException("失败")
         data = body["data"][0]
 
