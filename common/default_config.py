@@ -133,6 +133,7 @@ module:
     user: # 用户数据，可以通过浏览器获取，需要vip账号来获取会员歌曲，如果没有请留为空值，qqmusic_key可以从Cookie中/客户端的请求体中（comm.authst）获取
       qqmusic_key: ""
       uin: "" # key对应的QQ号
+      refresh_key: "" # 刷新失活 qqmusic_key
       refresh_login: # 刷新登录相关配置，enable是否启动，interval刷新间隔
         enable: false
         interval: 86000
@@ -209,6 +210,7 @@ module:
     tx:
       - qqmusic_key: ""
         uin: ""
+        refresh_key: ""
         refresh_login: # cookie池中对于此账号刷新登录的配置，账号间互不干扰
           enable: false
           interval: 86000
