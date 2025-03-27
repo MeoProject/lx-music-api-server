@@ -110,7 +110,6 @@ async def _process_refresh(user_info: Dict[str, Any]) -> Optional[bool]:
             "刷新过程异常 [账号: %s] 错误信息: %s",
             user_info["uin"],
             str(e),
-            exc_info=True,
         )
     return False
 
