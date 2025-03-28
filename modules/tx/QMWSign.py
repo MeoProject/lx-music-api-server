@@ -1,104 +1,55 @@
 # ----------------------------------------
-# - mode: python - 
-# - author: helloplhm-qwq - 
-# - name: QMWSign.py - 
-# - project: lx-music-api-server - 
-# - license: MIT - 
+# - mode: python -
+# - author: jixunmoe -
+# - name: zzc_sign.py -
+# - project: qmweb-sign -
+# - license: MIT -
 # ----------------------------------------
-# This file is part of the "lx-music-api-server" project.
+# This file is part of the "qmweb-sign" project.
 
-from common.utils import createMD5
-import re as _re
+import sys
+import re
 
-def v(b):
-    res = []
-    p = [21, 4, 9, 26, 16, 20, 27, 30]
-    for x in p:
-        res.append(b[x])
-    return ''.join(res)
+from hashlib import sha1
+from base64 import b64encode
 
-def c(b):
-    res = []
-    p = [18, 11, 3, 2, 1, 7, 6, 25]
-    for x in p:
-        res.append(b[x])
-    return ''.join(res)
+PART_1_INDEXES = [23, 14, 6, 36, 16, 40, 7, 19]
+PART_2_INDEXES = [16, 1, 32, 12, 19, 27, 8, 5]
+SCRAMBLE_VALUES = [
+    89,
+    39,
+    179,
+    150,
+    218,
+    82,
+    58,
+    252,
+    177,
+    52,
+    186,
+    123,
+    120,
+    64,
+    242,
+    133,
+    143,
+    161,
+    121,
+    179,
+]
 
-def y(a, b, c):
-    e = []
-    r25 = a >> 2
-    if b is not None and c is not None:
-        r26 = a & 3
-        r26_2 = r26 << 4
-        r26_3 = b >> 4
-        r26_4 = r26_2 | r26_3
-        r27 = b & 15
-        r27_2 = r27 << 2
-        r27_3 = r27_2 | (c >> 6)
-        r28 = c & 63
-        e.append(r25)
-        e.append(r26_4)
-        e.append(r27_3)
-        e.append(r28)
-    else:
-        r10 = a >> 2
-        r11 = a & 3
-        r11_2 = r11 << 4
-        e.append(r10)
-        e.append(r11_2)
-    return e
+PART_1_INDEXES = filter(lambda x: x < 40, PART_1_INDEXES)
 
-def n(ls):
-    e = []
-    for i in range(0, len(ls), 3):
-        if i < len(ls) - 2:
-            e += y(ls[i], ls[i + 1], ls[i + 2])
-        else:
-            e += y(ls[i], None, None)
-    res = []
-    b64all = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/='
-    for i in e:
-        res.append(b64all[i])
-    return ''.join(res)
 
-def t(b):
-    zd = {
-        "0": 0,
-        "1": 1,
-        "2": 2,
-        "3": 3,
-        "4": 4,
-        "5": 5,
-        "6": 6,
-        "7": 7,
-        "8": 8,
-        "9": 9,
-        "A": 10,
-        "B": 11,
-        "C": 12,
-        "D": 13,
-        "E": 14,
-        "F": 15
-    }
-    ol = [212, 45, 80, 68, 195, 163, 163, 203, 157, 220, 254, 91, 204, 79, 104, 6]
-    res = []
-    j = 0
-    for i in range(0, len(b), 2):
-        one = zd[b[i]]
-        two = zd[b[i + 1]]
-        r = one * 16 ^ two
-        res.append(r ^ ol[j])
-        j += 1
-    return res
+def sign(payload: str) -> str:
+    hash = sha1(payload.encode("utf-8")).hexdigest().upper()
 
-def sign(params):
-    md5Str = createMD5(params).upper()
-    h = v(md5Str)
-    e = c(md5Str)
-    ls = t(md5Str)
-    m = n(ls)
-    res = 'zzb' + h + m + e
-    res = res.lower()
-    r = _re.compile(r'[\\/+]')
-    res = _re.sub(r, '', res)
-    return res
+    part1 = "".join(map(lambda i: hash[i], PART_1_INDEXES))
+    part2 = "".join(map(lambda i: hash[i], PART_2_INDEXES))
+
+    part3 = bytearray(20)
+    for i, v in enumerate(SCRAMBLE_VALUES):
+        value = v ^ int(hash[i * 2 : i * 2 + 2], 16)
+        part3[i] = value
+    b64_part = re.sub(rb"[\\/+=]", b"", b64encode(part3)).decode("utf-8")
+    return f"zzc{part1}{b64_part}{part2}".lower()
