@@ -8,7 +8,7 @@
 # This file is part of the "lx-music-api-server" project.
 
 from common.exceptions import FailedException
-from common import config, utils, variable, Httpx
+from common import config, utils, variable
 from .musicInfo import getMusicInfo
 from .utils import tools
 from .utils import signRequest
