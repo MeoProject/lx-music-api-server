@@ -78,15 +78,19 @@ async def url(songId, quality):
         expected_level = tools["qualityMap"][quality]
     
         # 检查客户端请求的 quality 与服务器返回的 level 是否匹配
-        if data_level != expected_level:
-            raise FailedException(
-                f"reject unmatched quality: expected={expected_level}, got={data_level}"
-            )
+        try:
+            if data_level != expected_level:
+                raise FailedException(
+                    f"reject unmatched quality: expected={expected_level}, got={data_level}"
+                )
+        except FailedException:
+            print(f"Warning: Quality has changed from {expected_level} to {data_level}")
         
         return {
             'url': data["url"].split("?")[0],
             'quality': tools['qualityMapReverse'][data['level']]
         }
+
     elif (PROTO == "ncmapi") and (API_URL):
         requestUrl = f"{API_URL}/song/url/v1"
         requestBody = {
@@ -108,12 +112,15 @@ async def url(songId, quality):
         expected_level = tools["qualityMap"][quality]
     
         # 检查客户端请求的 quality 与服务器返回的 level 是否匹配
-        if data_level != expected_level:
-            raise FailedException(
-                f"reject unmatched quality: expected={expected_level}, got={data_level}"
-            )
-    
+        try:
+            if data_level != expected_level:
+                raise FailedException(
+                    f"reject unmatched quality: expected={expected_level}, got={data_level}"
+                )
+        except FailedException:
+            print(f"Warning: Quality has changed from {expected_level} to {data_level}")
+        
         return {
             'url': data["url"].split("?")[0],
-            'quality': quality
+            'quality': tools['qualityMapReverse'][data['level']]
         }
