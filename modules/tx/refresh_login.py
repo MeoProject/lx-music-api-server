@@ -7,206 +7,151 @@
 # ----------------------------------------
 # This file is part of the "lx-music-api-server" project.
 
-from common import Httpx, variable
-from common import scheduler
-from common import config
-from common import log
+from common import Httpx, variable, scheduler, config, log
 from .utils import sign
 import ujson as json
+from typing import Dict, Any, Optional
 
-logger = log.log('qqmusic_refresh_login')
+logger = log.log("qqmusic_refresh_login")
 
 
-async def refresh():
-    if (not config.read_config('module.tx.user.qqmusic_key')):
-        return
-    if (not config.read_config('module.tx.user.refresh_login.enable')):
-        return
-    print(config.read_config('module.tx.user.qqmusic_key'))
-    if (config.read_config('module.tx.user.qqmusic_key').startswith('W_X')):
-        options = {
-            'method': 'POST',
-            'body': json.dumps({
-                "comm": {
-                    "fPersonality": "0",
-                    "tmeLoginType": "1",
-                    "tmeLoginMethod": "1",
-                    "qq": "",
-                    "authst": "",
-                    "ct": "11",
-                    "cv": "12080008",
-                    "v": "12080008",
-                    "tmeAppID": "qqmusic"
-                },
-                "req1": {
-                    "module": "music.login.LoginServer",
-                    "method": "Login",
-                    "param": {
-                        "code": "",
-                        "openid": "",
-                        "refresh_token": "",
-                        "str_musicid": str(config.read_config('module.tx.user.uin')),
-                        "musickey": config.read_config('module.tx.user.qqmusic_key'),
-                        "unionid": "",
-                        "refresh_key": "",
-                        "loginMode": 2
-                    }
-                }
-            })
-        }
-        signature = sign(options['body'])
-        req = await Httpx.AsyncRequest(f'https://u.y.qq.com/cgi-bin/musics.fcg?sign={signature}', options)
-        body = req.json()
-        if (body['req1']['code'] != 0):
-            logger.warning('刷新登录失败, code: ' +
-                           str(body['req1']['code']) + f'\n响应体: {body}')
-            return
-        else:
-            logger.info('刷新登录成功')
-            config.write_config('module.tx.user.uin',
-                                str(body['req1']['data']['musicid']))
-            logger.info('已通过相应数据更新uin')
-            config.write_config('module.tx.user.qqmusic_key',
-                                body['req1']['data']['musickey'])
-            logger.info('已通过相应数据更新qqmusic_key')
-    elif (config.read_config('module.tx.user.qqmusic_key').startswith('Q_H_L')):
-        options = {
-            'method': 'POST',
-            'body': json.dumps({
-                'req1': {
-                    'module': 'QQConnectLogin.LoginServer',
-                    'method': 'QQLogin',
-                    'param': {
-                        'expired_in': 7776000,
-                        'musicid': int(config.read_config('module.tx.user.uin')),
-                        'musickey': config.read_config('module.tx.user.qqmusic_key')
-                    }
-                }
-            })
-        }
-        signature = sign(options['body'])
-        req = await Httpx.AsyncRequest(f'https://u6.y.qq.com/cgi-bin/musics.fcg?sign={signature}', options)
-        body = req.json()
-        if (body['req1']['code'] != 0):
-            logger.warning('刷新登录失败, code: ' +
-                           str(body['req1']['code']) + f'\n响应体: {body}')
-            return
-        else:
-            logger.info('刷新登录成功')
-            config.write_config('module.tx.user.uin',
-                                str(body['req1']['data']['musicid']))
-            logger.info('已通过相应数据更新uin')
-            config.write_config('module.tx.user.qqmusic_key',
-                                body['req1']['data']['musickey'])
-            logger.info('已通过相应数据更新qqmusic_key')
+def _build_request_body(user_info: Dict[str, Any]) -> Dict[str, Any]:
+    """构建统一请求体结构"""
+    return {
+        "comm": {
+            "fPersonality": "0",
+            "tmeLoginType": "2"
+            if user_info["qqmusic_key"].startswith("Q_H_L")
+            else "1",
+            "qq": str(user_info["uin"]),
+            "authst": user_info["qqmusic_key"],
+            "ct": "11",
+            "cv": "12080008",
+            "v": "12080008",
+            "tmeAppID": "qqmusic",
+        },
+        "req1": {
+            "module": "music.login.LoginServer",
+            "method": "Login",
+            "param": {
+                "str_musicid": str(user_info["uin"]),
+                "musickey": user_info["qqmusic_key"],
+                "refresh_key": user_info.get("refresh_key", ""),
+            },
+        },
+    }
+
+
+async def _update_user_config(
+    user_info: Dict[str, Any], new_data: Dict[str, Any]
+) -> None:
+    """统一更新用户配置"""
+    updates = {
+        "uin": str(new_data.get("musicid", user_info["uin"])),
+        "qqmusic_key": new_data.get("musickey", user_info["qqmusic_key"]),
+        "refresh_key": new_data.get("refresh_key", user_info.get("refresh_key", "")),
+    }
+
+    if variable.use_cookie_pool:
+        user_list = config.read_config("module.cookiepool.tx")
+        target_user = next((u for u in user_list if u["uin"] == user_info["uin"]), None)
+        if target_user:
+            target_user.update(updates)
+            config.write_config("module.cookiepool.tx", user_list)
     else:
-        logger.error('未知的qqmusic_key格式')
+        for key, value in updates.items():
+            config.write_config(f"module.tx.user.{key}", value)
 
-if (not variable.use_cookie_pool):
-    # changed refresh login config path
-    txconfig = config.read_config('module.tx')
-    refresh_login_info = txconfig.get('refresh_login')
-    if (refresh_login_info):
-        txconfig['user']['refresh_login'] = refresh_login_info
-        txconfig.pop('refresh_login')
-        config.write_config('module.tx', txconfig)
 
-if (config.read_config('module.tx.user.refresh_login.enable') and not variable.use_cookie_pool):
-    scheduler.append('qqmusic_refresh_login', refresh,
-                     config.read_config('module.tx.user.refresh_login.interval'))
+async def _process_refresh(user_info: Dict[str, Any]) -> Optional[bool]:
+    """统一处理刷新逻辑"""
+    try:
+        # 构建请求参数
+        request_body = _build_request_body(user_info)
+        signature = sign(json.dumps(request_body))
 
-async def refresh_login_for_pool(user_info):
-    if (user_info['qqmusic_key'].startswith('W_X')):
-        options = {
-            'method': 'POST',
-            'body': json.dumps({
-                "comm": {
-                    "fPersonality": "0",
-                    "tmeLoginType": "1",
-                    "tmeLoginMethod": "1",
-                    "qq": "",
-                    "authst": "",
-                    "ct": "11",
-                    "cv": "12080008",
-                    "v": "12080008",
-                    "tmeAppID": "qqmusic"
+        # 发送请求
+        response = await Httpx.AsyncRequest(
+            f"https://u.y.qq.com/cgi-bin/musics.fcg?sign={signature}",
+            {
+                "method": "POST",
+                "body": json.dumps(request_body),
+                "headers": {
+                    "Content-Type": "application/json",
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
                 },
-                "req1": {
-                    "module": "music.login.LoginServer",
-                    "method": "Login",
-                    "param": {
-                        "code": "",
-                        "openid": "",
-                        "refresh_token": "",
-                        "str_musicid": str(user_info['uin']),
-                        "musickey": user_info['qqmusic_key'],
-                        "unionid": "",
-                        "refresh_key": "",
-                        "loginMode": 2
-                    }
-                }
-            })
-        }
-        signature = sign(options['body'])
-        req = await Httpx.AsyncRequest(f'https://u.y.qq.com/cgi-bin/musics.fcg?sign={signature}', options)
-        body = req.json()
-        if (body['req1']['code'] != 0):
-            logger.warning(f'为QQ音乐账号({user_info["uin"]})刷新登录失败, code: ' +
-                           str(body['req1']['code']) + f'\n响应体: {body}')
-            return
-        else:
-            logger.info(f'为QQ音乐账号(WeChat_{user_info["uin"]})刷新登录成功')
-            user_list = config.read_config('module.cookiepool.tx')
-            user_list[user_list.index(
-                user_info)]['qqmusic_key'] = body['req1']['data']['musickey']
-            user_list[user_list.index(
-                user_info)]['uin'] = str(body['req1']['data']['musicid'])
-            config.write_config('module.cookiepool.tx', user_list)
-            logger.info(f'为QQ音乐账号(WeChat_{user_info["uin"]})数据更新完毕')
-            return
-    elif (user_info['qqmusic_key'].startswith('Q_H_L')):
-        options = {
-            'method': 'POST',
-            'body': json.dumps({
-                'req1': {
-                    'module': 'QQConnectLogin.LoginServer',
-                    'method': 'QQLogin',
-                    'param': {
-                        'expired_in': 7776000,
-                        'musicid': int(user_info['uin']),
-                        'musickey': user_info['qqmusic_key']
-                    }
-                }
-            })
-        }
-        signature = sign(options['body'])
-        req = await Httpx.AsyncRequest(f'https://u6.y.qq.com/cgi-bin/musics.fcg?sign={signature}', options)
-        body = req.json()
-        if (body['req1']['code'] != 0):
+            },
+        )
+
+        response_data = response.json()
+        if response_data.get("req1", {}).get("code") != 0:
             logger.warning(
-                f'为QQ音乐账号({user_info["uin"]})刷新登录失败, code: ' + str(body['req1']['code']) + f'\n响应体: {body}')
-            return
-        else:
-            logger.info(f'为QQ音乐账号(QQ_{user_info["uin"]})刷新登录成功')
-            user_list = config.read_config('module.cookiepool.tx')
-            user_list[user_list.index(
-                user_info)]['qqmusic_key'] = body['req1']['data']['musickey']
-            user_list[user_list.index(
-                user_info)]['uin'] = str(body['req1']['data']['musicid'])
-            config.write_config('module.cookiepool.tx', user_list)
-            logger.info(f'为QQ音乐账号(QQ_{user_info["uin"]})数据更新完毕')
-            return
-    else:
-        logger.warning(f'为QQ音乐账号({user_info["uin"]})刷新登录失败: 未知或不支持的key类型')
+                f"刷新失败 [账号: {user_info['uin']} 代码: {response_data['req1']['code']}]"
+            )
+            return False
+
+        # 更新配置
+        await _update_user_config(user_info, response_data["req1"]["data"])
+        logger.info(f"刷新成功 [账号: {user_info['uin']}]")
+        return True
+
+    except json.JSONDecodeError:
+        logger.error(
+            "响应解析失败 [账号: %s] 原始响应: %s",
+            user_info["uin"],
+            response.text[:100],
+        )
+    except KeyError as e:
+        logger.error(
+            "响应数据格式异常 [账号: %s] 缺失字段: %s", user_info["uin"], str(e)
+        )
+    except Exception as e:
+        logger.error(
+            "刷新过程异常 [账号: %s] 错误信息: %s",
+            user_info["uin"],
+            str(e),
+        )
+    return False
+
+
+async def refresh() -> None:
+    """主刷新入口（非Cookie池模式）"""
+    if not config.read_config("module.tx.user.refresh_login.enable"):
         return
+    await _process_refresh(
+        {
+            "uin": config.read_config("module.tx.user.uin"),
+            "qqmusic_key": config.read_config("module.tx.user.qqmusic_key"),
+            "refresh_key": config.read_config("module.tx.user.refresh_key"),
+        }
+    )
 
-def reg_refresh_login_pool_task():
-    user_info_pool = config.read_config('module.cookiepool.tx')
-    for user_info in user_info_pool:
-        if (user_info['refresh_login'].get('enable')):
-            scheduler.append(
-                f'qqmusic_refresh_login_pooled_{user_info["uin"]}', refresh_login_for_pool, user_info['refresh_login']['interval'], args = {'user_info': user_info})
+
+async def refresh_login_for_pool(user_info: Dict[str, Any]) -> None:
+    """Cookie池刷新入口"""
+    if user_info.get("refresh_login", {}).get("enable", False):
+        await _process_refresh(user_info)
 
 
-if (variable.use_cookie_pool):
-    reg_refresh_login_pool_task()
+def _setup_scheduler() -> None:
+    """初始化定时任务"""
+    if variable.use_cookie_pool:
+        user_list = config.read_config("module.cookiepool.tx")
+        for user in user_list:
+            if user.get("refresh_login", {}).get("enable", False):
+                scheduler.append(
+                    f"qq_refresh_{user['uin']}",
+                    refresh_login_for_pool,
+                    user["refresh_login"].get("interval", 3600),
+                    args={"user_info": user},
+                )
+    elif config.read_config("module.tx.user.refresh_login.enable"):
+        scheduler.append(
+            "qqmusic_main_refresh",
+            refresh,
+            config.read_config("module.tx.user.refresh_login.interval"),
+        )
+
+
+# 初始化定时任务
+_setup_scheduler()
