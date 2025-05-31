@@ -1,0 +1,22 @@
+{
+  "name": "lx-music-api-server-docs",
+  "version": "2.0.0",
+  "description": "lx-music-api-server项目文档",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "docs:build": "vuepress-vite build src",
+    "docs:clean-dev": "vuepress-vite dev src --clean-cache",
+    "docs:dev": "vuepress-vite dev src",
+    "docs:update-package": "pnpm dlx vp-update"
+  },
+  "devDependencies": {
+    "@vuepress/bundler-vite": "2.0.0-rc.9",
+    "vue": "^3.5.16",
+    "vuepress": "2.0.0-rc.9",
+    "vuepress-theme-hope": "2.0.0-rc.34"
+  },
+  "dependencies": {
+    "lxgw-wenkai-webfont": "^1.7.0"
+  }
+}
