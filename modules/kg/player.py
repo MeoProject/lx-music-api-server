@@ -1,80 +1,86 @@
-# ----------------------------------------
-# - mode: python - 
-# - author: helloplhm-qwq - 
-# - name: player.py - 
-# - project: lx-music-api-server - 
-# - license: MIT - 
-# ----------------------------------------
-# This file is part of the "lx-music-api-server" project.
-import random
-from common.exceptions import FailedException
-from common import config, utils, variable
-from .utils import getKey, signRequest, tools
-from .musicInfo import getMusicInfo
 import time
+import random
+from common import config
+from common.exceptions import FailedException
+from .utils import tools, getKey, signRequest
+from .musicInfo import getMusicInfo
 
-async def url(songId, quality):
-    songId = songId.lower()
-    body_ = await getMusicInfo(songId)
-    thash = body_['audio_info'][tools.qualityHashMap[quality]]
-    albumid = body_['album_info']['album_id'] if (body_.get('album_info') and body_['album_info'].get('album_id')) else None
-    albumaudioid = body_['album_audio_id'] if (body_.get('album_audio_id')) else None
-    if (not thash):
-        raise FailedException('获取歌曲信息失败')
-    if (not albumid):
-        albumid = ""
-    if (not albumaudioid):
-        albumaudioid = ""
-    thash = thash.lower()
-    user_info = config.read_config('module.kg.user') if (not variable.use_cookie_pool) else random.choice(config.read_config('module.cookiepool.kg'))
-    params = {
-        'album_id': albumid,
-        'userid': user_info['userid'],
-        'area_code': 1,
-        'hash': thash,
-        'module': '',
-        'mid': user_info['mid'],
-        'appid': tools.appid,
-        'ssa_flag': 'is_fromtrack',
-        'clientver': tools.clientver,
-        'open_time': time.strftime("%Y%m%d"),
-        'vipType': 6,
-        'ptype': 0,
-        'token': user_info['token'],
-        'auth': '',
-        'mtype': 0,
-        'album_audio_id': albumaudioid,
-        'behavior': 'play',
-        'clienttime': int(time.time()),
-        'pid': tools.pid,
-        'key': getKey(thash, user_info),
-        'dfid': '-',
-        'pidversion': 3001
-    }
-    if (tools.version == 'v5'):
-        params['quality'] = tools.qualityMap[quality]
-    if (tools.version == "v4"):
-        params['version'] = tools.clientver
-    params = utils.mergeDict(tools["extra_params"], params)
-    headers = {
-            'User-Agent': 'Android712-AndroidPhone-8983-18-0-NetMusic-wifi',
-            'KG-THash': '3e5ec6b',
-            'KG-Rec': '1',
-            'KG-RC': '1',
+
+async def url(songId: str, quality: str) -> dict:
+    try:
+        songId = songId.lower()
+        info_body = await getMusicInfo(songId)
+        thash = info_body["audio_info"][tools["qualityHashMap"][quality]]
+        album_id = (
+            info_body["album_info"]["album_id"]
+            if (info_body.get("album_info") and info_body["album_info"].get("album_id"))
+            else None
+        )
+        album_audio_id = info_body["album_audio_id"]
+
+        if not thash:
+            raise FailedException("获取歌曲信息失败或没有该音质资源")
+    except Exception as e:
+        raise FailedException(f"获取音乐信息失败: {e}")
+
+    try:
+        user_info = random.choice(config.ReadConfig("module.kg.users"))
+
+        params = {
+            "album_id": album_id,
+            "userid": user_info["userid"],
+            "area_code": 1,
+            "hash": thash.lower(),
+            "mid": tools["mid"],
+            "appid": tools[user_info["version"]]["appid"],
+            "ssa_flag": "is_fromtrack",
+            "clientver": tools[user_info["version"]]["clientver"],
+            "token": user_info["token"],
+            "album_audio_id": album_audio_id,
+            "behavior": "play",
+            "clienttime": int(time.time()),
+            "pid": tools[user_info["version"]]["pid"],
+            "key": getKey(thash, user_info),
+            "quality": tools["qualityMap"][quality],
+            "version": tools[user_info["version"]]["clientver"],
+            "dfid": "-",
+            "pidversion": 3001,
         }
-    if (tools['x-router']['enable']):
-        headers['x-router'] = tools['x-router']['value']
-    req = await signRequest(tools.url, params, {'headers': headers})
-    body = req.json()
 
-    if body['status'] == 3:
-        raise FailedException('该歌曲在酷狗没有版权，请换源播放')
-    elif body['status'] == 2:
-        raise FailedException('链接获取失败，请检查账号是否有会员或数字专辑是否购买')
-    elif body['status'] != 1:
-        raise FailedException('链接获取失败，可能是数字专辑或者api失效')
+        headers = {
+            "User-Agent": "Android12-AndroidCar-20089-46-0-NetMusic-wifi",
+            "KG-THash": "255d751",
+            "KG-Rec": "1",
+            "KG-RC": "1",
+        }
 
-    return {
-        'url': body["url"][0],
-        'quality': quality
-    }
+        req = await signRequest(
+            "https://tracker.kugou.com/v5/url",
+            params,
+            {"headers": headers},
+            version=user_info["version"],
+        )
+        body = dict(req.json())
+
+        if not body["url"]:
+            match body["status"]:
+                case 3:
+                    return FailedException("酷狗无版权的歌曲，目前无解")
+                case 2:
+                    raise FailedException(
+                        "链接获取失败，可能出现验证码或数字专辑未购买"
+                    )
+                case 1:
+                    raise FailedException("链接获取失败, 可能是数字专辑或者API失效")
+                case _:
+                    raise FailedException("未知错误导致获取链接失败")
+
+        play_url = body["url"][0]
+
+        return {
+            "url": play_url,
+            "quality": quality,
+        }
+
+    except Exception as e:
+        raise FailedException(f"未知错误: {e}")

@@ -1,18 +1,10 @@
-# ----------------------------------------
-# - mode: python - 
-# - author: helloplhm-qwq - 
-# - name: eapi.py - 
-# - project: lx-music-api-server - 
-# - license: MIT - 
-# ----------------------------------------
-# This file is part of the "lx-music-api-server" project.
-
 from ujson import dumps
 from os import urandom
 from base64 import b64encode
 from binascii import hexlify
 from Crypto.Cipher import AES
 from common import utils
+
 
 __all__ = ["weEncrypt", "linuxEncrypt", "eEncrypt"]
 
@@ -26,12 +18,10 @@ MODULUS = (
 PUBKEY = "010001"
 NONCE = b"0CoJUm6Qyw8W8jud"
 LINUXKEY = b"rFgB&h#%2?^eDg:Q"
-EAPIKEY = b'e82ckenh8dichen8'
+EAPIKEY = b"e82ckenh8dichen8"
+
 
 def weEncrypt(text):
-    """
-    引用自 https://github.com/darknessomi/musicbox/blob/master/NEMbox/encrypt.py#L40
-    """
     data = dumps(text).encode("utf-8")
     secret = create_key(16)
     method = {"iv": True, "base64": True}
@@ -39,13 +29,12 @@ def weEncrypt(text):
     encseckey = rsa(secret, PUBKEY, MODULUS)
     return {"params": params, "encSecKey": encseckey}
 
+
 def linuxEncrypt(text):
-    """
-    参考自 https://github.com/Binaryify/NeteaseCloudMusicApi/blob/master/util/crypto.js#L28
-    """
     text = str(text).encode()
     data = aes(text, LINUXKEY)
     return {"eparams": data.decode()}
+
 
 def eapiEncrypt(url, text):
     text = str(text)
@@ -53,22 +42,23 @@ def eapiEncrypt(url, text):
     data = "{}-36cd479b6b5-{}-36cd479b6b5-{}".format(url, text, digest)
     return {"params": aes(data.encode(), EAPIKEY).decode("utf-8")}
 
+
 def aes(text, key, method={}):
     pad = 16 - len(text) % 16
     text = text + bytearray([pad] * pad)
     if "iv" in method:
         encryptor = AES.new(key, AES.MODE_CBC, b"0102030405060708")
     else:
-        encryptor = AES.new(key,  AES.MODE_ECB)
+        encryptor = AES.new(key, AES.MODE_ECB)
     ciphertext = encryptor.encrypt(text)
     if "base64" in method:
         return b64encode(ciphertext)
     return hexlify(ciphertext).upper()
 
+
 def rsa(text, pubkey, modulus):
     text = text[::-1]
-    rs = pow(int(hexlify(text), 16),
-             int(pubkey, 16), int(modulus, 16))
+    rs = pow(int(hexlify(text), 16), int(pubkey, 16), int(modulus, 16))
     return format(rs, "x").zfill(256)
 
 

@@ -1,61 +1,57 @@
-# ----------------------------------------
-# - mode: python -
-# - author: helloplhm-qwq -
-# - name: variable.py -
-# - project: lx-music-api-server -
-# - license: MIT -
-# ----------------------------------------
-# This file is part of the "lx-music-api-server" project.
-
-import os as _os
-import ruamel.yaml as _yaml
-
-yaml = _yaml.YAML()
+import os as os
+import aiohttp
+import requests
+import ujson as json
+from . import stats
 
 
-def _read_config_file():
+def _ReadConfig_file():
     try:
-        with open(f"./config/config.yml", "r", encoding="utf-8") as f:
-            return yaml.load(f.read())
+        with open("./data/config.json", "r", encoding="utf-8") as f:
+            return json.load(f)
     except:
-        return []
+        return {}
 
 
-def _read_config(key):
-    config = _read_config_file()
-    keys = key.split('.')
-    value = config
-    for k in keys:
-        if isinstance(value, dict):
-            if k not in value and keys.index(k) != len(keys) - 1:
-                value[k] = []
-            elif k not in value and keys.index(k) == len(keys) - 1:
+def _ReadConfig(key):
+    try:
+        config = _ReadConfig_file()
+        keys = key.split(".")
+        value = config
+        for k in keys:
+            if isinstance(value, dict):
+                if k not in value and keys.index(k) != len(keys) - 1:
+                    value[k] = {}
+                elif k not in value and keys.index(k) == len(keys) - 1:
+                    value = None
+                value = value[k]
+            else:
                 value = None
-            value = value[k]
-        else:
-            value = None
-            break
-    return value
+                break
+
+        return value
+    except:
+        return None
 
 
-_dm = _read_config("common.debug_mode")
-_lm = _read_config("common.log_file")
-_ll = _read_config("common.log_length_limit")
-debug_mode = True if (_os.getenv('CURRENT_ENV') ==
-                      'development') else (_dm if (_dm) else False)
-log_length_limit = _ll if (_ll) else 500
-log_file = _lm if (isinstance(_lm, bool)) else True
-running = True
-config = {}
-workdir = _os.getcwd()
-banList_suggest = 0
-iscn = True
-fake_ip = None
-aioSession = None
-qdes_lib_loaded = False
-use_cookie_pool = False
-running_ports = []
-use_proxy = False
-http_proxy = ''
-https_proxy = ''
-log_files = []
+_dm: bool = _ReadConfig("common.debug_mode")
+_lm: bool = _ReadConfig("common.log_file")
+
+DebugMode: bool = (
+    True if (os.getenv("CURRENT_ENV") == "development") else (_dm if (_dm) else False)
+)
+
+with open("./package.json", "r", encoding="utf-8") as f:
+    PackageInfo: dict = json.loads(f.read())
+
+LogFile: bool = _lm if (isinstance(_lm, bool)) else True
+Running: bool = True
+Config: dict = {}
+WorkDir = os.getcwd()
+FakeIP = None
+SyncClient: requests.Session = None
+AsyncClient: aiohttp.ClientSession = None
+QRCDecrypterLoaded: bool = False
+LogFiles: list = []
+RefreshDone = False
+StatsManager = stats.StatisticsManager()

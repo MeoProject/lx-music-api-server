@@ -1,72 +1,81 @@
-# ----------------------------------------
-# - mode: python - 
-# - author: helloplhm-qwq - 
-# - name: utils.py - 
-# - project: lx-music-api-server - 
-# - license: MIT - 
-# ----------------------------------------
-# This file is part of the "lx-music-api-server" project.
-from Crypto.Cipher import AES
-from Crypto.Util.Padding import pad
+import ujson
+import random
 from common import utils
 from common import config
-from common import Httpx
-import json
+from common import request
 
-createObject = utils.CreateObject
-
-
-tools = createObject({
-    "signkey": config.read_config("module.kg.client.signatureKey"),
-    "pidversec": config.read_config("module.kg.client.pidversionsecret"),
-    "clientver": config.read_config("module.kg.client.clientver"),
-    "x-router": config.read_config("module.kg.tracker.x-router"),
-    "url": config.read_config("module.kg.tracker.host") + config.read_config("module.kg.tracker.path"),
-    "version": config.read_config("module.kg.tracker.version"),
-    "extra_params": config.read_config("module.kg.tracker.extra_params"),
-    "appid": config.read_config("module.kg.client.appid"),
-    'mid': config.read_config('module.kg.user.mid'),
-    "pid": config.read_config("module.kg.client.pid"),
-    'qualityHashMap': {
-        '128k': 'hash_128',
-        '320k': 'hash_320',
-        'flac': 'hash_flac',
-        'flac24bit': 'hash_high',
-        'master': 'hash_128',
+tools = {
+    "mid": random.choice(config.ReadConfig("module.kg.mid")),
+    "offcial": {
+        "appid": "1005",
+        "signkey": "OIlwieks28dk2k092lksi2UIkp",
+        "pidversec": "57ae12eb6890223e355ccfcb74edf70d",
+        "clientver": "12029",
+        "pid": "2",
     },
-    'qualityMap': {
-        '128k': '128',
-        '320k': '320',
-        'flac': 'flac',
-        'flac24bit': 'high',
-        'master': 'viper_atmos',
+    "qualityHashMap": {
+        "128k": "hash_128",
+        "320k": "hash_320",
+        "flac": "hash_flac",
+        "hires": "hash_high",
+        "atmos": "hash_128",
+        "master": "hash_128",
     },
-})
+    "qualityMap": {
+        "128k": "128",
+        "320k": "320",
+        "flac": "flac",
+        "hires": "high",
+        "atmos": "viper_atmos",
+        "master": "viper_clear",
+    },
+}
 
-def buildSignatureParams(dictionary, body = ""):
-    joined_str = ''.join([f'{k}={v}' for k, v in dictionary.items()])
+
+def buildSignatureParams(dictionary, body=""):
+    joined_str = "".join([f"{k}={v}" for k, v in dictionary.items()])
     return joined_str + body
 
+
 def buildRequestParams(dictionary: dict):
-    joined_str = '&'.join([f'{k}={v}' for k, v in dictionary.items()])
+    joined_str = "&".join([f"{k}={v}" for k, v in dictionary.items()])
     return joined_str
 
-def sign(params, body = "", signkey = tools["signkey"]):
-    if (isinstance(body, dict)):
-        body = json.dumps(body)
+
+def sign(params, body="", signkey=None):
+    if isinstance(body, dict):
+        body = ujson.dumps(body)
     params = utils.sortDict(params)
     params = buildSignatureParams(params, body)
     return utils.createMD5(signkey + params + signkey)
 
-async def signRequest(url, params, options, signkey = tools["signkey"]):
-    params['signature'] = sign(params, options.get("body") if options.get("body") else (options.get("data") if options.get("data") else (options.get("json") if options.get("json") else "")), signkey)
+
+async def signRequest(url, params, options, signkey=None, version="offcial"):
+    if not signkey:
+        signkey = tools[version]["signkey"]
+
+    params["signature"] = sign(
+        params,
+        (
+            options.get("body")
+            if options.get("body")
+            else (
+                options.get("data")
+                if options.get("data")
+                else (options.get("json") if options.get("json") else "")
+            )
+        ),
+        signkey,
+    )
     url = url + "?" + buildRequestParams(params)
-    return await Httpx.AsyncRequest(url, options)
+    return await request.AsyncRequest(url, options)
+
 
 def getKey(hash_, user_info):
-    return utils.createMD5(hash_.lower() + tools.pidversec + tools.appid + user_info['mid'] + user_info['userid'])
-
-def aes_sign(plain_text, key=b'90b8382a1bb4ccdcf063102053fd75b8', iv=b'f063102053fd75b8'):
-    cipher = AES.new(key, AES.MODE_CBC, iv)
-    crypto = cipher.encrypt(pad(plain_text.encode(), AES.block_size))
-    return crypto.hex()
+    return utils.createMD5(
+        hash_.lower()
+        + tools[user_info["version"]]["pidversec"]
+        + tools[user_info["version"]]["appid"]
+        + tools["mid"]
+        + user_info["userid"]
+    )

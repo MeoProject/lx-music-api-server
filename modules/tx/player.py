@@ -1,58 +1,103 @@
-# ----------------------------------------
-# - mode: python - 
-# - author: helloplhm-qwq - 
-# - name: player.py - 
-# - project: lx-music-api-server - 
-# - license: MIT - 
-# ----------------------------------------
-# This file is part of the "lx-music-api-server" project.
-
-from common.exceptions import FailedException
-from common import config, utils, variable
-from .musicInfo import getMusicInfo
-from .utils import tools
-from .utils import signRequest
 import random
+from .detail import getMusicInfo
+from .utils import signRequest, tools, formatSinger
+from common import config
+from common.exceptions import FailedException
 
-createObject = utils.CreateObject
 
-async def url(songId, quality):
+async def url(songId: str, quality: str, try_cishu: int = 0):
+    if try_cishu > 3:
+        raise FailedException(f"获取失败")
+
+    enc = False
+
+    if "_e" in songId:
+        enc = True
+
     infoBody = await getMusicInfo(songId)
-    strMediaMid = infoBody['track_info']['file']['media_mid']
-    user_info = config.read_config('module.tx.user') if (not variable.use_cookie_pool) else random.choice(config.read_config('module.cookiepool.tx'))
+    songId = infoBody["track_info"]["mid"]
+    strMediaMid = infoBody["track_info"]["file"]["media_mid"]
+    user_info = config.ReadConfig("module.tx.users")
+
+    if quality == "master":
+        user_info = random.choice(
+            [user for user in user_info if user.get("vip_type") == "svip"]
+        )
+    else:
+        user_info = random.choice(user_info)
+
     requestBody = {
-        "req": {
+        "comm": {
+            "ct": "11",
+            "cv": "12050505",
+            "v": "12050505",
+            "chid": "2005000894",
+            "tmeLoginMethod": "2",
+            "tmeLoginType": "2",
+            "OpenUDID2": user_info["devices"]["UDID2"],
+            "QIMEI36": user_info["devices"]["QIMEI"],
+            "tmeAppID": "qqmusic",
+            "rom": user_info["devices"]["fingerprint"],
+            "fPersonality": "0",
+            "OpenUDID": user_info["devices"]["UDID"],
+            "udid": user_info["devices"]["UDID"],
+            "os_ver": user_info["devices"]["osver"],
+            "aid": user_info["devices"]["aid"],
+            "phonetype": user_info["devices"]["model"],
+            "devicelevel": user_info["devices"]["level"],
+            "newdevicelevel": user_info["devices"]["level"],
+            "qq": user_info["uin"],
+            "authst": user_info["token"],
+        },
+        "request": {
             "module": "music.vkey.GetVkey",
             "method": "UrlGetVkey",
             "param": {
-                "filename": [f"{tools.fileInfo[quality]['h']}{strMediaMid}{tools.fileInfo[quality]['e']}"],
-                "guid": config.read_config("module.tx.vkeyserver.guid"),
+                "uin": user_info["uin"],
+                "guid": user_info["devices"]["UDID2"],
                 "songmid": [songId],
-                "songtype": [0],
-                "uin": str(user_info["uin"]),
-                "loginflag": 1,
-                "platform": "20",
+                "songtype": [1],
+                "filename": [
+                    (
+                        f'{tools["File"]["fileInfo"][quality]["h"]}{strMediaMid}{tools["File"]["fileInfo"][quality]["e"]}'
+                        if not enc
+                        else f'{tools["encryptFile"]["fileInfo"][quality]["h"]}{strMediaMid}{tools["File"]["fileInfo"][quality]["e"]}'
+                    )
+                ],
+                "downloadfrom": 0,
+                "ctx": 1,
             },
         },
-        "comm": {
-            "qq": str(user_info["uin"]),
-            "authst": user_info["qqmusic_key"],
-            "ct": "26",
-            "cv": "2010101",
-            "v": "2010101"
-        },
     }
-    req = await signRequest(requestBody)
-    body = createObject(req.json())
-    data = body.req.data.midurlinfo[0]
-    url = data['purl']
 
-    if (not url):
-        raise FailedException('failed')
+    try:
+        req = await signRequest(requestBody)
+        body = req.json()
+        data = body["request"]["data"]["midurlinfo"][0]
+        purl = data["purl"]
 
-    resultQuality = data['filename'].split('.')[0][:4]
+        if enc:
+            ekey = data["ekey"]
+        else:
+            ekey = None
 
-    return {
-        'url': tools.cdnaddr + url,
-        'quality': tools.qualityMapReverse[resultQuality]
-    }
+        if not purl:
+            try_cishu += 1
+            return await url(songId, quality, try_cishu)
+
+        purl = (
+            (purl + f"&fromtag={random.randint(1, 99999)}")
+            if not "fromtag" in purl
+            else purl
+        )
+
+        return {
+            "name": infoBody["track_info"]["title"],
+            "artist": formatSinger(infoBody["track_info"]["singer"]),
+            "album": infoBody["track_info"]["album"]["title"],
+            "url": tools["cdnaddr"] + purl,
+            "quality": quality,
+            "ekey": ekey,
+        }
+    except Exception as e:
+        raise FailedException(f"获取失败：{e}")

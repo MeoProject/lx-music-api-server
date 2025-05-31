@@ -1,63 +1,111 @@
-# ----------------------------------------
-# - mode: python - 
-# - author: helloplhm-qwq - 
-# - name: __init__.py - 
-# - project: lx-music-api-server - 
-# - license: MIT - 
-# ----------------------------------------
-# This file is part of the "lx-music-api-server" project.
-
 import random
-from common import Httpx
+import time
+from common import request
 from common import config
-from common import variable
+from common import log
 from common.exceptions import FailedException
-from . import refresh_login # 删了这个定时任务会寄掉
 
 tools = {
-    'qualityMap': {
-        '128k': '1',
-        '320k': '2',
-        'flac': '3',
-        'flac24bit': '4',
-        "master": "5"
-    },
-    'qualityMapReverse': {
-        '000009': '128k',
-        '020010': '320k',
-        '011002': 'flac',
-        '011005': 'flac24bit',
-    },
+    "qualityMap": {"128k": "PQ", "320k": "HQ", "flac": "SQ", "hires": "ZQ"},
+    "qualityMapReverse": {"PQ": "128k", "HQ": "320k", "SQ": "flac", "ZQ": "hires"},
 }
 
-async def url(songmid, quality):
-    info_url = f"http://app.c.nf.migu.cn/MIGUM2.0/v1.0/content/resourceinfo.do?resourceType=2&copyrightId=" + songmid
-    info_request = await Httpx.AsyncRequest(info_url, {"method": "POST", "cache": 259200})
-    infobody = info_request.json()
-    if infobody["code"] != "000000":
-        raise FailedException("failed to fetch song info")
-    user_info = config.read_config('module.mg.user') if (not variable.use_cookie_pool) else random.choice(config.read_config('module.cookiepool.mg'))
-    req = await Httpx.AsyncRequest(f'https://m.music.migu.cn/migumusic/h5/play/auth/getSongPlayInfo?type={tools["qualityMap"][quality]}&copyrightId={infobody["resource"][0]["copyrightId"]}', {
-        'method': 'GET',
-        'headers': {
-            'User-Agent': user_info['useragent'],
-            "by": user_info["by"],
-            "Cookie": "SESSION=" + user_info["session"],
-            "Referer": "https://m.music.migu.cn/v4/",
-            "Origin": "https://m.music.migu.cn",
-        },
-    })
+logger = log.log("MiguMusic")
+
+
+async def IdGetInfo(songId):
+    req = await request.AsyncRequest(
+        f"https://c.musicapp.migu.cn/MIGUM3.0/resource/song/by-contentids/v2.0?contentId={songId}",
+        {"method": "GET"},
+    )
+    response = dict(req.json())
+    if response.get("code") != "000000":
+        raise FailedException("歌曲信息获取失败")
+    return response
+
+
+async def copyrightIdGetInfo(songId):
+    req = await request.AsyncRequest(
+        f"http://app.c.nf.migu.cn/MIGUM2.0/v1.0/content/resourceinfo.do?resourceType=2&copyrightId={songId}",
+        {"method": "GET"},
+    )
+    response = dict(req.json())
+    if response.get("code") != "000000":
+        raise FailedException("歌曲信息获取失败")
+    return response
+
+
+def formatSinger(singerList):
+    n = []
+    for s in singerList:
+        n.append(s["name"])
+    return "、".join(n)
+
+
+async def url(songId: str, quality: str):
+    _songId = None
+    _albumId = None
+
     try:
-        body = req.json()
-
-        if (int(body['code']) != 200 or (not body.get("data")) or (not body["data"]["playUrl"])):
-            raise FailedException(body.get("msg") if body.get("msg") else "failed")
-
-        data = body["data"]
-
-        return {
-            'url': body["data"]["playUrl"].split("?")[0] if body["data"]["playUrl"].split("?")[0].startswith("http") else "http:" + body["data"]["playUrl"].split("?")[0],
-            'quality': tools['qualityMapReverse'].get(data['formatId']) if (tools['qualityMapReverse'].get(data['formatId'])) else "unknown",
-        }
+        req = await IdGetInfo(songId)
+        resourceList = req.get("data", [{}])
+        infobody = resourceList[0]
+        _name = infobody["songName"]
+        _album = infobody["album"]
+        _artist = formatSinger(infobody["singerList"])
+        _contentId = infobody["contentId"]
+        _songId = infobody["songId"]
+        _albumId = infobody["albumId"]
     except:
-        raise FailedException('failed')
+        req = await copyrightIdGetInfo(songId)
+        resourceList = req.get("resource", [{}])
+        infobody = resourceList[0]
+        _name = infobody["songName"]
+        _album = infobody["album"]
+        _artist = infobody["singer"]
+        _contentId = infobody["contentId"]
+        _songId = infobody["songId"]
+        _albumId = infobody["albumId"]
+
+    user_info = random.choice(config.ReadConfig("module.mg.users"))
+
+    req = await request.AsyncRequest(
+        f'https://app.c.nf.migu.cn/MIGUM2.0/strategy/listen-url/v2.4?albumId={_albumId}&lowerQualityContentId={_contentId}&netType=01&resourceType=2&songId={_songId}&toneFlag={tools["qualityMap"][quality]}',
+        {
+            "method": "GET",
+            "headers": {
+                "channel": user_info["channel"],
+                "token": user_info["token"],
+                "ce": user_info["ce"],
+                "timestamp": int(round(time.time() * 1000)),
+            },
+        },
+    )
+
+    body = dict(req.json())
+    data = dict(body.get("data", {}))
+
+    if not data.get("url"):
+        raise FailedException(
+            "获取失败: "
+            + str(
+                dict(data.get("dialogInfo", {})).get("text", "未返回任何数据")
+            ).replace("正在播放试听片段。", "")
+        )
+
+    data = body["data"]
+    purl = str(data["url"])
+
+    play_url = (
+        purl.split("?")[0]
+        if purl.split("?")[0].startswith("http")
+        else "http:" + purl.split("?")[0]
+    )
+
+    return {
+        "name": _name,
+        "artist": _artist,
+        "album": _album,
+        "url": play_url,
+        "quality": tools["qualityMapReverse"].get(data["audioFormatType"], "unknown"),
+    }

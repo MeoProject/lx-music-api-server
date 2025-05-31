@@ -1,117 +1,106 @@
-# ----------------------------------------
-# - mode: python - 
-# - author: helloplhm-qwq - 
-# - name: __init__.py - 
-# - project: lx-music-api-server - 
-# - license: MIT - 
-# ----------------------------------------
-# This file is part of the "lx-music-api-server" project.
-
 import random
-from common import Httpx, config, variable
+from common import request, log
+from common.config import ReadConfig
 from common.exceptions import FailedException
-from common.utils import CreateObject
-from .encrypt import base64_encrypt
+from .des import createEncrypt, createDecrypt
+
+logger = log.log("KWMusic")
 
 tools = {
-    'qualityMap': {
-        '128k': '128kmp3',
-        '320k': '320kmp3',
-        'flac': '2000kflac',
-        'flac24bit': '4000kflac',
-        '128kmp3': '128kmp3',
-        '320kmp3': '320kmp3',
-        "2000kflac": "2000kflac",
-        "4000kflac": "4000kflac",
+    "qualityMap": {
+        "128k": "128kmp3",
+        "192k": "192kogg",
+        "320k": "320kmp3",
+        "flac": "2000kflac",
+        "hires": "4000kflac",
+        "atmos": "20201kmflac",
+        "atmos_plus": "20501kmflac",
+        "master": "20900kmflac",
     },
-    'qualityMapReverse': {
-        128: '128k',
-        320: '320k',
-        2000: 'flac',
-        4000: 'flac24bit',
+    "qualityMapReverse": {
+        99: "99k",
+        100: "100k",
+        128: "128k",
+        256: "256k",
+        320: "320k",
+        2000: "flac",
+        4000: "hires",
+        20201: "atmos",
+        20501: "atmos_plus",
+        20900: "master",
     },
-    'extMap': {
-        '128k': 'mp3',
-        '320k': 'mp3',
-        'flac': 'flac',
-        'flac24bit': 'flac',
-    }
+    "extMap": {
+        "128k": "mp3",
+        "320k": "mp3",
+        "flac": "flac",
+        "hires": "flac",
+        "atmos": "mflac",
+        "atmos_plus": "mflac",
+        "master": "mflac",
+    },
 }
 
+
 async def url(songId, quality):
-    proto = config.read_config('module.kw.proto')
-    if (proto == 'bd-api'):
-        user_info = config.read_config('module.kw.user') if (not variable.use_cookie_pool) else random.choice(config.read_config('module.cookiepool.kw'))
-        target_url = f'''https://bd-api.kuwo.cn/api/service/music/downloadInfo/{songId}?isMv=0&format={tools['extMap'][quality]}&br={tools['qualityMap'][quality]}&uid={user_info['uid']}&token={user_info['token']}'''
-        req = await Httpx.AsyncRequest(target_url, {
-            'method': 'GET',
-            'headers': {
-                'User-Agent': 'Dart/2.14 (dart:io)',
-                'channel': 'qq',
-                'plat': 'ar',
-                'net': 'wifi',
-                'ver': '3.1.2',
-                'uid': user_info['uid'],
-                'devId': user_info['device_id'],
-            }
-        })
-        try:
-            body = req.json()
-            data = body['data']
+    source_config = dict(random.choice(ReadConfig("module.kw.source_config_list")))
 
-            if (body['code'] != 200) or (int(data['audioInfo']['bitrate']) == 1):
-                raise FailedException('failed')
+    params = source_config["params"].copy()
 
-            return {
-                'url': data['url'].split('?')[0],
-                'quality': tools['qualityMapReverse'][int(data['audioInfo']['bitrate'])]
-            }
-        except:
-            raise FailedException('failed')
-    elif (proto == 'kuwodes'):
-        des_info = config.read_config('module.kw.des')
-        params = des_info['params'].format(
-            songId = songId,
-            map_quality = tools['qualityMap'][quality],
-            ext = tools['extMap'][quality],
-            raw_quality = quality,
+    for key, value in params.items():
+        if isinstance(value, str):
+            params[key] = (
+                value.replace("{songId}", songId)
+                .replace("{mapQuality}", tools["qualityMap"][quality])
+                .replace("{ext}", tools["extMap"][quality])
+            )
+
+    params["source"] = source_config["source"]
+
+    rawParams = "&".join([f"{k}={v}" for k, v in params.items()])
+
+    if source_config["isenc"]:
+        rawParams = createEncrypt(rawParams)
+
+    target_url = f'https://{source_config["type"]}.kuwo.cn/mobi.s?{rawParams}'
+
+    req = await request.AsyncRequest(
+        target_url,
+        {
+            "method": "GET",
+            "headers": {"User-Agent": "okhttp/3.10.0"},
+        },
+    )
+
+    if req.json()["code"] != 200:
+        raise FailedException("失败")
+
+    body = dict(req.json().get("data", {}))
+
+    url = str(body.get("surl", body.get("url", "")))
+    bitrate = int(body.get("bitrate", 1))
+
+    if url == "" or bitrate == 1 or bitrate not in tools["qualityMapReverse"]:
+        raise FailedException("失败")
+
+    if tools["qualityMapReverse"][bitrate] != quality:
+        logger.info(
+            f"酷我音乐 {songId}, {quality} -> {tools['qualityMapReverse'][bitrate]}"
         )
-        target_url = f'https://{des_info["host"]}/{des_info["path"]}?f={des_info["f"]}&' + ('q=' + base64_encrypt(params) if (des_info["need_encrypt"]) else params)
-        req = await Httpx.AsyncRequest(target_url, {
-            'method': 'GET',
-            'headers': des_info['headers']
-        })
-        url = ''
-        bitrate = 1
-        if (des_info["response_type"] == 'json'):
-            url = req.json()
-            for p in des_info['url_json_path'].split('.'):
-                url = url.get(p)
-                if (url == None):
-                    raise FailedException('failed')
-            bitrate = req.json()
-            for p in des_info['bitrate_json_path'].split('.'):
-                bitrate = bitrate.get(p)
-                if (bitrate == None):
-                    raise FailedException('failed')
-        elif (des_info['response_type'] == 'text'):
-            body = req.text
-            for l in body.split('\n'):
-                l = l.strip()
-                if (l.startswith('url=')):
-                    url = l.split('=')[1]
-                elif (l.startswith('bitrate=')):
-                    bitrate = int(l.split('=')[1])
-        else:
-            raise FailedException('配置文件参数response_type填写错误或不支持')
-        bitrate = int(bitrate)
-        if (url == '' or bitrate == 1):
-            raise FailedException('failed')
-        if (not url.startswith('http')):
-            raise FailedException('failed')
-        return {
-            'url': url.split('?')[0],
-            'quality': tools['qualityMapReverse'][bitrate]
-        }
+
+    if body["format"] == "mflac":
+        ekey = createDecrypt(req.json()["data"]["ekey"])
     else:
-        raise FailedException('配置文件参数proto填写错误或不支持')
+        ekey = None
+
+    info_url = f"http://musicpay.kuwo.cn/music.pay?ver=MUSIC_9.1.1.2_BCS2&src=mbox&op=query&signver=new&action=play&ids={songId}&accttype=1&appuid=38668888"
+    info_req = await request.AsyncRequest(info_url)
+    info_body = info_req.json()
+
+    return {
+        "name": info_body["songs"][0]["name"],
+        "artist": info_body["songs"][0]["artist"],
+        "album": info_body["songs"][0]["album"],
+        "url": url.split("?")[0],
+        "quality": tools["qualityMapReverse"][bitrate],
+        "ekey": ekey,
+    }
