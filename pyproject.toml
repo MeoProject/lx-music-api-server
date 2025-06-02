@@ -21,7 +21,7 @@ mutagen = "^1.47.0"
 colorama = "^0.4.6"
 ruamel-yaml = "^0.18.10"
 pybind11 = "^2.13.6"
-redis = "^5.2.1"
+redis = "^6.1.1"
 hiredis = "^3.1.0"
 
 [build-system]

@@ -960,14 +960,14 @@ windows-terminal = ["colorama (>=0.4.6)"]
 
 [[package]]
 name = "redis"
-version = "5.2.1"
+version = "6.1.1"
 description = "Python client for Redis database and key-value store"
 optional = false
 python-versions = ">=3.8"
 groups = ["main"]
 files = [
-    {file = "redis-5.2.1-py3-none-any.whl", hash = "sha256:ee7e1056b9aea0f04c6c2ed59452947f34c4940ee025f5dd83e6a6418b6989e4"},
-    {file = "redis-5.2.1.tar.gz", hash = "sha256:16f2e22dff21d5125e8481515e386711a34cbec50f0e44413dd7d9c060a54e0f"},
+    {file = "redis-6.1.1-py3-none-any.whl", hash = "sha256:ed44d53d065bbe04ac6d76864e331cfe5c5353f86f6deccc095f8794fd15bb2e"},
+    {file = "redis-6.1.1.tar.gz", hash = "sha256:88c689325b5b41cedcbdbdfd4d937ea86cf6dab2222a83e86d8a466e4b3d2600"},
 ]
 
 [package.dependencies]
@@ -975,7 +975,8 @@ async-timeout = {version = ">=4.0.3", markers = "python_full_version < \"3.11.3\
 
 [package.extras]
 hiredis = ["hiredis (>=3.0.0)"]
-ocsp = ["cryptography (>=36.0.1)", "pyopenssl (==23.2.1)", "requests (>=2.31.0)"]
+jwt = ["pyjwt (>=2.9.0)"]
+ocsp = ["cryptography (>=36.0.1)", "pyopenssl (>=20.0.1)", "requests (>=2.31.0)"]
 
 [[package]]
 name = "requests"
@@ -1326,4 +1327,4 @@ propcache = ">=0.2.0"
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.8"
-content-hash = "8cc70ab6f18f7a3227fa31c2f16e3691593095cbb73be0acfffec1a60797408d"
+content-hash = "bf81d32dde5176e3bcbe72a54e69bf0af621c57e4eca0c9f790f93a6ca541f64"
