@@ -283,12 +283,18 @@ def write_config(key, value):
 
     keys = key.split(".")
     current = config
+    current_cache = variable.config
     for k in keys[:-1]:
         if k not in current:
             current[k] = {}
         current = current[k]
+        if k not in current_cache:
+            current_cache[k] = {}
+        current_cache = current_cache[k]
 
     current[keys[-1]] = value
+    # 更新配置缓存
+    current_cache[keys[-1]] = value
 
     # 设置保留注释和空行的参数
     y = yaml_.YAML()
