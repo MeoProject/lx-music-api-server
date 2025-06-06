@@ -9,6 +9,7 @@
 [![GitHub Release (with filter)](https://img.shields.io/github/v/release/MeoProject/lx-music-api-server?style=for-the-badge)](https://github.com/MeoProject/lx-music-api-server/releases/latest)
 [![GitHub All Releases](https://img.shields.io/github/downloads/MeoProject/lx-music-api-server/total?style=for-the-badge&color=violet)](https://github.com/MeoProject/lx-music-api-server/releases)
 [![GitHub License](https://img.shields.io/github/license/MeoProject/lx-music-api-server?style=for-the-badge)](https://github.com/MeoProject/lx-music-api-server/blob/main/LICENSE)
+[![Powered by DartNode](https://dartnode.com/branding/DN-Open-Source-sm.png)](https://dartnode.com "Powered by DartNode - Free VPS for Open Source")
 
 </div>
 
