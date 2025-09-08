@@ -1201,14 +1201,14 @@ zstd = ["zstandard (>=0.18.0)"]
 
 [[package]]
 name = "xmltodict"
-version = "0.14.2"
+version = "0.15.0"
 description = "Makes working with XML feel like you are working with JSON"
 optional = false
 python-versions = ">=3.6"
 groups = ["main"]
 files = [
-    {file = "xmltodict-0.14.2-py2.py3-none-any.whl", hash = "sha256:20cc7d723ed729276e808f26fb6b3599f786cbc37e06c65e192ba77c40f20aac"},
-    {file = "xmltodict-0.14.2.tar.gz", hash = "sha256:201e7c28bb210e374999d1dde6382923ab0ed1a8a5faeece48ab525b7810a553"},
+    {file = "xmltodict-0.15.0-py2.py3-none-any.whl", hash = "sha256:8887783bf1faba1754fc45fdf3fe03fbb3629c811ae57f91c018aace4c58d4ed"},
+    {file = "xmltodict-0.15.0.tar.gz", hash = "sha256:c6d46b4e3413d1e4fc3e5016f0f1c7a5c10f8ce39efaa0cb099af986ecfc9a53"},
 ]
 
 [[package]]
@@ -1327,4 +1327,4 @@ propcache = ">=0.2.0"
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.8"
-content-hash = "bc19d5d09cd73ddbff02063ad70d2da83f5ed51c47f83b290ceae58928dadb5f"
+content-hash = "d7d4f96e71313943e8983c69fe4fd34f47b02b1d1c6bafbd23d680b5a58edd7d"
