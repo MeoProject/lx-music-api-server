@@ -1,29 +1,23 @@
-[tool.poetry]
-name = "lx_music_api_server"
-version = "2.0.0"
-description = "一个适配 LX Music 的 API 后端实现"
-authors = ["helloplhm-qwq", "lerdb", "Folltoshe"]
-license = "MIT"
+[project]
+name = "lx-music-api-server"
+version = "2.0.2"
+description = "LX Music Api Server"
+license = {text = "MIT"}
 readme = "README.md"
-package-mode = false
+requires-python = ">=3.10"
+dependencies = [
+    "ujson (>=5.10.0,<6.0.0)",
+    "fastapi (>=0.115.12,<0.116.0)",
+    "pycryptodome (>=3.22.0,<4.0.0)",
+    "xmltodict (>=0.14.2,<0.15.0)",
+    "redis (>=5.2.1,<6.0.0)",
+    "cryptography (>=44.0.3,<45.0.0)",
+    "uvicorn (>=0.34.2,<0.35.0)",
+    "httpx[h2] (>=0.28.1,<0.29.0)",
+    "rich (>=14.1.0,<15.0.0)",
+]
 
-[tool.poetry.dependencies]
-python = "^3.8"
-aiohttp = "^3.10.10"
-pycryptodome = "^3.22.0"
-ujson = "^5.10.0"
-requests = "^2.32.4"
-colorlog = "^6.9.0"
-Pygments = "^2.19.1"
-xmltodict = "^0.15.0"
-pillow = "^10.4.0"
-mutagen = "^1.47.0"
-colorama = "^0.4.6"
-ruamel-yaml = "^0.18.14"
-pybind11 = "^3.0.1"
-redis = "^6.1.1"
-hiredis = "^3.1.0"
 
 [build-system]
-requires = ["poetry-core"]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"

@@ -1,5 +1,3 @@
-# Git Ignore for lx-music-api-server
-
 # python
 *.pyc
 *.pyo
@@ -16,22 +14,19 @@ dist
 build
 
 # project
-cache.db
-data.db
 test.*
 */test.*
-logs
-config.json
-config.yml
-/config/config.json
-/config/data.db
 *.log
 *.bak
 *.tmp
+*.db
+*.json
+*.yml
+logs
+data
 
 # VSCode
 .history
-.idea
 
 # Vim
 *.swp
@@ -40,9 +35,3 @@ config.yml
 # GVim
 *.un~
 *.un
-
-# temp script
-lx-music-source-example.js
-
-# dumprecord
-dumprecord_*.txt
