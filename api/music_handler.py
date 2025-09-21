@@ -15,15 +15,19 @@ async def HandleSong(request: Request, source: str, songId: str | int, quality: 
     return handleResponse(request, result)
 
 
-@router.get("/search")
-async def HandleSearch(
-    request: Request, source: str, keyword: str, pages: int = 1, limit: int = 30
-):
-    try:
-        result = await modules._search(source, keyword, pages, limit)
-        return handleResponse(request, result)
-    except Exception:
-        return handleResponse(
-            request,
-            {"code": 500, "message": "内部服务器错误"},
-        )
+@router.get("/info")
+async def HandleSongInfo(request: Request, source: str, songId: str | int):
+    if source == "kg":
+        songId = songId.lower()
+
+    result = await modules._info(source, songId)
+    return handleResponse(request, result)
+
+
+@router.get("/lyric")
+async def HandleLyric(request: Request, source: str, songId: str | int):
+    if source == "kg":
+        songId = songId.lower()
+
+    result = await modules._lyric(source, songId)
+    return handleResponse(request, result)

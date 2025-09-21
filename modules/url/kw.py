@@ -1,8 +1,7 @@
 import random
 from utils import http as request
 from server.config import config
-from models import SongInfo, UrlResponse, Song
-from modules.info.kw import getMusicInfo
+from models import UrlResponse
 from server.exceptions import getUrlFailed
 from crypt.kuwodes import createDecrypt
 
@@ -41,7 +40,7 @@ tools = {
 }
 
 
-async def getUrl(songId: str | int, quality: str) -> Song:
+async def getUrl(songId: str | int, quality: str) -> UrlResponse:
     source = random.choice(config.read("module.kw.source_list"))
 
     params = {
@@ -87,15 +86,10 @@ async def getUrl(songId: str | int, quality: str) -> Song:
     else:
         ekey = ""
 
-    try:
-        info = await getMusicInfo(songId)
-    except:
-        info = SongInfo(songId, "未知", "未知", "未知")
-
     url = UrlResponse(
         url=url.split("?")[0],
         quality=tools["qualityMapReverse"][bitrate],
         ekey=ekey,
     )
 
-    return Song(info, url)
+    return url
