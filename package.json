@@ -1,13 +1,24 @@
 {
   "name": "lx-music-api-server",
-  "version": "2.0.0",
-  "description": "一个适配 LX Music 的 API 后端实现",
+  "version": "2.0.2",
+  "description": "LX Music Api Server",
+  "main": "main.py",
   "scripts": {
-    "dev": "python run.py development",
-    "prod": "python run.py production",
-    "install": "pip install -r requirements.txt",
-    "poetry:install": "poetry install",
-    "poetry:development": "poetry run python run.py development",
-    "poetry:production": "poetry run python run.py production"
-  }
+    "start": "poetry run python app.py",
+    "clean": "python clean.py",
+    "install": "poetry install"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MeoProject/lx-music-api-server.git"
+  },
+  "keywords": [
+    "music"
+  ],
+  "author": "MeoProject",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/MeoProject/lx-music-api-server/issues"
+  },
+  "homepage": "https://github.com/MeoProject/lx-music-api-server"
 }
