@@ -1,8 +1,7 @@
 import random
 import ujson
 
-from models import Song, SongInfo, UrlResponse
-from modules.info.wy import getMusicInfo
+from models import UrlResponse
 from modules.plat.wy import eEncrypt, QMap
 from utils.http import HttpRequest
 from server.config import config
@@ -52,9 +51,4 @@ async def getUrl(songId: str, quality: str) -> UrlResponse:
         quality=QMap["qualityMapReverse"][data["level"]],
     )
 
-    try:
-        info = await getMusicInfo(songId)
-    except:
-        info = SongInfo(songId, "未知", "未知", "未知")
-
-    return Song(info=info, url=url)
+    return url

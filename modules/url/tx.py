@@ -3,7 +3,7 @@ from server.config import config
 from server.exceptions import getUrlFailed
 from modules.plat.tx import build_common_params, utils
 from modules.info.tx import getMusicInfo
-from models import UrlResponse, Song
+from models import UrlResponse
 
 translate = {
     0: "无版权/未知原因",
@@ -12,7 +12,7 @@ translate = {
 }
 
 
-async def getUrl(songId: str | int, quality: str) -> Song:
+async def getUrl(songId: str | int, quality: str) -> UrlResponse:
     try:
         info = await getMusicInfo(songId)
     except:
@@ -66,4 +66,4 @@ async def getUrl(songId: str | int, quality: str) -> Song:
         quality=quality,
     )
 
-    return Song(info=info, url=url)
+    return url

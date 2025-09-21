@@ -1,10 +1,9 @@
 import time
 import random
-from models import Song, UrlResponse
+from models import UrlResponse
 from server.config import config
 from server.exceptions import getUrlFailed
 from modules.info.kg import getMusicInfo
-from modules.lyric.kg import lyricSearchByHash, getLyric
 from modules.plat.kg.utils import tools, getKey, signRequest
 
 
@@ -73,13 +72,6 @@ async def getUrl(songId: str, quality: str) -> dict:
         play_url = body["url"][0]
         url = UrlResponse(play_url, quality)
 
-        try:
-            lyric_id, accesskey = await lyricSearchByHash(info.hash)
-            lyric = await getLyric(lyric_id, accesskey)
-            info.lyric = lyric
-        except:
-            info.lyric = None
-
-        return Song(info=info, url=url)
+        return url
     except Exception as e:
         raise getUrlFailed(f"未知错误: {e}")
