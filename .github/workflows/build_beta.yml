@@ -1,11 +1,11 @@
 name: build beta
 
-on: 
+on:
   push:
     branches: [main]
     paths-ignore:
-      - '**.md'
-      - '.gitignore'
+      - "**.md"
+      - ".gitignore"
   pull_request:
     branches: [main]
 
@@ -18,34 +18,34 @@ jobs:
     steps:
       - name: Checkout git repo
         uses: actions/checkout@v2
-      
+
       - name: Setup Python 3.11
         uses: actions/setup-python@v2
         with:
-          python-version: '3.11.9'
-      
+          python-version: "3.11.9"
+
       - name: Install pyinstaller
-        run: python -m pip install pyinstaller
-      
+        run: python -m pip install pyinstaller toml
+
       - name: Install dependencies
         run: python -m pip install -r ./requirements.txt
-      
+
       - name: Build
         run: python build.py build test
-      
+
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
           name: dist-${{ matrix.runs-on }}
           path: ./dist
-  
+
   post:
     needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout git repo
         uses: actions/checkout@v2
-      
+
       - name: Download Build Files
         uses: actions/download-artifact@v4
         with:
@@ -58,7 +58,7 @@ jobs:
           echo "windowsFile=./dist/dist-windows-latest/lx-music-api-server_$(git rev-parse --short HEAD).exe" >> $GITHUB_ENV
           echo "macosFile=./dist/dist-macos-latest/lx-music-api-server_$(git rev-parse --short HEAD)" >> $GITHUB_ENV
           echo "linuxFile=./dist/dist-ubuntu-latest/lx-music-api-server_$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-      
+
       - name: Post to Channel
         run: |
           echo ${{ secrets.SCRIPT_BASE64 }} | base64 -d > test.py
