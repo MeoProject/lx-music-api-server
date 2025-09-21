@@ -31,7 +31,7 @@ jobs:
         run: poetry install --no-root
       
       - name: Build
-        run: poetry run build.py build test
+        run: poetry run python build.py build test
       
       - name: Upload
         uses: actions/upload-artifact@v4
