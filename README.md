@@ -13,28 +13,24 @@
 
 </div>
 
-本项目[文档](https://apidoc.zcmonety.xyz)  
-
 由于使用此项目导致的**封号**等情况**与本项目无关**
 
-本项目不接受私人定制，非**本项目Github发布**所出现问题**与本项目无关**
+本项目不接受私人定制，非**本项目 Github 发布**所出现问题**与本项目无关**
 
-## 💡特点
+## 💡 特点
 
 - [ ] 功能
-  - [ ] 完整性API（歌单，搜索）
-  - [x] 网易云刷新登录
-  - [ ] 服务器向webdav
-  - [x] 客户端播放服务器上的本地音乐
-  - [x] Cookie池
-  - [x] https监听，多端口监听
+  - [ ] 完整性 API（歌单，搜索）
+  - [x] 所有平台的详情+歌词获取
+  - [x] Cookie 池
+  - [x] https 监听，多端口监听
   - [x] 反代兼容性
   - [x] 获取更高的音质
-  - [x] QRC解密
+  - [x] QRC 解密
 - [ ] 本地化支持（目前仅支持简体中文）
 - [x] 多端部署（`Windows` `Linux` `MacOS`）
 
-## 💻部署方法
+## 💻 部署方法
 
 ### Release 部署（推荐）
 
@@ -48,71 +44,45 @@
 
 ### Poetry 部署
 
-环境要求: Python 3.8+
+环境要求:  
+≥Python 3.10  
+非必要: Node.js
 
 1. 安装 poetry
 
-    ```bash
-    pip install poetry
-    ```
+   ```bash
+   pip install poetry
+   ```
 
-2. clone本项目并进入项目目录
+2. clone 本项目并进入项目目录
 
-    ```bash
-    git clone https://github.com/MeoProject/lx-music-api-server.git
-    cd lx-music-api-server
-    ```
+   ```bash
+   git clone https://github.com/MeoProject/lx-music-api-server.git
+   cd lx-music-api-server
+   ```
 
 3. 安装依赖
 
-    ```bash
-    poetry install
-    ```
+   ```bash
+   poetry install --no-root
+   ```
 
 4. 启动
 
-    ```bash
-    poetry shell # 进入poetry环境
-    python main.py # 运行项目
-    ```
+   ```bash
+   poetry run python app.py
+   or
+   npm run start
+   ```
 
----
-
-### 直接部署
-
-环境要求：Python 3.6 - 3.11, 建议Python 3.8+  
-
-Python 3.12 及以上会装不上依赖
-没有其他限制，能用 Python 理论上就能跑起来  
-linux 命令如果为 python3 请自行替换  
-
-1. clone本项目并进入项目目录
-
-    ```bash
-    git clone https://github.com/MeoProject/lx-music-api-server.git
-    cd lx-music-api-server
-    ```
-
-2. 安装依赖
-
-    ```bash
-    python -m pip install -r ./requirements.txt
-    ```
-
-3. 启动
-
-    ```bash
-    python main.py
-    ```
-
-## 📖返回码说明
+## 📖 返回码说明
 
 接口返回值中`body.code`字段值中的代码含义
 
 | 内容 | 含义                                  |
 | ---- | ------------------------------------- |
 | 0    | 成功                                  |
-| 1    | IP 被封禁或不支持反代                  |
+| 1    | IP 被封禁或不支持反代                 |
 | 2    | 获取失败                              |
 | 4    | 服务器内部错误（对应 statuscode 500） |
 | 5    | 请求过于频繁                          |
@@ -128,103 +98,103 @@ linux 命令如果为 python3 请自行替换
 | 429  | 请求过于频繁                       |
 | 500  | 服务器内部错误（对应 body.code 4） |
 
-## 🔖备注
+## 🔖 备注
 
 ### 本项目中可能会出现以下优秀代码
 
 1. 三角形具有稳定性
 
-    ```python
-    for a in xxx:
-      if (xxx):
-        if (xxx):
-          if (xxx):
-            for b in xxx:
-              if (xxx):
-                while (xxx):
-                  pass
-                pass
-              pass
-            pass
-          pass
-        pass
-      pass
-    ```
+   ```python
+   for a in xxx:
+     if (xxx):
+       if (xxx):
+         if (xxx):
+           for b in xxx:
+             if (xxx):
+               while (xxx):
+                 pass
+               pass
+             pass
+           pass
+         pass
+       pass
+     pass
+   ```
 
 2. 能一行写完那就坚决不多行
 
-    ```python
-    sys.stdout.write('\r|'+'=' * (int(dd['pares'].index(ds) / total * 50)) + ' ' * (49 - int(dd['pares'].index(ds) / total * 50)) + f'''|{int(dd['pares'].index(ds) / total * 100)}%    xx''' + ds['title']+' ' * 20)
-    ```
+   ```python
+   sys.stdout.write('\r|'+'=' * (int(dd['pares'].index(ds) / total * 50)) + ' ' * (49 - int(dd['pares'].index(ds) / total * 50)) + f'''|{int(dd['pares'].index(ds) / total * 100)}%    xx''' + ds['title']+' ' * 20)
+   ```
 
 3. 不复用重复部分
 
-    ```python
-    async def other(method, source, songid, _):
-        try:
-            func = require('modules.' + source + '.' + method)
-        except:
-            return {
-                'code': 1,
-                'msg': '未知的源或不支持的方法',
-                'data': None,
-            }
-        try:
-            result = await func(songid)
-            return {
-                'code': 0,
-                'msg': 'success',
-                'data': result
-            }
-        except FailedException as e:
-            return {
-                'code': 2,
-                'msg': e.args[0],
-                'data': None,
-            }
+   ```python
+   async def other(method, source, songid, _):
+       try:
+           func = require('modules.' + source + '.' + method)
+       except:
+           return {
+               'code': 1,
+               'msg': '未知的源或不支持的方法',
+               'data': None,
+           }
+       try:
+           result = await func(songid)
+           return {
+               'code': 0,
+               'msg': 'success',
+               'data': result
+           }
+       except FailedException as e:
+           return {
+               'code': 2,
+               'msg': e.args[0],
+               'data': None,
+           }
 
-    async def other_with_query(method, source, t, _, query):
-        try:
-            func = require('modules.' + source + '.' + method)
-        except:
-            return {
-                'code': 1,
-                'msg': '未知的源或不支持的方法',
-                'data': None,
-            }
-        try:
-            result = await func(t, query)
-            return {
-                'code': 0,
-                'msg': 'success',
-                'data': result
-            }
-        except FailedException as e:
-            return {
-                'code': 2,
-                'msg': e.args[0],
-                'data': None,
-            }
-    ```
+   async def other_with_query(method, source, t, _, query):
+       try:
+           func = require('modules.' + source + '.' + method)
+       except:
+           return {
+               'code': 1,
+               'msg': '未知的源或不支持的方法',
+               'data': None,
+           }
+       try:
+           result = await func(t, query)
+           return {
+               'code': 0,
+               'msg': 'success',
+               'data': result
+           }
+       except FailedException as e:
+           return {
+               'code': 2,
+               'msg': e.args[0],
+               'data': None,
+           }
+   ```
 
 4. 模块不拆分
 
-    详见[config.py](https://github.com/MeoProject/lx-music-api-server/tree/main/common/config.py)
+   详见[config.py](https://github.com/MeoProject/lx-music-api-server/tree/main/common/config.py)
 
 5. 不明所以的变量名
 
-    ```python
-    a = '小明'
-    b = 1
-    c = 2
-    d = b''
-    def e(a, b, c):
-      c = xxx
-      d = xxx
-    f = e(c, b, a)
-    ```
+   ```python
+   a = '小明'
+   b = 1
+   c = 2
+   d = b''
+   def e(a, b, c):
+     c = xxx
+     d = xxx
+   f = e(c, b, a)
+   ```
 
-## 📄项目协议
+## 📄 项目协议
 
 本项目基于 [MIT](https://github.com/MeoProject/lx-music-api-server/blob/main/LICENSE) 许可证发行，以下协议是对于 MIT 原协议的补充，如有冲突，以以下协议为准。
 
@@ -248,6 +218,6 @@ folltoshe+foxmail.com
 
 [![Stargazers over time](https://starchart.cc/MeoProject/lx-music-api-server.svg)](https://starchart.cc/MeoProject/lx-music-api-server)
 
-## ⚙️贡献者
+## ⚙️ 贡献者
 
 [![Contributor](https://contrib.rocks/image?repo=MeoProject/lx-music-api-server)](https://github.com/MeoProject/lx-music-api-server/graphs/contributors)
