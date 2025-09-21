@@ -85,6 +85,10 @@ async def lx_script(request: Request, key: str | None = None):
         content=r,
         media_type="text/javascript",
         headers={
-            "Content-Disposition": f"""attachment; filename=ikun-music-source.js"""
+            "Content-Disposition": f"""attachment; filename={(
+                config.read('script.file') 
+                if config.read('script.file').endswith('.js') 
+                else config.read('script.file') + '.js'
+            )}"""
         },
     )

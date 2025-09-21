@@ -136,7 +136,7 @@ def build_test(fileName):
             "res/icon.ico",
             "--name",
             fileName if fileName else f"lx-music-api-server_{sha}",
-            "main.py",
+            "app.py",
         ]
     )
 
@@ -184,7 +184,7 @@ def build_release(fileName=""):
             "res/icon.ico",
             "--name",
             fileName if fileName else f"lx-music-api-server_{vername}",
-            "main.py",
+            "app.py",
         ]
     )
 

@@ -22,6 +22,7 @@ default = {
         "intro": "详情",
         "author": "作者",
         "version": "版本",
+        "file": "lx-music-source.js",
         "dev": False,
         "update": False,
         "updateMsg": "{updateUrl}",

@@ -11,19 +11,17 @@ English | [简体中文](README.md)
 [![GitHub License](https://img.shields.io/github/license/MeoProject/lx-music-api-server?style=for-the-badge)](https://github.com/MeoProject/lx-music-api-server/blob/main/LICENSE)
 
 </div>
-This project [Document](https://apidoc.zcmonety.xyz)  
+This project [Document](https://apidoc.zcmonety.xyz)
 
 **Ban** and other situations caused by the use of this project have **nothing** to do with this project.
 
-This project does not accept private customization, and the problems that occur in the non-**Github release of this project** have nothing to do with this project**
+This project does not accept private customization, and the problems that occur in the non-**Github release of this project** have nothing to do with this project\*\*
 
 ## 💡Feature
 
 - [ ] Functions
   - [ ] All APIs (playlist, search)
-  - [x] Netease Cloud Refresh Login
-  - [ ] Client plays music on webdav
-  - [x] Client plays local music on the server
+  - [x] All lyric+info
   - [x] Cookie pool
   - [x] HTTPS listening, multi port listening
   - [x] Reverse proxy compatibility
@@ -48,81 +46,52 @@ Required environment: Python 3.8+
 
 1. Install poetry
 
-    ```bash
-    pip install poetry
-    ```
+   ```bash
+   pip install poetry
+   ```
 
 2. Clone this project and enter the project directory
 
-    ```bash
-    git clone https://github.com/MeoProject/lx-music-api-server.git
-    cd lx-music-api-server
-    ```
+   ```bash
+   git clone https://github.com/MeoProject/lx-music-api-server.git
+   cd lx-music-api-server
+   ```
 
 3. Install requirements
 
-    ```bash
-    poetry install --no-root
-    ```
+   ```bash
+   poetry install --no-root
+   ```
 
 4. Run it
 
-    ```bash
-    poetry shell # enter poetry environment
-    python main.py # run project
-    ```
-
----
-
-### Directly deploy
-
-Required environment: Python 3.6 - 3.11, Python 3.8+ is better.
-
-Python 3.12 or higher maybe install requirements failed.  
-Without other restrictions, you can run only with Python.  
-If you are using linux, you command maybe python3, please replace it yourself.
-
-1. Clone this project and enter the project directory
-
-    ```bash
-    git clone https://github.com/MeoProject/lx-music-api-server.git
-    cd lx-music-api-server
-    ```
-
-2. Install requirements
-
-    ```bash
-    python -m pip install -r ./requirements.txt
-    ```
-
-3. Run it
-
-    ```bash
-    python main.py
-    ```
+   ```bash
+   poetry shell # enter poetry environment
+   python main.py # run project
+   ```
 
 ## 📖Return code description
 
 The code meaning in the `body.code` field value in the interface return value.
 
-| Value | Meaning                                               |
-| ---- | --------------------------------------------------- |
-| 0    | Success                                                 |
-| 1    | IP is banned or does not support anti-generation      |
-| 2    | Fail to obtain.                                         |
-| 4    | Server internal error (corresponding to statuscode 500) |
-| 5    | Too frequent requests                                   |
-| 6    | Parameter error                                        |
+| Value | Meaning                                                 |
+| ----- | ------------------------------------------------------- |
+| 0     | Success                                                 |
+| 1     | IP is banned or does not support anti-generation        |
+| 2     | Fail to obtain.                                         |
+| 4     | Server internal error (corresponding to statuscode 500) |
+| 5     | Too frequent requests                                   |
+| 6     | Parameter error                                         |
 
 The code meaning of `statuscode` returned by the interface.
 
 | Value | Meaning                                              |
-| ---- | -------------------------------------------------- |
-| 200  | Success                                               |
-| 403  | IP is banned                                          |
-| 400  | Parameter error                                      |
-| 429  | Too frequent requests                                |
-| 500  | Server internal error (corresponding to body.code 4) |
+| ----- | ---------------------------------------------------- |
+| 200   | Success                                              |
+| 403   | IP is banned                                         |
+| 400   | Parameter error                                      |
+| 429   | Too frequent requests                                |
+| 500   | Server internal error (corresponding to body.code 4) |
 
 ## 🔖Remarks
 
@@ -130,95 +99,95 @@ The code meaning of `statuscode` returned by the interface.
 
 1. Triangle has stability.
 
-    ```python
-    for a in xxx:
-      if (xxx):
-        if (xxx):
-          if (xxx):
-            for b in xxx:
-              if (xxx):
-                while (xxx):
-                  pass
-                pass
-              pass
-            pass
-          pass
-        pass
-      pass
-    ```
+   ```python
+   for a in xxx:
+     if (xxx):
+       if (xxx):
+         if (xxx):
+           for b in xxx:
+             if (xxx):
+               while (xxx):
+                 pass
+               pass
+             pass
+           pass
+         pass
+       pass
+     pass
+   ```
 
 2. If you can finish it in one line, then don't write many lines.
 
-    ```python
-    sys.stdout.write('\r|'+'=' * (int(dd['pares'].index(ds) / total * 50)) + ' ' * (49 - int(dd['pares'].index(ds) / total * 50)) + f'''|{int(dd['pares'].index(ds) / total * 100)}%    xx''' + ds['title']+' ' * 20)
-    ```
+   ```python
+   sys.stdout.write('\r|'+'=' * (int(dd['pares'].index(ds) / total * 50)) + ' ' * (49 - int(dd['pares'].index(ds) / total * 50)) + f'''|{int(dd['pares'].index(ds) / total * 100)}%    xx''' + ds['title']+' ' * 20)
+   ```
 
 3. Do not reuse duplicate parts
 
-    ```python
-    async def other(method, source, songid, _):
-        try:
-            func = require('modules.' + source + '.' + method)
-        except:
-            return {
-                'code': 1,
-                'msg': '未知的源或不支持的方法',
-                'data': None,
-            }
-        try:
-            result = await func(songid)
-            return {
-                'code': 0,
-                'msg': 'success',
-                'data': result
-            }
-        except FailedException as e:
-            return {
-                'code': 2,
-                'msg': e.args[0],
-                'data': None,
-            }
+   ```python
+   async def other(method, source, songid, _):
+       try:
+           func = require('modules.' + source + '.' + method)
+       except:
+           return {
+               'code': 1,
+               'msg': '未知的源或不支持的方法',
+               'data': None,
+           }
+       try:
+           result = await func(songid)
+           return {
+               'code': 0,
+               'msg': 'success',
+               'data': result
+           }
+       except FailedException as e:
+           return {
+               'code': 2,
+               'msg': e.args[0],
+               'data': None,
+           }
 
-    async def other_with_query(method, source, t, _, query):
-        try:
-            func = require('modules.' + source + '.' + method)
-        except:
-            return {
-                'code': 1,
-                'msg': '未知的源或不支持的方法',
-                'data': None,
-            }
-        try:
-            result = await func(t, query)
-            return {
-                'code': 0,
-                'msg': 'success',
-                'data': result
-            }
-        except FailedException as e:
-            return {
-                'code': 2,
-                'msg': e.args[0],
-                'data': None,
-            }
-    ```
+   async def other_with_query(method, source, t, _, query):
+       try:
+           func = require('modules.' + source + '.' + method)
+       except:
+           return {
+               'code': 1,
+               'msg': '未知的源或不支持的方法',
+               'data': None,
+           }
+       try:
+           result = await func(t, query)
+           return {
+               'code': 0,
+               'msg': 'success',
+               'data': result
+           }
+       except FailedException as e:
+           return {
+               'code': 2,
+               'msg': e.args[0],
+               'data': None,
+           }
+   ```
 
 4. Module does not split
 
-    Details at [config.py](https://github.com/MeoProject/lx-music-api-server/tree/main/common/config.py)
+   Details at [config.py](https://github.com/MeoProject/lx-music-api-server/tree/main/common/config.py)
 
 5. Unknown variable name
 
-    ```python
-    a = '小明'
-    b = 1
-    c = 2
-    d = b''
-    def e(a, b, c):
-      c = xxx
-      d = xxx
-    f = e(c, b, a)
-    ```
+   ```python
+   a = '小明'
+   b = 1
+   c = 2
+   d = b''
+   def e(a, b, c):
+     c = xxx
+     d = xxx
+   f = e(c, b, a)
+   ```
 
 ## 📄Project agreement
 
