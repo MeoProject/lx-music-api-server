@@ -32,6 +32,9 @@ jobs:
       
       - name: Install dependencies
         run: poetry install --no-root
+
+      - name: Install pyinstaller
+        run: poetry add pyinstaller
       
       - name: Build
         run: poetry run python build.py build release
