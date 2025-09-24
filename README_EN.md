@@ -17,18 +17,19 @@ PS: The main developer (@helloplhm-qwq) cannot maintain the project due to acade
 
 ## 💡 Feature Support
 
-Main features:  
-[x] Link retrieval (kw, kg, tx, wy, mg)  
-[x] Details retrieval (kw, kg, tx, wy, mg)  
-[x] Lyrics retrieval (kw, kg, tx, wy, mg)  
-[x] Login refresh (kg, tx) (only these two require refresh)
+- [ ] Main features:
 
-[] Search (not planned)  
-[] i18n (not planned)
+  - [x] Link retrieval (kw, kg, tx, wy, mg)
+  - [x] Details retrieval (kw, kg, tx, wy, mg)
+  - [x] Lyrics retrieval (kw, kg, tx, wy, mg)
+  - [x] Login refresh (kg, tx) (only these two require refresh)
 
-Special features:  
-[x] [Data deleted] encryption (version 2) decryption  
-[x] Complete lyrics API adaptation (link retrieval, update, sponsorship, splash screen)
+  - [ ] Search (not planned)
+  - [ ] i18n (not planned)
+
+- [x] Special features:
+  - [x] [Data deleted] encryption (version 2) decryption
+  - [x] Complete lyrics API adaptation (link retrieval, update, sponsorship, splash screen)
 
 ## 💻 Deployment Method
 
