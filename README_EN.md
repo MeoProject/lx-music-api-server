@@ -2,47 +2,40 @@ English | [简体中文](README.md)
 
 <div align="center">
 
-![lx-music-api-server](https://socialify.git.ci/MeoProject/lx-music-api-server/image?description=1&forks=1&issues=1&logo=https%3A%2F%2Fraw.githubusercontent.com%2FMeoProject%2Flx-music-api-server%2Fmain%2Ficon.png&owner=1&pulls=1&stargazers=1&theme=Auto)
+![lx-music-api-server](https://socialify.git.ci/MeoProject/lx-music-api-server/image?description=1&forks=1&issues=1&logo=https%3A%2F%2Fraw.githubusercontent.com%2FMeoProject%2Flx-music-api-server%2Fmain%2Fres%2Ficon.png&owner=1&pulls=1&stargazers=1&theme=Auto)
 
 ![GitHub Repo Size](https://img.shields.io/github/repo-size/MeoProject/lx-music-api-server?style=for-the-badge)
-[![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/MeoProject/lx-music-api-server/build_beta.yml?style=for-the-badge)](https://github.com/MeoProject/lx-music-api-server/actions/workflows/build_beta.yml)
-[![GitHub Release (with filter)](https://img.shields.io/github/v/release/MeoProject/lx-music-api-server?style=for-the-badge)](https://github.com/MeoProject/lx-music-api-server/releases/latest)
-[![GitHub All Releases](https://img.shields.io/github/downloads/MeoProject/lx-music-api-server/total?style=for-the-badge&color=violet)](https://github.com/MeoProject/lx-music-api-server/releases)
 [![GitHub License](https://img.shields.io/github/license/MeoProject/lx-music-api-server?style=for-the-badge)](https://github.com/MeoProject/lx-music-api-server/blob/main/LICENSE)
 
 </div>
-This project [Document](https://apidoc.zcmonety.xyz)
 
-**Ban** and other situations caused by the use of this project have **nothing** to do with this project.
+Any **account bans** or other consequences resulting from using this project **are not related to this project**
 
-This project does not accept private customization, and the problems that occur in the non-**Github release of this project** have nothing to do with this project\*\*
+This project does not accept private customization. Issues arising from sources **not officially released by this project's GitHub** **are not related to this project**
 
-## 💡Feature
+PS: The main developer (@helloplhm-qwq) cannot maintain the project due to academic reasons. Before June 2026 (college entrance exam), please contact me (@ikun0014) first if needed. Meanwhile, we wish the main developer success in exams and admission to their ideal university.
 
-- [ ] Functions
-  - [ ] All APIs (playlist, search)
-  - [x] All lyric+info
-  - [x] Cookie pool
-  - [x] HTTPS listening, multi port listening
-  - [x] Reverse proxy compatibility
-  - [x] Get higher quality
-  - [x] QRC decrypt
-- [ ] Localization (currently only Simplified Chinese is supported)
-- [x] Platform support: `Windows` `Linux` `MacOS`
+## 💡 Feature Support
 
-## 💻How to deploy
+[x] Link retrieval (kw, kg, tx, wy, mg)  
+[x] Details retrieval (kw, kg, tx, wy, mg)  
+[x] Lyrics retrieval (kw, kg, tx, wy, mg)  
+[x] Login refresh (kg, tx) (only these two require refresh)
 
-### Use Release (recommended)
+[] Search (not planned)  
+[] i18n (not planned)
 
-1. Download the executable file corresponding to your system from [Releases](https://github.com/MeoProject/lx-music-api-server/releases) or [Actions](https://github.com/MeoProject/lx-music-api-server/actions)
+Special features:  
+[x] [Data deleted] encryption (version 2) decryption  
+[x] Complete lyrics API adaptation (link retrieval, update, sponsorship, splash screen)
 
-2. Run the downloaded executable file (maybe you need to unzip the downloaded file if it is a compressed files)
+## 💻 Deployment Method
 
----
-
-### Use Poetry
-
-Required environment: Python 3.8+
+Environment requirements:  
+≥Python 3.10  
+≥Redis 6.0  
+Red Hat-based systems not recommended, Debian-based systems and Windows recommended (most convenient)  
+Optional: Node.js
 
 1. Install poetry
 
@@ -57,43 +50,45 @@ Required environment: Python 3.8+
    cd lx-music-api-server
    ```
 
-3. Install requirements
+3. Install dependencies
 
    ```bash
    poetry install --no-root
    ```
 
-4. Run it
+4. Start
 
    ```bash
-   poetry shell # enter poetry environment
-   python main.py # run project
+   poetry run python app.py
+   or
+   npm run start
    ```
 
-## 📄Project agreement
+## 📄 Project License
 
-This project is issued under [MIT](https://github.com/MeoProject/lx-music-api-server/blob/main/LICENSE) license. The following agreement is a supplement to the original MIT agreement. In case of conflict, the following agreement shall prevail.
+This project is released under the [MIT](https://github.com/MeoProject/lx-music-api-server/blob/main/LICENSE) License. The following agreement supplements the original MIT agreement. In case of conflict, the following agreement shall prevail.
 
-Word agreement: "this project" in this agreement refers to this audio source project; "User" means the user who signed this Agreement; "Official Music Platform" refers to the official platforms built in this project, including Cool Me, Cool Dog, Mi Gu and other music sources; "Copyright data" refers to data of which others have copyright, including but not limited to images, audio, names, etc.
+Term Definitions: In this agreement, "this project" refers to this music source project; "user" refers to the user who signs this agreement; "official music platforms" refers collectively to the official platforms of music sources built into this project, including KuWo, KuGou, Migu, etc.; "copyrighted data" refers to data owned by others, including but not limited to images, audio, names, etc.
 
-1. The data source principle of this project is to pull data from the public servers of official music platforms, and display the data after simple screening and merging, so this project is not responsible for the accuracy of the data.
-2. Copyright data may be generated during the use of this project, and this project does not own the copyright data. In order to avoid infringement, users must clear the copyright data generated during the use of this project within **24 hours**.
-3. Any direct, indirect, special, accidental or consequential damages of any nature arising from the use of this project (including but not limited to damages caused by loss of goodwill, shutdown, computer failure or malfunction, or any and all other commercial damages or losses) shall be borne by the user.
-4. This project is completely free of charge, and the open source is published on GitHub for people all over the world to learn and exchange technology. This project does not guarantee that the technology in the project may violate local laws and regulations. **It is forbidden to use this project in violation of local laws and regulations.** The user shall bear any illegal acts caused by the user knowing or not knowing that the local laws and regulations do not allow it, and this project will not bear any direct, indirect, special, accidental or consequential responsibilities.
+1. The data source principle of this project is to pull data from the public servers of various official music platforms. After simple filtering and merging of the data, it is displayed. Therefore, this project is not responsible for the accuracy of the data.
+2. Copyrighted data may be generated during the use of this project. This project does not own the ownership of such copyrighted data. To avoid infringement, users must clear the copyrighted data generated during the use of this project within **24 hours**.
+3. The user is responsible for any direct, indirect, special, incidental, or consequential damages of any nature arising from the use of this project, including those arising from this agreement or from the use or inability to use this project (including but not limited to damages for loss of goodwill, work stoppage, computer failure or malfunction, or any and all other commercial damages or losses).
+4. This project is completely free and open-source on GitHub for worldwide technical learning and exchange. This project does not guarantee that the technology within may not violate local laws and regulations. **It is prohibited to use this project in violation of local laws and regulations**. The user bears responsibility for any illegal actions resulting from using this project knowingly or unknowingly in violation of local laws. This project bears no direct, indirect, special, incidental, or consequential responsibility.
 
-If you use this project, you will accept the above agreement on your behalf.
+By using this project, you accept the above agreement.
 
-Music platform is not easy, please respect copyright and support genuine.  
-This project is only used for the exploration and research of technical feasibility, and does not accept any commercial (including but not limited to advertising) cooperation and donation.  
-If you have any questions about this, please mail to:  
+Music platforms are not easy to maintain. Please respect copyright and support genuine versions.  
+This project is only for exploring and researching technical feasibility and does not accept any commercial cooperation (including but not limited to advertising) or donations.  
+If you have questions about this, please mail to:  
 helloplhm-qwq+outlook.com  
 folltoshe+foxmail.com  
-(please replace `+` to `@`)
+ikun+ikunshare.com  
+(Please replace `+` with `@`)
 
-## ✨Star trend chart
+## ✨ Star History
 
 [![Stargazers over time](https://starchart.cc/MeoProject/lx-music-api-server.svg)](https://starchart.cc/MeoProject/lx-music-api-server)
 
-## ⚙️Contributor
+## ⚙️ Contributors
 
 [![Contributor](https://contrib.rocks/image?repo=MeoProject/lx-music-api-server)](https://github.com/MeoProject/lx-music-api-server/graphs/contributors)

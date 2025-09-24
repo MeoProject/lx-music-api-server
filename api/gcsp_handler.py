@@ -148,5 +148,16 @@ async def GcspApi(request: Request, method: str) -> Response:
                 return handleResponse(request, body1)
             elif req["type"] == "zfb":
                 return handleResponse(request, body2)
+    elif request.method == "GET":
+        if method == "Splash":
+            return handleResponse(
+                request,
+                {
+                    "state": "0",
+                    "color": "white",
+                    "status_bar_color": "white",
+                    "imageUrl": "",
+                },
+            )
     else:
         return Response(content="Method Not Allowed", status_code=405)

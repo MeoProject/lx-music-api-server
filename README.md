@@ -2,50 +2,39 @@
 
 <div align="center">
 
-![lx-music-api-server](https://socialify.git.ci/MeoProject/lx-music-api-server/image?description=1&forks=1&issues=1&logo=https%3A%2F%2Fraw.githubusercontent.com%2FMeoProject%2Flx-music-api-server%2Fmain%2Ficon.png&owner=1&pulls=1&stargazers=1&theme=Auto)
+![lx-music-api-server](https://socialify.git.ci/MeoProject/lx-music-api-server/image?description=1&forks=1&issues=1&logo=https%3A%2F%2Fraw.githubusercontent.com%2FMeoProject%2Flx-music-api-server%2Fmain%2Fres%2Ficon.png&owner=1&pulls=1&stargazers=1&theme=Auto)
 
 ![GitHub Repo Size](https://img.shields.io/github/repo-size/MeoProject/lx-music-api-server?style=for-the-badge)
-[![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/MeoProject/lx-music-api-server/build_beta.yml?style=for-the-badge)](https://github.com/MeoProject/lx-music-api-server/actions/workflows/build_beta.yml)
-[![GitHub Release (with filter)](https://img.shields.io/github/v/release/MeoProject/lx-music-api-server?style=for-the-badge)](https://github.com/MeoProject/lx-music-api-server/releases/latest)
-[![GitHub All Releases](https://img.shields.io/github/downloads/MeoProject/lx-music-api-server/total?style=for-the-badge&color=violet)](https://github.com/MeoProject/lx-music-api-server/releases)
 [![GitHub License](https://img.shields.io/github/license/MeoProject/lx-music-api-server?style=for-the-badge)](https://github.com/MeoProject/lx-music-api-server/blob/main/LICENSE)
-[![Powered by DartNode](https://dartnode.com/branding/DN-Open-Source-sm.png)](https://dartnode.com "Powered by DartNode - Free VPS for Open Source")
 
 </div>
 
-由于使用此项目导致的**封号**等情况**与本项目无关**
+使用此项目导致的**封号**等情况**与本项目无关**
 
 本项目不接受私人定制，非**本项目 Github 发布**所出现问题**与本项目无关**
 
-## 💡 特点
+PS: 主开发(@helloplhm-qwq)因学业原因无法维护项目, 在 2026 年 6 月(高考)前有事可优先联系我(@ikun0014)，同时祝主开发金榜题名，考上自己理想的大学
 
-- [ ] 功能
-  - [ ] 完整性 API（歌单，搜索）
-  - [x] 所有平台的详情+歌词获取
-  - [x] Cookie 池
-  - [x] https 监听，多端口监听
-  - [x] 反代兼容性
-  - [x] 获取更高的音质
-  - [x] QRC 解密
-- [ ] 本地化支持（目前仅支持简体中文）
-- [x] 多端部署（`Windows` `Linux` `MacOS`）
+## 💡 功能支持性
+
+[x] 链接获取(kw,kg,tx,wy,mg)  
+[x] 详情获取(kw,kg,tx,wy,mg)  
+[x] 歌词获取(kw,kg,tx,wy,mg)  
+[x] 刷新登录(kg,tx)(只有这俩必须刷新)
+
+[] 搜索(计划外)  
+[] i18n(计划外)
+
+特别功能:  
+[x] [数据已删除]加密(第二版)解密  
+[x] 歌词适配完整 API(链接获取,更新,赞助,闪屏)
 
 ## 💻 部署方法
 
-### Release 部署（推荐）
-
-1. 从 [Releases](https://github.com/MeoProject/lx-music-api-server/releases)
-   或 [Actions](https://github.com/MeoProject/lx-music-api-server/actions)
-   下载对应你系统的可执行文件 (从 GitHub Actions 下载需要登录 GitHub 账号)
-
-2. 运行可执行文件（如果下载的文件是压缩包请先解压）
-
----
-
-### Poetry 部署
-
 环境要求:  
 ≥Python 3.10  
+≥Redis 6.0  
+不推荐 Red hat 系, 推荐 Debian 系和 Windows，最省事  
 非必要: Node.js
 
 1. 安装 poetry
@@ -93,6 +82,7 @@
 若对此有疑问请 mail to:  
 helloplhm-qwq+outlook.com  
 folltoshe+foxmail.com  
+ikun+ikunshare.com  
 (请将`+`替换成`@`)
 
 ## ✨Star 趋势图
