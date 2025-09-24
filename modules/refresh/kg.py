@@ -88,8 +88,8 @@ async def refresh_login(user_info):
         return
     else:
         logger.info(f"酷狗音乐账号(UID_{userid})刷新登录成功")
-        user_list = config.read("module.kg.users")
+        user_list = config.read("module.platform.kg.users")
         user_list[user_list.index(user_info)]["token"] = body["data"]["token"]
         user_list[user_list.index(user_info)]["userid"] = str(body["data"]["userid"])
-        config.write("module.kg.users", user_list)
+        config.write("module.platform.kg.users", user_list)
         logger.info(f"为酷狗音乐账号(UID_{userid})数据更新完毕")

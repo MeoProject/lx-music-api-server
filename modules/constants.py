@@ -12,9 +12,6 @@ Source_Quality_Map = {
         "320k",
         "flac",
         "hires",
-        "atmos",
-        "atmos_plus",
-        "master",
     ],
     "kg": [
         "128k",

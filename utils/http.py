@@ -39,6 +39,7 @@ def _prepare_options(options: dict) -> tuple[str, dict]:
 
     return method, options
 
+
 def _log_response_content(content: bytes) -> None:
     """Log the response content if it's text or zlib-compressed text."""
     if content.startswith(b"\x78\x9c") or content.startswith(b"\x78\x01"):

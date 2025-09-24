@@ -1,6 +1,6 @@
 from modules.plat.tx.utils import signRequest
 from modules.plat.tx import build_common_params
-from models import SongInfo
+from server.models import SongInfo
 from server.exceptions import getSongInfoFailed
 from modules.plat import formatPlayTime, formatSinger
 from modules.lyric.tx import getLyric

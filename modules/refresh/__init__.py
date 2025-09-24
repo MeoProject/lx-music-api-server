@@ -5,7 +5,7 @@ from .tx import refresh_login as tx_refresh_login
 
 
 def reg_refresh_login_pool_task():
-    tx_user_info_pool = config.read("module.tx.users")
+    tx_user_info_pool = config.read("module.platform.tx.users")
     for tx_user_info in tx_user_info_pool:
         if tx_user_info["refresh_login"]:
             scheduler.append(
@@ -15,7 +15,7 @@ def reg_refresh_login_pool_task():
                 args={"user_info": tx_user_info},
             )
 
-    user_info_pool = config.read("module.kg.users")
+    user_info_pool = config.read("module.platform.kg.users")
     for user_info in user_info_pool:
         if user_info["refresh_login"]:
             scheduler.append(

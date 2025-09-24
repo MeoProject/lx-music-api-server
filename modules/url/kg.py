@@ -1,6 +1,6 @@
 import time
 import random
-from models import UrlResponse
+from server.models import UrlResponse
 from server.config import config
 from server.exceptions import getUrlFailed
 from modules.info.kg import getMusicInfo
@@ -21,7 +21,7 @@ async def getUrl(songId: str, quality: str) -> dict:
         raise getUrlFailed(f"获取音乐信息失败: {e}")
 
     try:
-        user_info = random.choice(config.read("module.kg.users"))
+        user_info = random.choice(config.read("module.platform.kg.users"))
 
         params = {
             "album_id": album_id,
