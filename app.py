@@ -1,5 +1,4 @@
 import asyncio
-import os
 
 from api import home_handler, gcsp_handler, script_handler, music_handler, qmc_handler
 
@@ -46,8 +45,6 @@ async def lifespan(app: FastAPI):
     if variable.running:
         variable.running = False
         logger.info("服务器暂停")
-    
-    
 
 
 app = FastAPI(
@@ -60,7 +57,9 @@ uvicorn_config = Config(
     port=config.read("server.port"),
     reload=config.read("server.reload"),
     workers=config.read("server.workers"),
-    log_level=config.read("server.log_level"),
+    log_config=None,
+    log_level=None,
+    access_log=False,
 )
 server = uvicorn.Server(config=uvicorn_config)
 
@@ -87,7 +86,7 @@ if config.read("module.qmc_decrypter"):
 
 
 @app.exception_handler(Exception)
-async def global_exception_handler(request: Request, exc: Exception):
+async def globalErrorHandler(request: Request, exc: Exception):
     logger.error(f"未处理的异常")
     return {"code": 500, "message": f"未处理的异常: {exc}"}
 
@@ -99,15 +98,15 @@ for f in variable.log_files:
         f.close()
 
 
-async def init():
+async def Init():
     try:
         await server.serve()
-    except (stopEvent, KeyboardInterrupt):
-        await clean()
-        variable.running = False
-    except Exception:
-        logger.error("遇到错误，请查看日志")
+    except Exception as e:
+        logger.error(e)
 
 
 if __name__ == "__main__":
-    asyncio.run(init())
+    try:
+        asyncio.run(Init())
+    except:
+        pass

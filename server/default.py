@@ -5,11 +5,11 @@ default = {
         "debug": False,
         "reload": False,
         "workers": 1,
-        "log_level": "info",
         "output_logs": True,
         "reverse_proxy": False,
         "real_ip": "X-Real-IP",
         "proto": "X-Forwarded-Proto",
+        "link": "http://127.0.0.1:8000",
     },
     "cache": {
         "enable": False,

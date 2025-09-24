@@ -1,5 +1,6 @@
+from ast import Str
 import httpx
-from urllib.parse import urlparse, unquote_plus
+from urllib.parse import urlparse
 from pyqmc_rust import QMCv2Cipher
 from fastapi import HTTPException, Request
 from fastapi.routing import APIRouter
@@ -23,18 +24,18 @@ decrypted = {
 
 def detect_content_type(url: str):
     parsed_url = urlparse(url)
-    filename = parsed_url.path.split("/")[-1]  # 修正：应该取最后一个部分
+    filename = parsed_url.path.split("/")[-1]
     if filename.endswith(".mgg"):
         return "audio/ogg"
     elif filename.endswith(".mflac"):
         return "audio/flac"
     else:
-        return "audio/mpeg"  # 默认返回 MP3
+        return "audio/mpeg"
 
 
 def get_filename(url: str):
     parsed_url = urlparse(url)
-    filename = parsed_url.path.split("/")[-1]  # 修正：应该取最后一个部分
+    filename = parsed_url.path.split("/")[-1]
     result = filename
     for key, value in decrypted.items():
         result = result.replace(key, value)
@@ -47,8 +48,6 @@ async def handle_decrypt_request(
     url: str,
     ekey: str,
 ):
-    print(url, ekey)
-
     try:
         cipher = QMCv2Cipher.new_from_ekey(ekey.encode("utf-8"))
     except Exception as e:
@@ -64,10 +63,8 @@ async def handle_decrypt_request(
         if value := request.headers.get(header):
             headers[header.replace("-", "_").title().replace("_", "-")] = value
 
-    # 解决方案1：将整个流处理逻辑放在一个异步生成器中
     async def decrypt_stream():
         async with http.stream("GET", url, headers=headers) as response:
-            # 计算初始偏移量
             offset = 0
             if range_header and response.status_code == 206:
                 content_range = response.headers.get("content-range", "")
@@ -76,7 +73,6 @@ async def handle_decrypt_request(
                     if range_parts[0].isdigit():
                         offset = int(range_parts[0])
 
-            # 流式解密
             async for chunk in response.aiter_bytes(chunk_size=1024 * 1024):
                 if chunk:
                     data = bytearray(chunk)
@@ -84,9 +80,8 @@ async def handle_decrypt_request(
                     offset += len(chunk)
                     yield bytes(data)
 
-    # 先发送一个 HEAD 请求获取响应头（可选，但更稳定）
     head_response = await http.head(url, headers=headers)
-    
+
     content_type = detect_content_type(url)
     response_headers = {
         "Accept-Ranges": "bytes",

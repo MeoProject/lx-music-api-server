@@ -34,7 +34,6 @@ class RequestLoggerMiddleware(BaseHTTPMiddleware):
             f"请求: {request.method} - {request.state.remote_addr} - "
             f"{ip_info['local']} - {request.url.path} - "
             f"{request.headers.get('User-Agent', '')} - "
-            f"{request.url.query} - {request.headers.get('X-Request-Key', '')}"
         )
 
         response = await call_next(request)

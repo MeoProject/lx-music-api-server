@@ -1,6 +1,6 @@
 [project]
 name = "lx-music-api-server"
-version = "2.0.2"
+version = "2.0.3"
 description = "LX Music Api Server"
 license = {text = "MIT"}
 readme = "README.md"

@@ -22,8 +22,40 @@ Tools = {
     "File": {
         "fileInfo": {
             "128k": {
+                "e": ".mp3",
+                "h": "M500",
+            },
+            "320k": {
+                "e": ".mp3",
+                "h": "M800",
+            },
+            "flac": {
+                "e": ".flac",
+                "h": "F000",
+            },
+            "hires": {
+                "e": ".flac",
+                "h": "RS01",
+            },
+            "atmos": {
+                "e": ".flac",
+                "h": "Q000",
+            },
+            "atmos_plus": {
+                "e": ".flac",
+                "h": "Q001",
+            },
+            "master": {
+                "e": ".flac",
+                "h": "AI00",
+            },
+        },
+    },
+    "EncryptFile": {
+        "fileInfo": {
+            "128k": {
                 "e": ".mgg",
-                "h": "O5M0",
+                "h": "O6M0",
             },
             "320k": {
                 "e": ".mgg",
@@ -49,15 +81,6 @@ Tools = {
                 "e": ".mflac",
                 "h": "AIM0",
             },
-        },
-        "qualityMapReverse": {
-            "M500": "128k",
-            "M800": "320k",
-            "F000": "flac",
-            "RS01": "hires",
-            "Q000": "atmos",
-            "Q001": "atmos_plus",
-            "AI00": "master",
         },
     },
     "cdnaddr": (
