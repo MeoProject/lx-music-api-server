@@ -8,7 +8,7 @@ from .constants import (
     QualityNameTranslate,
 )
 from server.config import config, cache as cacheM
-from models import Song, SongInfo, UrlResponse
+from server.models import Song, SongInfo, UrlResponse
 from server.exceptions import getLyricFailed, getSongInfoFailed, getUrlFailed
 
 from . import plat

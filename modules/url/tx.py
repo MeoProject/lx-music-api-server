@@ -3,7 +3,7 @@ from server.config import config
 from server.exceptions import getUrlFailed
 from modules.plat.tx import build_common_params, utils
 from modules.info.tx import getMusicInfo
-from models import UrlResponse
+from server.models import UrlResponse
 
 translate = {
     0: "无版权/未知原因",
@@ -21,7 +21,7 @@ async def getUrl(songId: str | int, quality: str) -> UrlResponse:
     songId = info.songMid
     strMediaMid = info.mediaMid
 
-    user_info = config.read("module.tx.users")
+    user_info = config.read("module.platform.tx.users")
 
     if quality not in ["128k", "320k", "flac", "hires"]:
         user_info = random.choice(
@@ -32,8 +32,8 @@ async def getUrl(songId: str | int, quality: str) -> UrlResponse:
 
     requestBody = {
         "request": {
-            "module": "music.vkey.GetVkey",
-            "method": "UrlGetVkey",
+            "module": "music.vkey.GetEVkey",
+            "method": "CgiGetEVkey",
             "param": {
                 "guid": "musicapi",
                 "uin": user_info["uin"],
@@ -57,13 +57,11 @@ async def getUrl(songId: str | int, quality: str) -> UrlResponse:
     data = body["request"]["data"]["midurlinfo"][0]
 
     purl = str(data["purl"])
+    ekey = str(data["ekey"])
 
     if not purl:
         raise getUrlFailed(translate[body["request"]["code"]])
 
-    url = UrlResponse(
-        url=utils.Tools["cdnaddr"] + purl,
-        quality=quality,
-    )
+    url = UrlResponse(url=utils.Tools["cdnaddr"] + purl, quality=quality, ekey=ekey)
 
     return url

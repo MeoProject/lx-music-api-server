@@ -1,26 +1,27 @@
 import os
+import logzero
 import logging
-from rich.logging import RichHandler
+from logging import Logger
+from logzero import setup_logger, LogFormatter
 
 from server.variable import output_logs, debug
 
 
-def createLogger(name: str) -> logging.Logger:
+def createLogger(name: str) -> Logger:
     os.makedirs("./logs", exist_ok=True)
 
     if debug:
-        level = logging.DEBUG
+        level = logzero.DEBUG
     else:
-        level = logging.INFO
+        level = logzero.INFO
 
-    logging.basicConfig(
-        level=level,
-        format="%(message)s",
-        datefmt="[%X]",
-        handlers=[RichHandler(rich_tracebacks=True)],
+    terminal_formatter = LogFormatter(
+        color=True,
+        fmt="%(color)s%(asctime)s %(message)s%(end_color)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
     )
 
-    logger = logging.getLogger(name)
+    logger = setup_logger(name, level=level, formatter=terminal_formatter)
 
     if output_logs:
         logfile = f"./logs/{name}.log"

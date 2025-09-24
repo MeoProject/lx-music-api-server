@@ -1,5 +1,5 @@
 import time
-from models import SongInfo
+from server.models import SongInfo
 from utils import http as request
 from server.exceptions import getSongInfoFailed
 

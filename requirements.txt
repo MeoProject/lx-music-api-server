@@ -1,9 +1,0 @@
-ujson
-fastapi
-pycryptodome
-xmltodict
-redis
-cryptography
-uvicorn
-httpx[h2]
-rich

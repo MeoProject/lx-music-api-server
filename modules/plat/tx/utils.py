@@ -22,32 +22,32 @@ Tools = {
     "File": {
         "fileInfo": {
             "128k": {
-                "e": ".mp3",
-                "h": "M500",
+                "e": ".mgg",
+                "h": "O5M0",
             },
             "320k": {
-                "e": ".mp3",
-                "h": "M800",
+                "e": ".mgg",
+                "h": "O8M0",
             },
             "flac": {
-                "e": ".flac",
-                "h": "F000",
+                "e": ".mflac",
+                "h": "F0M0",
             },
             "hires": {
-                "e": ".flac",
-                "h": "RS01",
+                "e": ".mflac",
+                "h": "RSM1",
             },
             "atmos": {
-                "e": ".flac",
-                "h": "Q000",
+                "e": ".mflac",
+                "h": "Q0M0",
             },
             "atmos_plus": {
-                "e": ".flac",
-                "h": "Q001",
+                "e": ".mflac",
+                "h": "Q0M1",
             },
             "master": {
-                "e": ".flac",
-                "h": "AI00",
+                "e": ".mflac",
+                "h": "AIM0",
             },
         },
         "qualityMapReverse": {
@@ -61,8 +61,8 @@ Tools = {
         },
     },
     "cdnaddr": (
-        config.read("module.tx.cdnaddr")
-        if config.read("module.tx.cdnaddr")
+        config.read("module.platform.tx.cdnaddr")
+        if config.read("module.platform.tx.cdnaddr")
         else "http://ws.stream.qqmusic.qq.com/"
     ),
 }

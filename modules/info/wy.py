@@ -1,7 +1,7 @@
 import ujson
 from modules.lyric.wy import getLyric
 from modules.plat.wy import eEncrypt
-from models import SongInfo
+from server.models import SongInfo
 from utils.http import HttpRequest
 from server.exceptions import getSongInfoFailed
 from modules.plat import formatPlayTime, formatSinger

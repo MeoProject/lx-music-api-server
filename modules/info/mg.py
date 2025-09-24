@@ -1,4 +1,4 @@
-from models import SongInfo
+from server.models import SongInfo
 from utils.http import HttpRequest
 from modules.plat import formatSinger
 from server.exceptions import getSongInfoFailed

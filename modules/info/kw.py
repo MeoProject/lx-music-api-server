@@ -1,5 +1,5 @@
 from utils import http as request
-from models import SongInfo
+from server.models import SongInfo
 from modules.lyric.kw import getLyric
 from modules.plat import formatPlayTime
 from server.exceptions import getSongInfoFailed

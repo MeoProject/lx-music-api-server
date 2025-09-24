@@ -3,7 +3,7 @@ import random
 from server.config import config
 from modules.lyric.mg import MrcTools
 from utils.http import HttpRequest
-from models import Song, UrlResponse
+from server.models import Song, UrlResponse
 from modules.info.mg import getMusicInfo
 from server.exceptions import getUrlFailed
 
@@ -19,7 +19,7 @@ async def getUrl(songId: str, quality: str) -> Song:
     except:
         raise getUrlFailed("详情获取失败")
 
-    user_info = random.choice(config.read("module.mg.users"))
+    user_info = random.choice(config.read("module.platform.mg.users"))
 
     req = await HttpRequest(
         f'https://app.c.nf.migu.cn/MIGUM2.0/strategy/listen-url/v2.4?albumId={info.albumId}&lowerQualityContentId={info.contentId}&netType=01&resourceType=2&songId={info.songId}&toneFlag={tools["qualityMap"][quality]}',
@@ -30,6 +30,7 @@ async def getUrl(songId: str, quality: str) -> Song:
                 "token": user_info["token"],
                 "ce": user_info["ce"],
                 "timestamp": str(int(round(time.time() * 1000))),
+                "User-Agent": "Mozilla/5.0 (Linux; U; Android 12; zh-cn; ABR-AL80 Build/V417IR) AppleWebKit/533.1 (KHTML, like Gecko) Version/5.0 Mobile Safari/533.1",
             },
         },
     )

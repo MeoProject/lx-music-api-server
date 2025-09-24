@@ -86,7 +86,7 @@ async def refresh_login(user_info):
     else:
         logger.info(f'为QQ音乐账号({user_info["uin"]})刷新登录成功')
 
-        user_list = config.read("module.tx.users")
+        user_list = config.read("module.platform.tx.users")
         user_list[user_list.index(user_info)]["uin"] = str(
             body["req"]["data"]["musicid"]
         )
@@ -100,5 +100,5 @@ async def refresh_login(user_info):
         ]
         user_list[user_list.index(user_info)]["vip_type"] = await check_vip(user_info)
 
-        config.write("module.tx.users", user_list)
+        config.write("module.platform.tx.users", user_list)
         logger.info(f'为QQ音乐账号({user_info["uin"]})数据更新完毕')

@@ -1,7 +1,7 @@
 import random
 import ujson
 
-from models import UrlResponse
+from server.models import UrlResponse
 from modules.plat.wy import eEncrypt, QMap
 from utils.http import HttpRequest
 from server.config import config
@@ -23,7 +23,9 @@ async def getUrl(songId: str, quality: str) -> UrlResponse:
             "method": "POST",
             "headers": {
                 "User-Agent": "NeteaseMusic/9.3.0.250516233250(9003000);Dalvik/2.1.0 (Linux; U; Android 12; ABR-AL80 Build/9b35a01.0)",
-                "Cookie": random.choice(config.read("module.wy.users"))["cookie"],
+                "Cookie": random.choice(config.read("module.platform.wy.users"))[
+                    "cookie"
+                ],
             },
             "form": eEncrypt(path, params),
         },

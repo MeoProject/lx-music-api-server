@@ -18,10 +18,10 @@ logger = createLogger("GCSP Handler")
 
 @router.api_route("/client/cgi-bin/{method}", methods=["GET", "POST"])
 async def GcspApi(request: Request, method: str) -> Response:
-    PACKAGE = config.read("gcsp.package_md5")
-    SALT_1 = config.read("gcsp.salt_1")
-    SALT_2 = config.read("gcsp.salt_2")
-    NEED_VERIFY = config.read("gcsp.enable_verify")
+    PACKAGE = config.read("module.gcsp.package_md5")
+    SALT_1 = config.read("module.gcsp.salt_1")
+    SALT_2 = config.read("module.gcsp.salt_2")
+    NEED_VERIFY = config.read("module.gcsp.enable_verify")
 
     qm = {
         "mp3": "128k",
