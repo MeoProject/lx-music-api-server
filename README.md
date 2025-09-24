@@ -17,6 +17,7 @@ PS: 主开发(@helloplhm-qwq)因学业原因无法维护项目, 在 2026 年 6 �
 
 ## 💡 功能支持性
 
+主要功能：
 - [x] 链接获取(kw,kg,tx,wy,mg)  
 - [x] 详情获取(kw,kg,tx,wy,mg)  
 - [x] 歌词获取(kw,kg,tx,wy,mg)  

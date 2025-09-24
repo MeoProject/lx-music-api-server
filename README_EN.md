@@ -17,6 +17,7 @@ PS: The main developer (@helloplhm-qwq) cannot maintain the project due to acade
 
 ## 💡 Feature Support
 
+Main features:  
 [x] Link retrieval (kw, kg, tx, wy, mg)  
 [x] Details retrieval (kw, kg, tx, wy, mg)  
 [x] Lyrics retrieval (kw, kg, tx, wy, mg)  
