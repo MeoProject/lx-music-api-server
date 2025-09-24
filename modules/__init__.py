@@ -51,7 +51,7 @@ async def _url(source: str, songId: str, quality: str) -> dict:
             if cache:
                 cache = dict(cache)
                 logger.info(
-                    f"使用缓存的{sourceNameTranslate[source]}_{songId}_{QualityNameTranslate[quality]}数据, URL: {cache['url']}"
+                    f"使用缓存的{sourceNameTranslate[source]}_{songId}_{QualityNameTranslate[quality]}数据, URL: {cache['url']['url']}"
                 )
 
                 result = UrlResponse(**cache["url"])
@@ -88,7 +88,10 @@ async def _url(source: str, songId: str, quality: str) -> dict:
         }
 
     try:
-        result: UrlResponse = await func(songId, quality)
+        result: UrlResponse | Song = await func(songId, quality)
+        if source == "mg":
+            result: UrlResponse = result.url
+
         logger.info(
             "获取%s_%s_%s成功, URL: %s"
             % (
@@ -108,7 +111,7 @@ async def _url(source: str, songId: str, quality: str) -> dict:
                 {
                     "time": expireAt,
                     "expire": canExpire,
-                    "url": result.url.__dict__,
+                    "url": result.__dict__,
                 },
                 expireTime if canExpire else None,
             )
@@ -166,7 +169,10 @@ async def _info(source, songId):
         }
 
     try:
-        result: SongInfo = await func(songId)
+        if source == "kg":
+            result, _ = await func(songId)
+        else:
+            result: SongInfo = await func(songId)
         expireTime = 86400 * 3
         expireAt = int(time.time() + expireTime)
         if CACHE_ENABLE:
@@ -193,17 +199,9 @@ async def _lyric(source, songId):
     try:
         cache = cacheM.get("lyric", f"{source}_{songId}")
         if cache:
-            return {"code": 0, "message": "success", "data": cache["data"]}
+            return {"code": 200, "message": "success", "data": cache["data"]}
     except:
         pass
-
-    try:
-        func = require("modules.lyric." + source + ".getLyric")
-    except:
-        return {
-            "code": 404,
-            "message": "未知的源或不支持的方法",
-        }
 
     if source == "tx":
         try:
@@ -217,7 +215,7 @@ async def _lyric(source, songId):
 
     if source == "mg":
         try:
-            song: Song = await url.mg.getUrl(songId)
+            song: Song = await url.mg.getUrl(songId, "128k")
             result = song.info.lyric
             expireTime = 86400 * 3
             expireAt = int(time.time() + expireTime)
@@ -238,6 +236,14 @@ async def _lyric(source, songId):
                 "code": 500,
                 "message": e.args[0],
             }
+
+    try:
+        func = require("modules.lyric." + source + ".getLyric")
+    except:
+        return {
+            "code": 404,
+            "message": "未知的源或不支持的方法",
+        }
 
     try:
         result = await func(songId)

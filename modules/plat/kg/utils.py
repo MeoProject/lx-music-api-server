@@ -61,7 +61,6 @@ async def signRequest(url, params, options):
                 else (options.get("json") if options.get("json") else "")
             )
         ),
-        tools["app"]["signkey"],
     )
     url = url + "?" + buildRequestParams(params)
     return await request.HttpRequest(url, options)

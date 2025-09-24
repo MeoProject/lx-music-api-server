@@ -67,14 +67,10 @@ async def getUrl(songId: str | int, quality: str) -> UrlResponse:
 
     if bitrate not in tools["qualityMapReverse"]:
         raise getUrlFailed("被自动降到了不支持的音质")
-
-    if body["ekey"]:
-        ekey = createDecrypt(body["ekey"])
-
+    
     url = UrlResponse(
         url=url.split("?")[0],
         quality=tools["qualityMapReverse"][bitrate],
-        ekey=ekey or None,
     )
 
     return url
