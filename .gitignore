@@ -14,14 +14,8 @@ dist
 build
 
 # project
-test.*
-*/test.*
 *.log
-*.bak
-*.tmp
-*.db
 *.json
-*.yml
 logs
 data
 
