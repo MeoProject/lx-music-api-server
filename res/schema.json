@@ -3,12 +3,7 @@
     "allOf": [
         {
             "$schema": "http://json-schema.org/draft-04/schema#",
-            "type": "object",
-            "properties": {
-                "Logging": {
-                    "$ref": "#/definitions/logging"
-                }
-            }
+            "type": "object"
         },
         {
             "type": "object",
