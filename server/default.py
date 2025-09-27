@@ -1,4 +1,5 @@
 default = {
+    "$schema": "https://gh-proxy.com/https://raw.githubusercontent.com/MeoProject/lx-music-api-server/main/res/schema.json",
     "server": {
         "host": "0.0.0.0",
         "port": 9000,
@@ -9,7 +10,6 @@ default = {
         "reverse_proxy": False,
         "real_ip": "X-Real-IP",
         "proto": "X-Forwarded-Proto",
-        "link": "http://127.0.0.1:8000",
     },
     "cache": {
         "enable": False,

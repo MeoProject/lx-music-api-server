@@ -1,0 +1,515 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "server": {
+            "type": "object",
+            "description": "服务器主机配置",
+            "properties": {
+                "host": {
+                    "type": "string",
+                    "description": "服务器主机IP, 0.0.0.0为监听所有IPv4",
+                    "default": "0.0.0.0"
+                },
+                "port": {
+                    "type": "integer",
+                    "description": "服务器主机端口",
+                    "default": 9000
+                },
+                "debug": {
+                    "type": "boolean",
+                    "description": "是否启用调试模式",
+                    "default": false
+                },
+                "reload": {
+                    "type": "boolean",
+                    "description": "是否在文件变动时重启服务器, 启用时workers失效",
+                    "default": false
+                },
+                "workers": {
+                    "type": "integer",
+                    "description": "是否启用多工作进程模式, 计算公式: cpu核心数 + 1",
+                    "default": 1
+                },
+                "output_logs": {
+                    "type": "boolean",
+                    "description": "是否将日志输出到文件, 当用户基数大时为减少io操作可关闭",
+                    "default": false
+                },
+                "reverse_proxy": {
+                    "type": "boolean",
+                    "description": "是否启用Nginx反向代理适配模式",
+                    "default": false
+                },
+                "real_ip": {
+                    "type": "string",
+                    "description": "用户真实IP请求头, 一般启用Nginx反向代理时自动增加",
+                    "default": "X-Real-IP"
+                },
+                "proto": {
+                    "type": "string",
+                    "description": "请求协议请求头, 一般启用Nginx反向代理时自动增加",
+                    "default": "X-Forwarded-Proto"
+                }
+            },
+            "additionalProperties": false,
+            "required": [
+                "host",
+                "port",
+                "debug",
+                "reload",
+                "workers",
+                "output_logs",
+                "reverse_proxy",
+                "real_ip",
+                "proto"
+            ]
+        },
+        "cache": {
+            "type": "object",
+            "description": "Redis缓存配置",
+            "properties": {
+                "enable": {
+                    "type": "boolean",
+                    "description": "启用Redis缓存",
+                    "default": false
+                },
+                "host": {
+                    "type": "string",
+                    "description": "Redis主机IP",
+                    "default": "127.0.0.1"
+                },
+                "port": {
+                    "type": "string",
+                    "description": "Redis主机端口",
+                    "default": "6379"
+                },
+                "db": {
+                    "type": "string",
+                    "description": "Redis数据库ID",
+                    "default": "0"
+                },
+                "user": {
+                    "type": "string",
+                    "description": "Redis用户名",
+                    "default": ""
+                },
+                "password": {
+                    "type": "string",
+                    "description": "Redis密码",
+                    "default": ""
+                },
+                "key_prefix": {
+                    "type": "string",
+                    "description": "Redis键前缀",
+                    "default": "LX_API"
+                }
+            },
+            "additionalProperties": false,
+            "required": [
+                "enable",
+                "host",
+                "port",
+                "db",
+                "user",
+                "password",
+                "key_prefix"
+            ]
+        },
+        "script": {
+            "type": "object",
+            "description": "LX Music 脚本模板配置",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "音源在LX Music中显示的名称",
+                    "default": "音源"
+                },
+                "intro": {
+                    "type": "string",
+                    "description": "音源在LX Music中显示的简介",
+                    "default": "简介"
+                },
+                "author": {
+                    "type": "string",
+                    "description": "音源在LX Music中显示的作者",
+                    "default": "作者"
+                },
+                "version": {
+                    "type": "string",
+                    "description": "音源在LX Music中显示的版本",
+                    "default": "v1"
+                },
+                "file": {
+                    "type": "string",
+                    "description": "音源的文件名",
+                    "default": "lx-music-source.js"
+                },
+                "dev": {
+                    "type": "boolean",
+                    "description": "开启音源脚本控制台",
+                    "default": false
+                },
+                "update": {
+                    "type": "boolean",
+                    "description": "开启音源脚本更新",
+                    "default": false
+                },
+                "updateMsg": {
+                    "type": "string",
+                    "description": "音源更新日志",
+                    "default": "脚本链接：{updateUrl}"
+                },
+                "qualitys": {
+                    "type": "object",
+                    "description": "对应平台支持的音质",
+                    "properties": {
+                        "kw": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            },
+                            "description": "酷我音乐支持的所有音质",
+                            "default": [
+                                "128k",
+                                "320k",
+                                "flac",
+                                "hires"
+                            ]
+                        },
+                        "kg": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            },
+                            "description": "酷狗音乐支持的所有音质",
+                            "default": [
+                                "128k",
+                                "320k",
+                                "flac",
+                                "hires"
+                            ]
+                        },
+                        "tx": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            },
+                            "description": "QQ音乐支持的所有音质",
+                            "default": [
+                                "128k",
+                                "320k",
+                                "flac",
+                                "hires"
+                            ]
+                        },
+                        "wy": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            },
+                            "description": "网易云音乐支持的所有音质",
+                            "default": [
+                                "128k",
+                                "320k",
+                                "flac",
+                                "hires"
+                            ]
+                        },
+                        "mg": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            },
+                            "description": "咪咕音乐支持的所有音质",
+                            "default": [
+                                "128k",
+                                "320k",
+                                "flac",
+                                "hires"
+                            ]
+                        }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                        "kw",
+                        "kg",
+                        "tx",
+                        "wy",
+                        "mg"
+                    ]
+                }
+            },
+            "additionalProperties": false,
+            "required": [
+                "name",
+                "intro",
+                "author",
+                "version",
+                "file",
+                "dev",
+                "update",
+                "updateMsg",
+                "qualitys"
+            ]
+        },
+        "security": {
+            "type": "object",
+            "description": "安全配置",
+            "properties": {
+                "key_verify": {
+                    "type": "object",
+                    "description": "密钥验证",
+                    "properties": {
+                        "enable": {
+                            "type": "boolean",
+                            "description": "开启密钥验证",
+                            "default": false
+                        },
+                        "list": {
+                            "type": "array",
+                            "description": "密钥列表",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                        "enable",
+                        "list"
+                    ]
+                }
+            },
+            "additionalProperties": false,
+            "required": [
+                "key_verify"
+            ]
+        },
+        "module": {
+            "type": "object",
+            "properties": {
+                "gcsp": {
+                    "type": "object",
+                    "description": "歌词适配模拟后端",
+                    "properties": {
+                        "enable": {
+                            "type": "boolean",
+                            "description": "开启歌词适配接口"
+                        },
+                        "package_md5": {
+                            "type": "string",
+                            "description": "安装包MD5值"
+                        },
+                        "salt_1": {
+                            "type": "string",
+                            "description": "盐值1"
+                        },
+                        "salt_2": {
+                            "type": "string",
+                            "description": "盐值2"
+                        },
+                        "enable_verify": {
+                            "type": "boolean",
+                            "description": "开启MD5验证"
+                        }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                        "enable",
+                        "package_md5",
+                        "salt_1",
+                        "salt_2",
+                        "enable_verify"
+                    ]
+                },
+                "qmc_decrypter": {
+                    "type": "boolean",
+                    "description": "QQ音乐解密器"
+                },
+                "platform": {
+                    "type": "object",
+                    "properties": {
+                        "kw": {
+                            "type": "object",
+                            "properties": {
+                                "source_list": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                }
+                            },
+                            "additionalProperties": false,
+                            "required": [
+                                "source_list"
+                            ]
+                        },
+                        "kg": {
+                            "type": "object",
+                            "properties": {
+                                "users": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "userid": {
+                                                "type": "string"
+                                            },
+                                            "token": {
+                                                "type": "string"
+                                            },
+                                            "refresh_login": {
+                                                "type": "boolean"
+                                            }
+                                        },
+                                        "additionalProperties": false,
+                                        "required": [
+                                            "userid",
+                                            "token",
+                                            "refresh_login"
+                                        ]
+                                    }
+                                }
+                            },
+                            "additionalProperties": false,
+                            "required": [
+                                "users"
+                            ]
+                        },
+                        "tx": {
+                            "type": "object",
+                            "properties": {
+                                "users": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "uin": {
+                                                "type": "string"
+                                            },
+                                            "token": {
+                                                "type": "string"
+                                            },
+                                            "refreshKey": {
+                                                "type": "string"
+                                            },
+                                            "openId": {
+                                                "type": "string"
+                                            },
+                                            "accessToken": {
+                                                "type": "string"
+                                            },
+                                            "vip_type": {
+                                                "type": "string"
+                                            },
+                                            "refresh_login": {
+                                                "type": "boolean"
+                                            }
+                                        },
+                                        "additionalProperties": false,
+                                        "required": [
+                                            "uin",
+                                            "token",
+                                            "refreshKey",
+                                            "openId",
+                                            "accessToken",
+                                            "vip_type",
+                                            "refresh_login"
+                                        ]
+                                    }
+                                },
+                                "cdnaddr": {
+                                    "type": "string"
+                                }
+                            },
+                            "additionalProperties": false,
+                            "required": [
+                                "users",
+                                "cdnaddr"
+                            ]
+                        },
+                        "wy": {
+                            "type": "object",
+                            "properties": {
+                                "users": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "cookie": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "additionalProperties": false,
+                                        "required": [
+                                            "cookie"
+                                        ]
+                                    }
+                                }
+                            },
+                            "additionalProperties": false,
+                            "required": [
+                                "users"
+                            ]
+                        },
+                        "mg": {
+                            "type": "object",
+                            "properties": {
+                                "users": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "ce": {
+                                                "type": "string"
+                                            },
+                                            "token": {
+                                                "type": "string"
+                                            },
+                                            "channel": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "additionalProperties": false,
+                                        "required": [
+                                            "ce",
+                                            "token",
+                                            "channel"
+                                        ]
+                                    }
+                                }
+                            },
+                            "additionalProperties": false,
+                            "required": [
+                                "users"
+                            ]
+                        }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                        "kw",
+                        "kg",
+                        "tx",
+                        "wy",
+                        "mg"
+                    ]
+                }
+            },
+            "additionalProperties": false,
+            "required": [
+                "gcsp",
+                "qmc_decrypter",
+                "platform"
+            ]
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "server",
+        "cache",
+        "script",
+        "security",
+        "module"
+    ]
+}

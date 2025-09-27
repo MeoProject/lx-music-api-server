@@ -17,11 +17,7 @@ async def getUrl(songId: str | int, quality: str) -> UrlResponse:
     if config.read("module.qmc_decrypter"):
         try:
             result = await getEncryptedUrl(songId, quality)
-            params = {"url": result.url, "ekey": result.ekey}
-            url = f"http://{config.read('server.link')}/qmc/decrypt?" + urlencode(
-                params
-            )
-            return UrlResponse(url, quality, result.ekey)
+            return result
         except Exception as e:
             raise e
     else:
