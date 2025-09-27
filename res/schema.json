@@ -1,233 +1,364 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "LX Music API 配置文件架构",
+    "description": "LX Music API 服务器的配置文件架构定义",
     "type": "object",
     "properties": {
         "server": {
             "type": "object",
-            "description": "服务器主机配置",
+            "title": "服务器配置",
+            "description": "服务器主机和运行环境配置",
             "properties": {
                 "host": {
                     "type": "string",
-                    "description": "服务器主机IP, 0.0.0.0为监听所有IPv4",
-                    "default": "0.0.0.0"
+                    "description": "服务器监听的IP地址，0.0.0.0 表示监听所有IPv4地址，127.0.0.1 仅本地访问",
+                    "default": "0.0.0.0",
+                    "pattern": "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$|^0\\.0\\.0\\.0$|^localhost$",
+                    "examples": [
+                        "0.0.0.0",
+                        "127.0.0.1",
+                        "192.168.1.100"
+                    ]
                 },
                 "port": {
                     "type": "integer",
-                    "description": "服务器主机端口",
-                    "default": 9000
+                    "description": "服务器监听端口，建议使用1024以上端口",
+                    "default": 9000,
+                    "minimum": 1,
+                    "maximum": 65535,
+                    "examples": [
+                        9000,
+                        8080,
+                        3000
+                    ]
                 },
                 "debug": {
                     "type": "boolean",
-                    "description": "是否启用调试模式",
+                    "description": "是否启用调试模式，生产环境建议关闭",
                     "default": false
                 },
                 "reload": {
                     "type": "boolean",
-                    "description": "是否在文件变动时重启服务器, 启用时workers失效",
+                    "description": "是否在文件变动时自动重启服务器（开发环境使用），启用时workers设置失效",
                     "default": false
                 },
                 "workers": {
                     "type": "integer",
-                    "description": "是否启用多工作进程模式, 计算公式: cpu核心数 + 1",
-                    "default": 1
+                    "description": "工作进程数，推荐值：CPU核心数 + 1，设为0则自动检测",
+                    "default": 1,
+                    "minimum": 0,
+                    "maximum": 128
                 },
                 "output_logs": {
                     "type": "boolean",
-                    "description": "是否将日志输出到文件, 当用户基数大时为减少io操作可关闭",
+                    "description": "是否将日志输出到文件，高并发时建议关闭以减少IO操作",
                     "default": false
                 },
                 "reverse_proxy": {
                     "type": "boolean",
-                    "description": "是否启用Nginx反向代理适配模式",
+                    "description": "是否启用反向代理适配模式（Nginx/Apache等）",
                     "default": false
                 },
                 "real_ip": {
                     "type": "string",
-                    "description": "用户真实IP请求头, 一般启用Nginx反向代理时自动增加",
-                    "default": "X-Real-IP"
+                    "description": "获取用户真实IP的请求头字段名，启用反向代理时需配置",
+                    "default": "X-Real-IP",
+                    "pattern": "^[A-Za-z][A-Za-z0-9-]*$",
+                    "examples": [
+                        "X-Real-IP",
+                        "X-Forwarded-For",
+                        "CF-Connecting-IP"
+                    ]
                 },
                 "proto": {
                     "type": "string",
-                    "description": "请求协议请求头, 一般启用Nginx反向代理时自动增加",
-                    "default": "X-Forwarded-Proto"
+                    "description": "获取请求协议的请求头字段名，启用反向代理时需配置",
+                    "default": "X-Forwarded-Proto",
+                    "pattern": "^[A-Za-z][A-Za-z0-9-]*$",
+                    "examples": [
+                        "X-Forwarded-Proto",
+                        "X-Forwarded-Protocol"
+                    ]
                 }
             },
             "additionalProperties": false,
             "required": [
                 "host",
-                "port",
-                "debug",
-                "reload",
-                "workers",
-                "output_logs",
-                "reverse_proxy",
-                "real_ip",
-                "proto"
+                "port"
             ]
         },
         "cache": {
             "type": "object",
-            "description": "Redis缓存配置",
+            "title": "缓存配置",
+            "description": "Redis缓存服务配置，用于提升响应速度",
             "properties": {
                 "enable": {
                     "type": "boolean",
-                    "description": "启用Redis缓存",
+                    "description": "是否启用Redis缓存",
                     "default": false
                 },
                 "host": {
                     "type": "string",
-                    "description": "Redis主机IP",
-                    "default": "127.0.0.1"
+                    "description": "Redis服务器地址",
+                    "default": "127.0.0.1",
+                    "pattern": "^[a-zA-Z0-9\\.\\-]+$",
+                    "examples": [
+                        "127.0.0.1",
+                        "localhost",
+                        "redis.example.com"
+                    ]
                 },
                 "port": {
-                    "type": "string",
-                    "description": "Redis主机端口",
-                    "default": "6379"
+                    "type": [
+                        "string",
+                        "integer"
+                    ],
+                    "description": "Redis服务器端口",
+                    "default": 6379,
+                    "pattern": "^[0-9]{1,5}$",
+                    "minimum": 1,
+                    "maximum": 65535
                 },
                 "db": {
-                    "type": "string",
-                    "description": "Redis数据库ID",
-                    "default": "0"
+                    "type": [
+                        "string",
+                        "integer"
+                    ],
+                    "description": "Redis数据库索引号（0-15）",
+                    "default": 0,
+                    "pattern": "^(1[0-5]|[0-9])$",
+                    "minimum": 0,
+                    "maximum": 15
                 },
                 "user": {
                     "type": "string",
-                    "description": "Redis用户名",
-                    "default": ""
+                    "description": "Redis用户名（Redis 6.0+支持）",
+                    "default": "",
+                    "maxLength": 256
                 },
                 "password": {
                     "type": "string",
                     "description": "Redis密码",
-                    "default": ""
+                    "default": "",
+                    "maxLength": 512
                 },
                 "key_prefix": {
                     "type": "string",
-                    "description": "Redis键前缀",
-                    "default": "LX_API"
+                    "description": "Redis键前缀，用于区分不同应用的缓存",
+                    "default": "LX_API",
+                    "pattern": "^[A-Z0-9_]+$",
+                    "minLength": 1,
+                    "maxLength": 32
                 }
             },
             "additionalProperties": false,
             "required": [
-                "enable",
-                "host",
-                "port",
-                "db",
-                "user",
-                "password",
-                "key_prefix"
-            ]
+                "enable"
+            ],
+            "if": {
+                "properties": {
+                    "enable": {
+                        "const": true
+                    }
+                }
+            },
+            "then": {
+                "required": [
+                    "host",
+                    "port"
+                ]
+            }
         },
         "script": {
             "type": "object",
+            "title": "脚本配置",
             "description": "LX Music 脚本模板配置",
             "properties": {
                 "name": {
                     "type": "string",
                     "description": "音源在LX Music中显示的名称",
-                    "default": "音源"
+                    "default": "自定义音源",
+                    "minLength": 1,
+                    "maxLength": 50
                 },
                 "intro": {
                     "type": "string",
                     "description": "音源在LX Music中显示的简介",
-                    "default": "简介"
+                    "default": "LX Music API 音源",
+                    "minLength": 1,
+                    "maxLength": 200
                 },
                 "author": {
                     "type": "string",
-                    "description": "音源在LX Music中显示的作者",
-                    "default": "作者"
+                    "description": "音源作者信息",
+                    "default": "Anonymous",
+                    "minLength": 1,
+                    "maxLength": 100
                 },
                 "version": {
                     "type": "string",
-                    "description": "音源在LX Music中显示的版本",
-                    "default": "v1"
+                    "description": "音源版本号，建议使用语义化版本",
+                    "default": "v1.0.0",
+                    "pattern": "^v?\\d+(\\.\\d+){0,2}(-[a-zA-Z0-9]+)?$",
+                    "examples": [
+                        "v1",
+                        "v1.0",
+                        "v1.0.0",
+                        "v2.1.3-beta"
+                    ]
                 },
                 "file": {
                     "type": "string",
-                    "description": "音源的文件名",
-                    "default": "lx-music-source.js"
+                    "description": "生成的音源脚本文件名",
+                    "default": "lx-music-source.js",
+                    "pattern": "^[a-zA-Z0-9\\-_.]+\\.js$",
+                    "minLength": 3,
+                    "maxLength": 255
                 },
                 "dev": {
                     "type": "boolean",
-                    "description": "开启音源脚本控制台",
+                    "description": "是否开启音源脚本控制台（开发调试用）",
                     "default": false
                 },
                 "update": {
                     "type": "boolean",
-                    "description": "开启音源脚本更新",
+                    "description": "是否启用音源脚本自动更新功能",
                     "default": false
                 },
                 "updateMsg": {
                     "type": "string",
-                    "description": "音源更新日志",
-                    "default": "脚本链接：{updateUrl}"
+                    "description": "音源更新提示信息，{updateUrl}将被替换为实际链接",
+                    "default": "脚本链接：{updateUrl}",
+                    "maxLength": 500
                 },
                 "qualitys": {
                     "type": "object",
-                    "description": "对应平台支持的音质",
+                    "title": "音质配置",
+                    "description": "各平台支持的音质列表",
                     "properties": {
                         "kw": {
                             "type": "array",
+                            "description": "酷我音乐支持的音质",
                             "items": {
-                                "type": "string"
+                                "type": "string",
+                                "enum": [
+                                    "128k",
+                                    "192k",
+                                    "256k",
+                                    "320k",
+                                    "flac",
+                                    "flac24bit",
+                                    "hires",
+                                    "ape"
+                                ]
                             },
-                            "description": "酷我音乐支持的所有音质",
                             "default": [
                                 "128k",
                                 "320k",
                                 "flac",
                                 "hires"
-                            ]
+                            ],
+                            "uniqueItems": true,
+                            "minItems": 1
                         },
                         "kg": {
                             "type": "array",
+                            "description": "酷狗音乐支持的音质",
                             "items": {
-                                "type": "string"
+                                "type": "string",
+                                "enum": [
+                                    "128k",
+                                    "192k",
+                                    "256k",
+                                    "320k",
+                                    "flac",
+                                    "flac24bit",
+                                    "hires",
+                                    "ape"
+                                ]
                             },
-                            "description": "酷狗音乐支持的所有音质",
                             "default": [
                                 "128k",
                                 "320k",
                                 "flac",
                                 "hires"
-                            ]
+                            ],
+                            "uniqueItems": true,
+                            "minItems": 1
                         },
                         "tx": {
                             "type": "array",
+                            "description": "QQ音乐支持的音质",
                             "items": {
-                                "type": "string"
+                                "type": "string",
+                                "enum": [
+                                    "128k",
+                                    "192k",
+                                    "256k",
+                                    "320k",
+                                    "flac",
+                                    "flac24bit",
+                                    "hires",
+                                    "ape",
+                                    "dts"
+                                ]
                             },
-                            "description": "QQ音乐支持的所有音质",
                             "default": [
                                 "128k",
                                 "320k",
                                 "flac",
                                 "hires"
-                            ]
+                            ],
+                            "uniqueItems": true,
+                            "minItems": 1
                         },
                         "wy": {
                             "type": "array",
+                            "description": "网易云音乐支持的音质",
                             "items": {
-                                "type": "string"
+                                "type": "string",
+                                "enum": [
+                                    "128k",
+                                    "192k",
+                                    "256k",
+                                    "320k",
+                                    "flac",
+                                    "flac24bit",
+                                    "hires"
+                                ]
                             },
-                            "description": "网易云音乐支持的所有音质",
                             "default": [
                                 "128k",
                                 "320k",
                                 "flac",
                                 "hires"
-                            ]
+                            ],
+                            "uniqueItems": true,
+                            "minItems": 1
                         },
                         "mg": {
                             "type": "array",
+                            "description": "咪咕音乐支持的音质",
                             "items": {
-                                "type": "string"
+                                "type": "string",
+                                "enum": [
+                                    "128k",
+                                    "192k",
+                                    "256k",
+                                    "320k",
+                                    "flac",
+                                    "flac24bit",
+                                    "hires"
+                                ]
                             },
-                            "description": "咪咕音乐支持的所有音质",
                             "default": [
                                 "128k",
                                 "320k",
                                 "flac",
                                 "hires"
-                            ]
+                            ],
+                            "uniqueItems": true,
+                            "minItems": 1
                         }
                     },
                     "additionalProperties": false,
@@ -243,41 +374,124 @@
             "additionalProperties": false,
             "required": [
                 "name",
-                "intro",
-                "author",
                 "version",
                 "file",
-                "dev",
-                "update",
-                "updateMsg",
                 "qualitys"
             ]
         },
         "security": {
             "type": "object",
-            "description": "安全配置",
+            "title": "安全配置",
+            "description": "API安全相关配置",
             "properties": {
                 "key_verify": {
                     "type": "object",
-                    "description": "密钥验证",
+                    "description": "API密钥验证配置",
                     "properties": {
                         "enable": {
                             "type": "boolean",
-                            "description": "开启密钥验证",
+                            "description": "是否启用API密钥验证",
                             "default": false
                         },
                         "list": {
                             "type": "array",
-                            "description": "密钥列表",
+                            "description": "允许的API密钥列表",
                             "items": {
-                                "type": "string"
-                            }
+                                "type": "string",
+                                "minLength": 8,
+                                "maxLength": 128,
+                                "pattern": "^[a-zA-Z0-9\\-_]+$"
+                            },
+                            "default": [],
+                            "uniqueItems": true,
+                            "examples": [
+                                [
+                                    "key123456",
+                                    "apikey789"
+                                ]
+                            ]
                         }
                     },
                     "additionalProperties": false,
                     "required": [
-                        "enable",
-                        "list"
+                        "enable"
+                    ],
+                    "if": {
+                        "properties": {
+                            "enable": {
+                                "const": true
+                            }
+                        }
+                    },
+                    "then": {
+                        "properties": {
+                            "list": {
+                                "minItems": 1
+                            }
+                        },
+                        "required": [
+                            "list"
+                        ]
+                    }
+                },
+                "rate_limit": {
+                    "type": "object",
+                    "description": "请求频率限制配置",
+                    "properties": {
+                        "enable": {
+                            "type": "boolean",
+                            "description": "是否启用频率限制",
+                            "default": false
+                        },
+                        "max_requests": {
+                            "type": "integer",
+                            "description": "时间窗口内的最大请求数",
+                            "default": 100,
+                            "minimum": 1,
+                            "maximum": 10000
+                        },
+                        "window_seconds": {
+                            "type": "integer",
+                            "description": "时间窗口大小（秒）",
+                            "default": 60,
+                            "minimum": 1,
+                            "maximum": 3600
+                        }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                        "enable"
+                    ]
+                },
+                "whitelist": {
+                    "type": "object",
+                    "description": "IP白名单配置",
+                    "properties": {
+                        "enable": {
+                            "type": "boolean",
+                            "description": "是否启用IP白名单",
+                            "default": false
+                        },
+                        "ips": {
+                            "type": "array",
+                            "description": "允许访问的IP地址列表",
+                            "items": {
+                                "type": "string",
+                                "pattern": "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(/([0-9]|[1-2][0-9]|3[0-2]))?$"
+                            },
+                            "default": [],
+                            "uniqueItems": true,
+                            "examples": [
+                                [
+                                    "192.168.1.0/24",
+                                    "10.0.0.1"
+                                ]
+                            ]
+                        }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                        "enable"
                     ]
                 }
             },
@@ -288,56 +502,69 @@
         },
         "module": {
             "type": "object",
+            "title": "功能模块配置",
+            "description": "各功能模块的配置",
             "properties": {
                 "gcsp": {
                     "type": "object",
-                    "description": "歌词适配模拟后端",
+                    "description": "歌词适配模拟后端配置",
                     "properties": {
                         "enable": {
                             "type": "boolean",
-                            "description": "开启歌词适配接口"
+                            "description": "是否启用歌词适配接口",
+                            "default": false
                         },
                         "package_md5": {
                             "type": "string",
-                            "description": "安装包MD5值"
+                            "description": "安装包MD5值（32位小写）",
+                            "default": "",
+                            "pattern": "^[a-f0-9]{32}$|^$"
                         },
                         "salt_1": {
                             "type": "string",
-                            "description": "盐值1"
+                            "description": "加密盐值1",
+                            "default": "",
+                            "maxLength": 256
                         },
                         "salt_2": {
                             "type": "string",
-                            "description": "盐值2"
+                            "description": "加密盐值2",
+                            "default": "",
+                            "maxLength": 256
                         },
                         "enable_verify": {
                             "type": "boolean",
-                            "description": "开启MD5验证"
+                            "description": "是否启用MD5校验",
+                            "default": false
                         }
                     },
                     "additionalProperties": false,
                     "required": [
-                        "enable",
-                        "package_md5",
-                        "salt_1",
-                        "salt_2",
-                        "enable_verify"
+                        "enable"
                     ]
                 },
                 "qmc_decrypter": {
                     "type": "boolean",
-                    "description": "QQ音乐解密器"
+                    "description": "是否启用QQ音乐文件解密器",
+                    "default": false
                 },
                 "platform": {
                     "type": "object",
+                    "description": "各音乐平台的详细配置",
                     "properties": {
                         "kw": {
                             "type": "object",
+                            "description": "酷我音乐平台配置",
                             "properties": {
                                 "source_list": {
                                     "type": "array",
+                                    "description": "酷我mobi接口的验证参数, 网络寻找",
                                     "items": {
-                                        "type": "string"
-                                    }
+                                        "type": "string",
+                                        "minLength": 1
+                                    },
+                                    "default": [],
+                                    "uniqueItems": true
                                 }
                             },
                             "additionalProperties": false,
@@ -347,29 +574,38 @@
                         },
                         "kg": {
                             "type": "object",
+                            "description": "酷狗音乐平台配置",
                             "properties": {
                                 "users": {
                                     "type": "array",
+                                    "description": "酷狗用户账号列表",
                                     "items": {
                                         "type": "object",
                                         "properties": {
                                             "userid": {
-                                                "type": "string"
+                                                "type": "string",
+                                                "description": "用户ID",
+                                                "minLength": 1
                                             },
                                             "token": {
-                                                "type": "string"
+                                                "type": "string",
+                                                "description": "用户Token",
+                                                "minLength": 1
                                             },
                                             "refresh_login": {
-                                                "type": "boolean"
+                                                "type": "boolean",
+                                                "description": "是否自动刷新登录",
+                                                "default": true
                                             }
                                         },
                                         "additionalProperties": false,
                                         "required": [
                                             "userid",
-                                            "token",
-                                            "refresh_login"
+                                            "token"
                                         ]
-                                    }
+                                    },
+                                    "default": [],
+                                    "maxItems": 10
                                 }
                             },
                             "additionalProperties": false,
@@ -379,73 +615,102 @@
                         },
                         "tx": {
                             "type": "object",
+                            "description": "QQ音乐平台配置",
                             "properties": {
                                 "users": {
                                     "type": "array",
+                                    "description": "QQ音乐用户账号列表",
                                     "items": {
                                         "type": "object",
                                         "properties": {
                                             "uin": {
-                                                "type": "string"
+                                                "type": "string",
+                                                "description": "QQ号或微信UIN, 抓包或浏览器Cookie获取",
+                                                "minLength": 1
                                             },
                                             "token": {
-                                                "type": "string"
+                                                "type": "string",
+                                                "description": "登录Token, 抓包或浏览器Cookie获取",
+                                                "minLength": 1
                                             },
                                             "refreshKey": {
-                                                "type": "string"
+                                                "type": "string",
+                                                "description": "刷新密钥, 抓包获取",
+                                                "minLength": 1
                                             },
                                             "openId": {
-                                                "type": "string"
+                                                "type": "string",
+                                                "description": "OpenID, 抓包获取",
+                                                "minLength": 1
                                             },
                                             "accessToken": {
-                                                "type": "string"
+                                                "type": "string",
+                                                "description": "accessToken, 抓包获取",
+                                                "minLength": 1
                                             },
                                             "vip_type": {
-                                                "type": "string"
+                                                "type": "string",
+                                                "description": "VIP类型（normal:普通用户 vip:绿钻 svip:SVIP)",
+                                                "enum": [
+                                                    "normal",
+                                                    "vip",
+                                                    "svip"
+                                                ],
+                                                "default": "normal"
                                             },
                                             "refresh_login": {
-                                                "type": "boolean"
+                                                "type": "boolean",
+                                                "description": "是否自动刷新登录",
+                                                "default": true
                                             }
                                         },
                                         "additionalProperties": false,
                                         "required": [
                                             "uin",
-                                            "token",
-                                            "refreshKey",
-                                            "openId",
-                                            "accessToken",
-                                            "vip_type",
-                                            "refresh_login"
+                                            "token"
                                         ]
-                                    }
+                                    },
+                                    "default": [],
+                                    "maxItems": 10
                                 },
                                 "cdnaddr": {
-                                    "type": "string"
+                                    "type": "string",
+                                    "description": "CDN加速地址",
+                                    "default": "https://wx.music.tc.qq.com/",
+                                    "format": "uri-reference",
+                                    "examples": [
+                                        "https://wx.music.tc.qq.com/"
+                                    ]
                                 }
                             },
                             "additionalProperties": false,
                             "required": [
-                                "users",
-                                "cdnaddr"
+                                "users"
                             ]
                         },
                         "wy": {
                             "type": "object",
+                            "description": "网易云音乐平台配置",
                             "properties": {
                                 "users": {
                                     "type": "array",
+                                    "description": "网易云音乐用户账号列表",
                                     "items": {
                                         "type": "object",
                                         "properties": {
                                             "cookie": {
-                                                "type": "string"
+                                                "type": "string",
+                                                "description": "登录Cookie",
+                                                "minLength": 1
                                             }
                                         },
                                         "additionalProperties": false,
                                         "required": [
                                             "cookie"
                                         ]
-                                    }
+                                    },
+                                    "default": [],
+                                    "maxItems": 10
                                 }
                             },
                             "additionalProperties": false,
@@ -455,29 +720,39 @@
                         },
                         "mg": {
                             "type": "object",
+                            "description": "咪咕音乐平台配置",
                             "properties": {
                                 "users": {
                                     "type": "array",
+                                    "description": "咪咕音乐用户账号列表",
                                     "items": {
                                         "type": "object",
                                         "properties": {
                                             "ce": {
-                                                "type": "string"
+                                                "type": "string",
+                                                "description": "加密凭证",
+                                                "minLength": 1
                                             },
                                             "token": {
-                                                "type": "string"
+                                                "type": "string",
+                                                "description": "用户Token",
+                                                "minLength": 1
                                             },
                                             "channel": {
-                                                "type": "string"
+                                                "type": "string",
+                                                "description": "渠道标识",
+                                                "default": "014000D",
+                                                "minLength": 1
                                             }
                                         },
                                         "additionalProperties": false,
                                         "required": [
                                             "ce",
-                                            "token",
-                                            "channel"
+                                            "token"
                                         ]
-                                    }
+                                    },
+                                    "default": [],
+                                    "maxItems": 10
                                 }
                             },
                             "additionalProperties": false,
@@ -507,9 +782,39 @@
     "additionalProperties": false,
     "required": [
         "server",
-        "cache",
-        "script",
-        "security",
         "module"
-    ]
+    ],
+    "dependencies": {
+        "cache": {
+            "oneOf": [
+                {
+                    "properties": {
+                        "cache": {
+                            "properties": {
+                                "enable": {
+                                    "const": false
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "properties": {
+                        "cache": {
+                            "properties": {
+                                "enable": {
+                                    "const": true
+                                }
+                            },
+                            "required": [
+                                "host",
+                                "port",
+                                "db"
+                            ]
+                        }
+                    }
+                }
+            ]
+        }
+    }
 }
