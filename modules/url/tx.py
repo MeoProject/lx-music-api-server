@@ -14,18 +14,11 @@ translate = {
 
 
 async def getUrl(songId: str | int, quality: str) -> UrlResponse:
-    if config.read("module.qmc_decrypter"):
-        try:
-            result = await getEncryptedUrl(songId, quality)
-            return result
-        except Exception as e:
-            raise e
-    else:
-        try:
-            result = await getUnencryptedUrl(songId, quality)
-            return result
-        except Exception as e:
-            raise e
+    try:
+        result = await getUnencryptedUrl(songId, quality)
+        return result
+    except Exception as e:
+        raise e
 
 
 async def getUnencryptedUrl(songId: str | int, quality: str) -> UrlResponse:

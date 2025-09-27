@@ -1,6 +1,6 @@
 import asyncio
 
-from api import home_handler, gcsp_handler, script_handler, music_handler, qmc_handler
+from api import home_handler, gcsp_handler, script_handler, music_handler
 
 from middleware.auth import AuthMiddleware
 from middleware.request_logger import RequestLoggerMiddleware
@@ -81,8 +81,6 @@ app.include_router(script_handler.router)
 app.include_router(music_handler.router)
 if config.read("module.gcsp.enable"):
     app.include_router(gcsp_handler.router)
-if config.read("module.qmc_decrypter"):
-    app.include_router(qmc_handler.router)
 
 
 @app.exception_handler(Exception)

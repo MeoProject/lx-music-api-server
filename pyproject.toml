@@ -1,6 +1,6 @@
 [project]
 name = "lx-music-api-server"
-version = "2.0.3"
+version = "3.0.0"
 description = "LX Music Api Server"
 license = {text = "MIT"}
 readme = "README.md"
@@ -14,7 +14,6 @@ dependencies = [
     "cryptography (>=44.0.3,<45.0.0)",
     "uvicorn (>=0.34.2,<0.35.0)",
     "httpx[h2] (>=0.28.1,<0.29.0)",
-    "pyqmc-rust (>=0.1.6,<0.2.0)",
     "logzero (>=1.7.0,<2.0.0)",
 ]
 

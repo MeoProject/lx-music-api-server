@@ -46,7 +46,6 @@ default = {
             "salt_2": "6562653262383463363633646364306534333668",
             "enable_verify": False,
         },
-        "qmc_decrypter": False,
         "platform": {
             "kw": {"source_list": ["kwplayer_version_code"]},
             "kg": {
