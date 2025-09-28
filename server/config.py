@@ -50,8 +50,10 @@ class ConfigManager:
                         self.logger.warning(
                             "首次启动或配置文件被删除，已创建默认配置文件"
                         )
+                        path = f"{variable.work_dir + os.path.sep}data/config.json".replace("\\", "/")
                         self.logger.warning(
-                            f"\n建议您到{variable.work_dir + os.path.sep}config.json修改配置后重新启动服务器"
+                            f"\n建议您到{path}修改配置后重新启动服务器"
+                            f"\n如果识别有误, 请在app.py所在的文件夹找data文件夹"
                         )
                     os._exit(1)
             except BaseException as e:
