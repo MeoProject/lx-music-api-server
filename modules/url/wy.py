@@ -10,7 +10,7 @@ from server.exceptions import getUrlFailed
 
 async def getUrl(songId: str, quality: str) -> UrlResponse:
     path = "/api/song/enhance/player/url/v1"
-    url = "https://interface.music.163.com/eapi/song/enhance/player/url/v1"
+    url = "http://interface.music.163.com/eapi/song/enhance/player/url/v1"
     params = {
         "ids": ujson.dumps([songId]),
         "level": QMap["qualityMap"][quality],

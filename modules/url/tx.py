@@ -1,5 +1,6 @@
 import random
 from urllib.parse import urlencode
+from modules.constants import translateStrOrInt
 from server.config import config
 from server.exceptions import getUrlFailed
 from modules.plat.tx import build_common_params, utils
@@ -14,14 +15,6 @@ translate = {
 
 
 async def getUrl(songId: str | int, quality: str) -> UrlResponse:
-    try:
-        result = await getUnencryptedUrl(songId, quality)
-        return result
-    except Exception as e:
-        raise e
-
-
-async def getUnencryptedUrl(songId: str | int, quality: str) -> UrlResponse:
     try:
         info = await getMusicInfo(songId)
     except:
@@ -68,7 +61,7 @@ async def getUnencryptedUrl(songId: str | int, quality: str) -> UrlResponse:
     purl = str(data["purl"])
 
     if not purl:
-        raise getUrlFailed(translate[body["request"]["code"]])
+        raise getUrlFailed(translateStrOrInt(body["request"]["code"]))
 
     url = UrlResponse(url=utils.Tools["cdnaddr"] + purl, quality=quality, ekey="")
 
@@ -123,7 +116,7 @@ async def getEncryptedUrl(songId: str | int, quality: str) -> UrlResponse:
     ekey = str(data["ekey"])
 
     if not purl:
-        raise getUrlFailed(translate[body["request"]["code"]])
+        raise getUrlFailed(translateStrOrInt(body["request"]["code"]))
 
     url = UrlResponse(url=utils.Tools["cdnaddr"] + purl, quality=quality, ekey=ekey)
 

@@ -8,7 +8,7 @@ async def getIPInfo(ip: str) -> dict:
             return {"ip": ip, "local": "本地IP"}
 
         req = await HttpRequest(
-            "https://mips.kugou.com/check/iscn",
+            "http://mips.kugou.com/check/iscn",
             {"method": "GET", "headers": {"X-Forwarded-For": ip}},
         )
         body = req.json()

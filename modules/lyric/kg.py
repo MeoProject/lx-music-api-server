@@ -100,7 +100,7 @@ async def lyricSearchByHash(hash_):
     timelength = int(musicInfo["audio_info"]["timelength"]) // 1000
     req = await http.HttpRequest(
         encodeURI(
-            f"https://lyrics.kugou.com/search?ver=1&man=yes&client=pc&keyword="
+            f"http://lyrics.kugou.com/search?ver=1&man=yes&client=pc&keyword="
             + name
             + "&hash="
             + hash_new
@@ -120,16 +120,23 @@ async def lyricSearchByHash(hash_):
     return lyric["id"], lyric["accesskey"]
 
 
-async def getLyric(lyric_id, accesskey):
+async def getLyric(hash_):
+    try:
+        lyric_id, accesskey = await lyricSearchByHash(hash_)
+    except:
+        raise getLyricFailed("未检索到歌词")
+
     req = await http.HttpRequest(
-        f"https://lyrics.kugou.com/download?ver=1&client=pc&id={lyric_id}&accesskey={accesskey}",
+        f"http://lyrics.kugou.com/download?ver=1&client=pc&id={lyric_id}&accesskey={accesskey}",
         {
             "method": "GET",
         },
     )
     body = req.json()
+
     if body["status"] != 200 or body["error_code"] != 0 or (not body["content"]):
         raise getLyricFailed("歌词获取失败")
+
     content = createBase64Decode(body["content"])
     content = krcDecode(content)
 

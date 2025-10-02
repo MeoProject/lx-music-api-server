@@ -6,7 +6,7 @@ from server.exceptions import getSongInfoFailed
 
 async def IdGetInfo(songId: int | str):
     req = await HttpRequest(
-        f"https://c.musicapp.migu.cn/MIGUM3.0/resource/song/by-contentids/v2.0?contentId={songId}",
+        f"http://c.musicapp.migu.cn/MIGUM3.0/resource/song/by-contentids/v2.0?contentId={songId}",
         {"method": "GET"},
     )
 

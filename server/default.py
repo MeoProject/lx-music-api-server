@@ -39,12 +39,21 @@ default = {
     },
     "security": {"key_verify": {"enable": False, "list": [""]}},
     "module": {
+        "doh": ["https://dns.alidns.com/dns-query"],
         "gcsp": {
             "enable": False,
             "package_md5": "",
             "salt_1": "NDRjZGIzNzliNzEe",
             "salt_2": "6562653262383463363633646364306534333668",
             "enable_verify": False,
+            "update": {
+                "ver": "",
+                "title": "",
+                "logs": "",
+                "down_url": "",
+                "pan_url": "",
+                "required": False,
+            },
         },
         "platform": {
             "kw": {"source_list": ["kwplayer_version_code"]},

@@ -7,7 +7,6 @@ from middleware.request_logger import RequestLoggerMiddleware
 
 from fastapi import FastAPI
 from fastapi import Request
-from fastapi.middleware.cors import CORSMiddleware
 
 from contextlib import asynccontextmanager
 
@@ -23,21 +22,15 @@ logger = log.createLogger("FastAPI")
 
 async def clean():
     if variable.http_client:
-        await variable.http_client.aclose()
+        await variable.http_client.connector.close()
+        await variable.http_client.close()
     logger.info("等待部分进程暂停...")
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    logger.info(f"服务器启动于http://{server.config.host}:{server.config.port}")
-    print(
-        f"已加载\n"
-        f"酷狗音乐账号{len(config.read('module.platform.kg.users') or [])}个\n"
-        f"QQ音乐账号{len(config.read('module.platform.tx.users') or [])}个\n"
-        f"网易云音乐账号{len(config.read('module.platform.wy.users') or [])}个\n"
-        f"咪咕音乐账号{len(config.read('module.platform.mg.users') or [])}个"
-    )
     await scheduler.run()
+
     yield
 
     await clean()
@@ -57,18 +50,8 @@ uvicorn_config = Config(
     port=config.read("server.port"),
     reload=config.read("server.reload"),
     workers=config.read("server.workers"),
-    log_config=None,
-    log_level=None,
-    access_log=False,
 )
 server = uvicorn.Server(config=uvicorn_config)
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 app.add_middleware(AuthMiddleware)
 app.add_middleware(RequestLoggerMiddleware)

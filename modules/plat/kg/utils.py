@@ -5,13 +5,6 @@ from utils.md5 import createMD5
 
 tools = {
     "mid": "musicapi",
-    "app": {
-        "appid": "1005",
-        "signkey": "OIlwieks28dk2k092lksi2UIkp",
-        "pidversec": "57ae12eb6890223e355ccfcb74edf70d",
-        "clientver": "12029",
-        "pid": "2",
-    },
     "qualityHashMap": {
         "128k": "hash_128",
         "320k": "hash_320",
@@ -44,12 +37,16 @@ def buildRequestParams(dictionary: dict):
 def sign(params, body=""):
     if isinstance(body, dict):
         body = ujson.dumps(body)
+
     params = sortDict(params)
     params = buildSignatureParams(params, body)
-    return createMD5(tools["app"]["signkey"] + params + tools["app"]["signkey"])
+
+    return createMD5(
+        "OIlwieks28dk2k092lksi2UIkp" + params + "OIlwieks28dk2k092lksi2UIkp"
+    )
 
 
-async def signRequest(url, params, options):
+async def signRequest(url: str, params: dict, options: dict) -> request.Response:
     params["signature"] = sign(
         params,
         (
@@ -66,11 +63,11 @@ async def signRequest(url, params, options):
     return await request.HttpRequest(url, options)
 
 
-def getKey(hash_, user_info):
+def getKey(hash_: str, user_info: dict[str, str]) -> str:
     return createMD5(
         hash_.lower()
-        + tools["app"]["pidversec"]
-        + tools["app"]["appid"]
+        + "57ae12eb6890223e355ccfcb74edf70d"
+        + "1005"
         + tools["mid"]
         + user_info["userid"]
     )

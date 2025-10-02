@@ -13,7 +13,7 @@ async def GetPic(songId: str | int, albumId: str | int) -> str:
 
     if picUrl == "NO_PIC":
         pic_url_req = await request.HttpRequest(
-            f"https://searchlist.kuwo.cn/r.s?stype=albuminfo&albumid={albumId}&show_copyright_off=1&alflac=1&vipver=1&sortby=1&newver=1&mobi=1"
+            f"http://searchlist.kuwo.cn/r.s?stype=albuminfo&albumid={albumId}&show_copyright_off=1&alflac=1&vipver=1&sortby=1&newver=1&mobi=1"
         )
         picUrl = pic_url_req.json().get("hts_img", "")
 

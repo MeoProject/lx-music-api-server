@@ -1,5 +1,6 @@
 import time
 import random
+from modules.constants import translateStrOrInt
 from server.models import UrlResponse
 from server.config import config
 from server.exceptions import getUrlFailed
@@ -29,17 +30,17 @@ async def getUrl(songId: str, quality: str) -> dict:
             "area_code": 1,
             "hash": thash.lower(),
             "mid": tools["mid"],
-            "appid": tools["app"]["appid"],
+            "appid": "1005",
             "ssa_flag": "is_fromtrack",
-            "clientver": tools["app"]["clientver"],
+            "clientver": "20349",
             "token": user_info["token"],
             "album_audio_id": album_audio_id,
             "behavior": "play",
             "clienttime": int(time.time()),
-            "pid": tools["app"]["pid"],
+            "pid": "2",
             "key": getKey(thash, user_info),
             "quality": tools["qualityMap"][quality],
-            "version": tools["app"]["clientver"],
+            "version": "20349",
             "dfid": "-",
             "pidversion": 3001,
         }
@@ -52,22 +53,14 @@ async def getUrl(songId: str, quality: str) -> dict:
         }
 
         req = await signRequest(
-            "https://tracker.kugou.com/v5/url",
+            "http://tracker.kugou.com/v5/url",
             params,
             {"headers": headers},
         )
         body = dict(req.json())
 
-        if not body["url"]:
-            match body["status"]:
-                case 3:
-                    return getUrlFailed("酷狗无版权的歌曲，目前无解")
-                case 2:
-                    raise getUrlFailed("链接获取失败，可能出现验证码或数字专辑未购买")
-                case 1:
-                    raise getUrlFailed("链接获取失败, 可能是数字专辑或者API失效")
-                case _:
-                    raise getUrlFailed("未知错误导致获取链接失败")
+        if not body.get("url"):
+            raise getUrlFailed(translateStrOrInt(body["status"]))
 
         play_url = body["url"][0]
         url = UrlResponse(play_url, quality)

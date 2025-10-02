@@ -134,7 +134,7 @@ async def get_qimei(version: str) -> QimeiResult:
         extra = '{"appKey":"' + APP_KEY + '"}'
         sign = createMD5(key, params, str(ts * 1000), nonce, SECRET, extra)
         res = await http.HttpRequest(
-            "https://api.tencentmusic.com/tme/trpc/proxy",
+            "http://api.tencentmusic.com/tme/trpc/proxy",
             {
                 "method": "POST",
                 "headers": {

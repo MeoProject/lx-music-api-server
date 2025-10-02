@@ -3,16 +3,13 @@ import asyncio
 from utils.time import tsFormat
 from . import log
 
-logger = log.createLogger("scheduler")
+logger = log.createLogger("定时器")
 
 running_event = asyncio.Event()
-
-global tasks
-
 tasks = []
 
 
-class taskWrapper:
+class SchedulerTaskWrapper:
     def __init__(self, name, function, interval=86400, args={}, latest_execute=0):
         self.function = function
         self.interval = interval
@@ -25,28 +22,26 @@ class taskWrapper:
 
     async def run(self):
         try:
-            logger.info(f"task {self.name} run start")
+            logger.info(f"进程 {self.name} 开始运行")
             await self.function(**self.args)
+            self.latest_execute = int(time.time())
             logger.info(
-                f"task {self.name} run success, next execute: {tsFormat(self.interval + self.latest_execute)}"
+                f"进程 {self.name} 运行成功, 下次执行: {tsFormat(self.interval + self.latest_execute)}"
             )
-        except Exception:
-            logger.error(f"task {self.name} run failed, waiting for next execute...")
+        except Exception as e:
+            logger.error(f"进程 {self.name} 运行失败: {e}", exc_info=True)
 
     def __str__(self):
         return f'SchedulerTaskWrapper(name="{self.name}", interval={self.interval}, function={self.function}, args={self.args}, latest_execute={self.latest_execute})'
 
 
 def append(name, task, interval=86400, args={}):
-    global tasks
-    wrapper = taskWrapper(name, task, interval, args)
-    logger.debug(f"new task ({name}) registered")
+    wrapper = SchedulerTaskWrapper(name, task, interval, args)
+    logger.debug(f"新进程 ({name}) 注册")
     return tasks.append(wrapper)
 
 
-# 在 thread_runner 函数中修改循环逻辑
 async def thread_runner():
-    global tasks, running_event
     while not running_event.is_set():
         tasks_runner = []
         for t in tasks:
@@ -59,6 +54,6 @@ async def thread_runner():
 
 
 async def run():
-    logger.debug("scheduler thread starting...")
+    logger.debug("定时线程启动...")
     task = asyncio.create_task(thread_runner())
-    logger.debug("schedluer thread load success")
+    logger.debug("定时线程停止")

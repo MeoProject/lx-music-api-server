@@ -254,7 +254,7 @@ def fixTimeLabel(lrc, tlrc, romalrc):
 
 async def getLyric(songId):
     path = "/api/song/lyric/v1"
-    url = "https://interface3.music.163.com/eapi/song/lyric/v1"
+    url = "http://interface3.music.163.com/eapi/song/lyric/v1"
     params = {
         "id": songId,
         "cp": False,

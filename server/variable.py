@@ -1,5 +1,5 @@
 import os
-import httpx
+import aiohttp
 import ujson
 
 
@@ -40,5 +40,5 @@ debug: bool = (
 output_logs: bool = _lm if (isinstance(_lm, bool)) else True
 running: bool = True
 work_dir = os.getcwd()
-http_client: httpx.AsyncClient = None
+http_client: aiohttp.ClientSession = None
 log_files: list = []

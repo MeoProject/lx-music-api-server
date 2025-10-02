@@ -422,6 +422,13 @@
             "title": "功能模块配置",
             "description": "各功能模块的配置",
             "properties": {
+                "doh": {
+                    "type": "array",
+                    "description": "DoH(DNS over HTTPS)配置",
+                    "default": [
+                        "https://dns.alidns.com/dns-query"
+                    ]
+                },
                 "gcsp": {
                     "type": "object",
                     "description": "歌词适配模拟后端配置",
@@ -453,6 +460,36 @@
                             "type": "boolean",
                             "description": "是否启用MD5校验",
                             "default": false
+                        },
+                        "update": {
+                            "type": "object",
+                            "description": "歌词适配更新信息",
+                            "properties": {
+                                "ver": {
+                                    "type": "string",
+                                    "description": "版本"
+                                },
+                                "title": {
+                                    "type": "string",
+                                    "description": "更新标题"
+                                },
+                                "logs": {
+                                    "type": "string",
+                                    "description": "更新日志"
+                                },
+                                "down_url": {
+                                    "type": "string",
+                                    "description": "更新链接(可直接下载到文件)"
+                                },
+                                "pan_url": {
+                                    "type": "string",
+                                    "description": "网盘链接"
+                                },
+                                "required": {
+                                    "type": "boolean",
+                                    "description": "是否必须更新"
+                                }
+                            }
                         }
                     },
                     "additionalProperties": false,

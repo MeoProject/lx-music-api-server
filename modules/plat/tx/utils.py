@@ -10,7 +10,7 @@ async def signRequest(data):
     s = signBody(data)
 
     return await HttpRequest(
-        f"https://u6.y.qq.com/cgi-bin/musics.fcg?sign=" + s,
+        f"http://u6.y.qq.com/cgi-bin/musics.fcg?sign=" + s,
         {
             "method": "POST",
             "body": data,

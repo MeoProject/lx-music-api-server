@@ -9,7 +9,7 @@ from modules.plat import formatPlayTime, formatSinger
 
 async def getMusicInfo(songId: str):
     path = "/api/v3/song/detail"
-    url = "https://interface.music.163.com/eapi/v3/song/detail"
+    url = "http://interface.music.163.com/eapi/v3/song/detail"
     params = {
         "c": [ujson.dumps({"id": songId})],
         "ids": [songId],

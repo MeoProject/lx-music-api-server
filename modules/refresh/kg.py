@@ -1,31 +1,101 @@
 import time
 import ujson
 import base64
-from Crypto.Cipher import AES
-from server.config import config
+import hashlib
 from utils.log import createLogger
+from server.config import config
 from modules.plat.kg.utils import signRequest, tools
+
+from Crypto.PublicKey import RSA
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import pad, unpad
 
 logger = createLogger("Refresh Login")
 
-key = "90b8382a1bb4ccdcf063102053fd75b8"
-iv = "f063102053fd75b8"
+PUBLIC_KEY = RSA.import_key(
+    base64.b64decode(
+        "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDIAG7QOELSYoIJvTFJhMpe1s/gbjDJX51HBNnEl5HXqTW6lQ7LC8jr9fWZTwusknp+sVGzwd40MwP6U5yDE27M/X1+UR4tvOGOqp94TJtQ1EPnWGWXngpeIW5GxoQGao1rmYWAu6oi1z9XkChrsUdC6DJE5E221wf/4WLFxwAtRQIDAQAB"
+    )
+)
 
 
-def pad(s):
-    return s + (16 - len(s) % 16) * chr(16 - len(s) % 16)
+def calcHash(input_str: str) -> str:
+    md5 = hashlib.md5()
+    md5.update(input_str.encode("utf-8"))
+    return md5.hexdigest()
 
 
-def unpad(s):
-    return s[: -ord(s[len(s) - 1 :])]
+def randomString(length: int) -> str:
+    import string
+    import random
+
+    chars = string.ascii_lowercase + string.digits
+    return "".join(random.choice(chars) for _ in range(length))
 
 
-def crypto_aes_encrypt(data: str | dict, key: str, iv: str):
+def cryptoAesEncrypt(data: str | dict, key: str = None, iv: str = None) -> dict | str:
     if isinstance(data, dict):
         data = ujson.dumps(data, ensure_ascii=False)
 
+    if key is None:
+        temp_key = randomString(16).lower()
+        key = calcHash(temp_key)[:32]
+        iv = key[16:32]
+        return_key = True
+    else:
+        temp_key = None
+        return_key = False
+        if iv is None:
+            processed_key = calcHash(key)
+            key = processed_key[:32]
+            iv = key[16:32]
+
     cipher = AES.new(key.encode("utf-8"), AES.MODE_CBC, iv.encode("utf-8"))
-    encrypted = cipher.encrypt(pad(data).encode("utf-8"))
+    encrypted = cipher.encrypt(pad(data.encode("utf-8"), AES.block_size))
+    hex_str = encrypted.hex()
+
+    if return_key:
+        return {"str": hex_str, "key": temp_key}
+    else:
+        return hex_str
+
+
+def cryptoAesDecrypt(data: str, key: str, iv: str = None) -> dict | str:
+    if iv is None:
+        processed_key = calcHash(key)
+        key = processed_key[:32]
+        iv = key[16:32]
+
+    encrypted_bytes = bytes.fromhex(data)
+
+    cipher = AES.new(key.encode("utf-8"), AES.MODE_CBC, iv.encode("utf-8"))
+    decrypted = cipher.decrypt(encrypted_bytes)
+    decrypted = unpad(decrypted, AES.block_size)
+
+    try:
+        result_str = decrypted.decode("utf-8")
+        try:
+            return ujson.loads(result_str)
+        except:
+            return result_str
+    except:
+        return decrypted
+
+
+def cryptoRSAEncrypt(data: dict | str) -> str:
+    if isinstance(data, dict):
+        data = ujson.dumps(data, ensure_ascii=False)
+
+    data_bytes = data.encode("utf-8")
+
+    if len(data_bytes) > 128:
+        padded_data = data_bytes[:128]
+    else:
+        padded_data = data_bytes + bytes(128 - len(data_bytes))
+
+    m = int.from_bytes(padded_data, byteorder="big")
+    c = pow(m, PUBLIC_KEY.e, PUBLIC_KEY.n)
+    encrypted = c.to_bytes(128, byteorder="big")
 
     return encrypted.hex()
 
@@ -39,44 +109,59 @@ async def refresh_login(user_info):
     if token == "":
         return
 
-    timestamp = int(time.time() * 1000)
+    clienttime = int(time.time())
+    clienttime_ms = int(clienttime * 1000)
 
-    p3 = crypto_aes_encrypt({"clienttime": timestamp // 1000, "token": token}, key, iv)
+    p3 = cryptoAesEncrypt(
+        {"clienttime": clienttime, "token": token},
+        key="90b8382a1bb4ccdcf063102053fd75b8",
+        iv="f063102053fd75b8",
+    )
 
-    data = {
-        "p3": p3,
-        "plat": 1,
-        "pk": "",
-        "params": "",
-        "t1": "",
-        "userid": userid,
-        "gitversion": "bab1274",
-        "t2": "",
-        "clienttime_ms": timestamp,
-        "t3": "",
-    }
+    encryptParams = cryptoAesEncrypt({})
 
-    params = {
-        "dfid": "-",
-        "uuid": "-",
-        "appid": tools[user_info["version"]]["appid"],
-        "mid": tools["mid"],
-        "clientver": tools[user_info["version"]]["clientver"],
-        "clienttime": timestamp // 1000,
-    }
-
-    headers = {
-        "User-Agent": "Android12-AndroidPhone-20149-201-0-ting#661004247|958959317-LOGIN-wifi",
-        "X-Router": "login.user.kugou.com",
-        "KG-THash": "25b8eea",
-        "KG-Rec": "1",
-        "KG-RC": "1",
-    }
+    pk = cryptoRSAEncrypt(
+        {
+            "clienttime_ms": clienttime_ms,
+            "key": encryptParams["key"],
+        }
+    )
 
     req = await signRequest(
-        "https://gateway.kugou.com/v5/login_by_token",
-        params,
-        {"method": "POST", "json": data, "headers": headers},
+        "http://gateway.kugou.com/v5/login_by_token",
+        {
+            "dfid": "-",
+            "uuid": "-",
+            "appid": "1005",
+            "mid": tools["mid"],
+            "clientver": "20349",
+            "clienttime": clienttime,
+        },
+        {
+            "method": "POST",
+            "body": {
+                "p3": p3,
+                "params": encryptParams["str"],
+                "userid": userid,
+                "need_toneinfo": 1,
+                "clienttime_ms": clienttime_ms,
+                "dfid": "-",
+                "dev": "SDY-AN00",
+                "plat": 1,
+                "pk": pk,
+                "t1": "0",
+                "gitversion": "a23c277",
+                "t2": "0",
+                "t3": "MCwwLDEsMSwwLDYsMSw2LDA=",
+            },
+            "headers": {
+                "SUPPORT-CALM": "1",
+                "KG-THash": "6a6a1ba",
+                "x-router": "login.user.kugou.com",
+                "User-Agent": "Android12-AndroidPhone-20349-201-0-ting#958959317/661004247-LOGIN-wifi",
+                "KG-RC": "1",
+            },
+        },
     )
 
     body = req.json()
@@ -88,8 +173,14 @@ async def refresh_login(user_info):
         return
     else:
         logger.info(f"酷狗音乐账号(UID_{userid})刷新登录成功")
+
+        decrypted_token = cryptoAesDecrypt(
+            body["data"]["secu_params"],
+            encryptParams["key"],
+        )
+
         user_list = config.read("module.platform.kg.users")
-        user_list[user_list.index(user_info)]["token"] = body["data"]["token"]
-        user_list[user_list.index(user_info)]["userid"] = str(body["data"]["userid"])
+        user_list[user_list.index(user_info)]["token"] = decrypted_token["token"]
+
         config.write("module.platform.kg.users", user_list)
         logger.info(f"为酷狗音乐账号(UID_{userid})数据更新完毕")
