@@ -1,0 +1,48 @@
+site_name: "LX Music Api Server Docs"
+site_author: "MeoProject"
+site_url: "https://docs.ikunshare.com"
+
+repo_name: "MeoProject/lx-music-api-server"
+repo_url: "https://github.com/MeoProject/lx-music-api-server"
+
+theme:
+  name: "material"
+  language: "zh"
+  favicon: "assets/icon.ico"
+  logo: "assets/icon.png"
+  icon:
+    repo: "fontawesome/brands/github"
+  features:
+    - "content.action.edit"
+    - "content.code.copy"
+
+extra_css:
+  - "stylesheets/extra.css"
+
+plugins:
+  - meta:
+      enabled: true
+  - git-authors:
+      enabled: true
+  - search:
+      enabled: true
+      lang: "zh"
+  - git-revision-date-localized:
+      enabled: true
+      enable_creation_date: true
+  - git-committers:
+      enabled: true
+      repository: "MeoProject/lx-music-api-server-docs"
+      branch: "main"
+
+nav:
+  - 前言: index.md
+  - 快速开始: getting-started.md
+  - 抓包: 
+    - 主页: capture/index.md
+    - 酷狗音乐: capture/kugou.md
+    - QQ音乐: capture/qq.md
+    - 网易云音乐: capture/wyy.md
+    - 咪咕音乐: capture/migu.md
+  - 项目协议: project-license.md
+  - 项目许可证: license.md
