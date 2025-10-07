@@ -9,6 +9,8 @@ English | [简体中文](README.md)
 
 </div>
 
+Press this link to join group【LX Music Api Server 项目交流群】：https://qm.qq.com/q/1jGHxmq4rs
+
 Any **account bans** or other consequences resulting from using this project **are not related to this project**
 
 This project does not accept private customization. Issues arising from sources **not officially released by this project's GitHub** **are not related to this project**

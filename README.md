@@ -9,6 +9,8 @@
 
 </div>
 
+点击链接加入群聊【LX Music Api Server 项目交流群】：https://qm.qq.com/q/1jGHxmq4rs
+
 使用此项目导致的**封号**等情况**与本项目无关**
 
 本项目不接受私人定制，非**本项目 Github 发布**所出现问题**与本项目无关**
