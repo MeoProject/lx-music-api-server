@@ -1,6 +1,6 @@
 {
   "name": "lx-music-api-server",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "LX Music Api Server",
   "main": "main.py",
   "scripts": {
