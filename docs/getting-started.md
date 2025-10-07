@@ -7,32 +7,30 @@
 
 步骤:
 
-- 1 获取项目源码并进入项目目录
+- 1 安装 uv
 
 ```
-git clone https://github.com/MeoProject/lx-music-api-server
+Win: powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+Linux/Darwin: curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+如果你在中国大陆，请参考 https://gitee.com/wangnov/uv-custom/releases
+
+- 2 克隆项目并进入项目目录
+
+```
+git clone https://github.com/MeoProject/lx-music-api-server.git
 cd lx-music-api-server
 ```
 
-- 2 安装项目依赖
+- 3 同步环境
 
 ```
-pip install poetry
-poetry install --no-root
+uv sync
 ```
 
-- 3 启动项目以生成配置文件
+- 5 启动项目, 配置项目
 
 ```
-poetry run python app.py
-```
-
-- 4 配置项目
-
-已于 3.0.0 版本为配置文件增加 JSON Schema, 使用 VSCode 等编辑器将鼠标悬停于配置键上即可获得配置简介
-
-- 5 启动项目
-
-```
-poetry run python app.py
+uv run main.py
 ```

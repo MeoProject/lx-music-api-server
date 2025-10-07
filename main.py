@@ -1,18 +1,18 @@
+try:
+    from fastapi import FastAPI
+    from fastapi import Request
+    from shared import Dossier, HOME
+except:
+    raise ImportError("Please run 'uv sync' to install packages.")
+
 import asyncio
-
+from pathlib import Path
 from api import home_handler, gcsp_handler, script_handler, music_handler
-
 from middleware.auth import AuthMiddleware
 from middleware.request_logger import RequestLoggerMiddleware
-
-from fastapi import FastAPI
-from fastapi import Request
-
 from contextlib import asynccontextmanager
-
 import uvicorn
 from uvicorn.config import Config
-
 from server import variable
 from server.config import config
 from utils import scheduler, log
@@ -24,6 +24,11 @@ async def clean():
     if variable.http_client:
         await variable.http_client.connector.close()
         await variable.http_client.close()
+
+    path = Path(HOME, "my_dossier")
+    dossier = Dossier(path)
+    dossier.set("registered", {"ok": False})
+
     logger.info("等待部分进程暂停...")
 
 
@@ -45,7 +50,7 @@ app = FastAPI(
 )
 
 uvicorn_config = Config(
-    "app:app",
+    "main:app",
     host=config.read("server.host"),
     port=config.read("server.port"),
     reload=config.read("server.reload"),
@@ -79,15 +84,8 @@ for f in variable.log_files:
         f.close()
 
 
-async def Init():
-    try:
-        await server.serve()
-    except Exception as e:
-        logger.error(e)
-
-
 if __name__ == "__main__":
     try:
-        asyncio.run(Init())
+        asyncio.run(server.serve())
     except:
         pass

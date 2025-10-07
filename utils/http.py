@@ -110,3 +110,4 @@ async def HttpRequest(url: str, options: dict = {}) -> Response:
         return req
     except Exception as e:
         logger.error(f"URL: {url} 请求时遇到错误: {e}")
+        raise e

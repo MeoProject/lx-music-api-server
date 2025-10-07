@@ -18,51 +18,54 @@ PS: 主开发(@helloplhm-qwq)因学业原因无法维护项目, 在 2026 年 6 �
 ## 💡 功能支持性
 
 - [ ] 主要功能：
-   - [x] 链接获取(kw,kg,tx,wy,mg)  
-   - [x] 详情获取(kw,kg,tx,wy,mg)  
-   - [x] 歌词获取(kw,kg,tx,wy,mg)  
-   - [x] 刷新登录(kg,tx)(只有这俩必须刷新)
 
-   - [ ] 搜索(计划外)  
-   - [ ] i18n(计划外)
+  - [x] 链接获取(kw,kg,tx,wy,mg)
+  - [x] 详情获取(kw,kg,tx,wy,mg)
+  - [x] 歌词获取(kw,kg,tx,wy,mg)
+  - [x] 刷新登录(kg,tx)(只有这俩必须刷新)
 
-- [x] 特别功能:  
-   - [x] [数据已删除]加密(第二版)解密  
-   - [x] 歌词适配完整 API(链接获取,更新,赞助,闪屏)
+  - [ ] 搜索(计划外)
+  - [ ] i18n(计划外)
+
+- [x] 特别功能:
+  - [x] [数据已删除]加密(第二版)解密
+  - [x] 歌词适配完整 API(链接获取,更新,赞助,闪屏)
 
 ## 💻 部署方法
 
 环境要求:  
 ≥Python 3.10  
 ≥Redis 6.0  
+UV  
 不推荐 Red hat 系, 推荐 Debian 系和 Windows，最省事  
 非必要: Node.js
 
-1. 安装 poetry
+1. 安装 uv
 
    ```bash
-   pip install poetry
+   Win: powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+   Linux/Darwin: curl -LsSf https://astral.sh/uv/install.sh | sh
    ```
 
-2. clone 本项目并进入项目目录
+   如果你在中国大陆，请参考 https://gitee.com/wangnov/uv-custom/releases
+
+2. 克隆项目并进入项目目录
 
    ```bash
    git clone https://github.com/MeoProject/lx-music-api-server.git
    cd lx-music-api-server
    ```
 
-3. 安装依赖
+3. 同步环境
 
    ```bash
-   poetry install --no-root
+   uv sync
    ```
 
-4. 启动
+4. 原神，启动！
 
    ```bash
-   poetry run python app.py
-   or
-   npm run start
+   uv run main.py
    ```
 
 ## 📄 项目协议

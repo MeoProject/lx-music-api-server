@@ -36,14 +36,18 @@ PS: The main developer (@helloplhm-qwq) cannot maintain the project due to acade
 Environment requirements:  
 ≥Python 3.10  
 ≥Redis 6.0  
+UV  
 Red Hat-based systems not recommended, Debian-based systems and Windows recommended (most convenient)  
 Optional: Node.js
 
-1. Install poetry
+1. Install uv
 
    ```bash
-   pip install poetry
+   Win: powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+   Linux/Darwin: curl -LsSf https://astral.sh/uv/install.sh | sh
    ```
+
+   If you in China Mainland, please reference https://gitee.com/wangnov/uv-custom/releases
 
 2. Clone this project and enter the project directory
 
@@ -55,15 +59,13 @@ Optional: Node.js
 3. Install dependencies
 
    ```bash
-   poetry install --no-root
+   uv sync
    ```
 
 4. Start
 
    ```bash
-   poetry run python app.py
-   or
-   npm run start
+   uv run main.py
    ```
 
 ## 📄 Project License
