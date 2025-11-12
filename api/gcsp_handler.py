@@ -1,6 +1,6 @@
 import zlib
 import time
-import ujson
+from utils import orjson
 import modules
 import binascii
 
@@ -44,10 +44,10 @@ async def getKuwoOldInfo(request: Request, songId: int):
 @router.api_route("/client/cgi-bin/{method}", methods=["GET", "POST"])
 async def GcspApi(request: Request, method: str) -> Response:
     try:
-        PACKAGE = config.read("module.gcsp.package_md5")
-        SALT_1 = config.read("module.gcsp.salt_1")
-        SALT_2 = config.read("module.gcsp.salt_2")
-        NEED_VERIFY = config.read("module.gcsp.enable_verify")
+        PACKAGE = config.read("modules.gcsp.package_md5")
+        SALT_1 = config.read("modules.gcsp.salt_1")
+        SALT_2 = config.read("modules.gcsp.salt_2")
+        NEED_VERIFY = config.read("modules.gcsp.enable_verify")
 
         qm = {
             "mp3": "128k",
@@ -66,7 +66,7 @@ async def GcspApi(request: Request, method: str) -> Response:
         }
 
         def decode(indata: bytes) -> dict:
-            return ujson.loads(binascii.unhexlify(zlib.decompress(indata)))
+            return orjson.loads(binascii.unhexlify(zlib.decompress(indata)))
 
         def verify(data: dict) -> str:
             if not NEED_VERIFY:
@@ -75,8 +75,8 @@ async def GcspApi(request: Request, method: str) -> Response:
             sign_1 = createMD5(PACKAGE + data["time"] + SALT_2)
             sign_2 = createMD5(
                 str(
-                    ujson.dumps(data["text_1"])
-                    + ujson.dumps(data["text_2"])
+                    orjson.dumps(data["text_1"])
+                    + orjson.dumps(data["text_2"])
                     + sign_1
                     + data["time"]
                     + SALT_1
@@ -101,13 +101,12 @@ async def GcspApi(request: Request, method: str) -> Response:
 
             if result != "success":
                 compressed_data = zlib.compress(
-                    ujson.dumps(
+                    orjson.dumps(
                         {
                             "code": "403",
                             "error_msg": internal_trans[result],
                             "data": None,
                         },
-                        ensure_ascii=False,
                     ).encode("utf-8")
                 )
                 return Response(
@@ -115,24 +114,21 @@ async def GcspApi(request: Request, method: str) -> Response:
                     media_type="application/octet-stream",
                 )
 
-            data["te"] = ujson.loads(data["text_1"])
+            data["te"] = orjson.loads(data["text_1"])
 
             body = await modules.getUrlForAPI(
                 pm[data["te"]["platform"]], data["te"]["t1"], qm[data["te"]["t2"]]
             )
 
             if body["code"] != 200:
-                data = ujson.dumps(
-                    {"code": "403", "error_msg": body["message"]}, ensure_ascii=False
-                )
+                data = orjson.dumps({"code": "403", "error_msg": body["message"]})
             else:
-                data = ujson.dumps(
+                data = orjson.dumps(
                     {
                         "code": "200",
                         "error_msg": "success",
                         "data": body["url"] if body["code"] == 200 else None,
                     },
-                    ensure_ascii=False,
                 )
 
             compressed_data = zlib.compress(data.encode("utf-8"))
@@ -152,14 +148,14 @@ async def GcspApi(request: Request, method: str) -> Response:
                 body = {
                     "code": "200",
                     "data": {
-                        "version": config.read("module.gcsp.update.ver"),
-                        "update_title": config.read("module.gcsp.update.title"),
-                        "update_log": config.read("module.gcsp.update.logs"),
-                        "down_url": config.read("module.gcsp.update.down_url"),
-                        "share_url": config.read("module.gcsp.update.pan_url"),
+                        "version": config.read("modules.gcsp.update.ver"),
+                        "update_title": config.read("modules.gcsp.update.title"),
+                        "update_log": config.read("modules.gcsp.update.logs"),
+                        "down_url": config.read("modules.gcsp.update.down_url"),
+                        "share_url": config.read("modules.gcsp.update.pan_url"),
                         "compulsory": (
                             "yes"
-                            if config.read("module.gcsp.update.required")
+                            if config.read("modules.gcsp.update.required")
                             else "no"
                         ),
                         "file_md5": PACKAGE,

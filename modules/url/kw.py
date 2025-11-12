@@ -32,7 +32,7 @@ tools = {
 
 async def getUrl(songId: str | int, quality: str) -> UrlResponse:
     try:
-        source = random.choice(config.read("module.platform.kw.source_list"))
+        source = random.choice(config.read("modules.platform.kw.source_list"))
 
         params = {
             "user": "359307055300426",

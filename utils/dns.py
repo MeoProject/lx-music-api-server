@@ -6,7 +6,7 @@ import asyncio
 import socket
 import time
 import base64
-import ujson
+from utils import orjson
 import struct
 import dns.message
 
@@ -94,8 +94,8 @@ class DNSResolver:
         :param cache_ttl: 缓存时长，单位为秒（默认 600 秒）。
         """
         self.doh = (
-            config.read("module.doh")
-            if len(config.read("module.doh")) != 0
+            config.read("modules.doh")
+            if len(config.read("modules.doh")) != 0
             else ["https://dns.alidns.com/dns-query"]
         )
         self.ipv6_enable = (
@@ -197,9 +197,9 @@ class DNSResolver:
                 if response.content_type.endswith("json"):
                     # 如果是 JSON 格式，使用 JSON 解析
                     try:
-                        data = ujson.loads(content.decode("utf-8"))
+                        data = orjson.loads(content.decode("utf-8"))
                         return data.get("Answer", [])
-                    except ujson.JSONDecodeError as e:
+                    except orjson.JSONDecodeError as e:
                         logger.error(f"JSON decode error: {e}")
                         raise DNSException(host, f"{record_type}: JSON_PARSE_ERROR")
                 else:

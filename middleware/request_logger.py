@@ -31,7 +31,7 @@ class RequestLoggerMiddleware(BaseHTTPMiddleware):
             ip_info = {"local": "Unknown"}
 
         logger.info(
-            f"请求: {request.method} - {request.state.remote_addr} - "
+            f"收到请求: {request.method} - {request.state.remote_addr} - "
             f"{ip_info['local']} - {request.url.path} - "
             f"{request.headers.get('User-Agent', '')} - "
         )

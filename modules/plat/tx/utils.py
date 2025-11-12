@@ -1,91 +1,66 @@
-import ujson
-
-from server.config import config
-from .sign import signBody
+import time
+from modules.plat.tx.sign import signBody
+from utils import orjson
 from utils.http import HttpRequest
+from server.config import config
 
 
-async def signRequest(data):
-    data = ujson.dumps(data, ensure_ascii=False)
-    s = signBody(data)
+async def getSign(data: dict) -> str:
+    body = orjson.dumps(data)
+    params = "&".join(
+        [
+            str(data["comm"]["ct"]),
+            str(data["comm"]["v"]),
+            "null",
+            "null",
+            str(int(time.time()) * 1000),
+            str(data["comm"]["udid"]),
+            "android",
+        ]
+    )
 
-    return await HttpRequest(
-        f"http://u6.y.qq.com/cgi-bin/musics.fcg?sign=" + s,
+    req = await HttpRequest(
+        f"{config.read('modules.platform.tx.sign_server_url')}/sign",
         {
             "method": "POST",
-            "body": data,
+            "body": orjson.dumps(
+                {
+                    "body": body,
+                    "params": params,
+                }
+            ),
         },
     )
 
+    resp = req.json()
+    sign = resp.get("sign", "")
+    mask = resp.get("mask", "")
 
-Tools = {
-    "File": {
-        "fileInfo": {
-            "128k": {
-                "e": ".mp3",
-                "h": "M500",
+    return sign, mask, body
+
+
+async def signRequest(data):
+    if config.read("modules.platform.tx.sign_server_url") not in [None, ""]:
+        sign, mask, body = await getSign(data)
+
+        return await HttpRequest(
+            "https://u.y.qq.com/cgi-bin/musics.fcg",
+            {
+                "method": "POST",
+                "body": body,
+                "headers": {
+                    "sign": sign,
+                    "mask": mask,
+                    "x-sign-data-type": "json",
+                },
             },
-            "320k": {
-                "e": ".mp3",
-                "h": "M800",
+        )
+    else:
+        body = orjson.dumps(data)
+        return await HttpRequest(
+            "https://u.y.qq.com/cgi-bin/musics.fcg" + signBody(body),
+            {
+                "method": "POST",
+                "body": body,
             },
-            "flac": {
-                "e": ".flac",
-                "h": "F000",
-            },
-            "hires": {
-                "e": ".flac",
-                "h": "RS01",
-            },
-            "atmos": {
-                "e": ".flac",
-                "h": "Q000",
-            },
-            "atmos_plus": {
-                "e": ".flac",
-                "h": "Q001",
-            },
-            "master": {
-                "e": ".flac",
-                "h": "AI00",
-            },
-        },
-    },
-    "EncryptFile": {
-        "fileInfo": {
-            "128k": {
-                "e": ".mgg",
-                "h": "O6M0",
-            },
-            "320k": {
-                "e": ".mgg",
-                "h": "O8M0",
-            },
-            "flac": {
-                "e": ".mflac",
-                "h": "F0M0",
-            },
-            "hires": {
-                "e": ".mflac",
-                "h": "RSM1",
-            },
-            "atmos": {
-                "e": ".mflac",
-                "h": "Q0M0",
-            },
-            "atmos_plus": {
-                "e": ".mflac",
-                "h": "Q0M1",
-            },
-            "master": {
-                "e": ".mflac",
-                "h": "AIM0",
-            },
-        },
-    },
-    "cdnaddr": (
-        config.read("module.platform.tx.cdnaddr")
-        if config.read("module.platform.tx.cdnaddr")
-        else "http://ws.stream.qqmusic.qq.com/"
-    ),
-}
+        )

@@ -1,8 +1,8 @@
 import zlib
 import random
-import ujson
 import aiohttp
 
+from utils import orjson
 from utils.dns import DNSResolver, aiohttpResolver
 
 from .text import *
@@ -33,11 +33,14 @@ def _prepare_options(options: dict) -> tuple[str, dict]:
     if method in ("POST", "PUT"):
         if "body" in options:
             options["data"] = options.pop("body")
+        if "xml" in options:
+            options["data"] = options.pop("xml")
+            headers["Content-Type"] = "application/x-www-form-urlencoded"
         if "form" in options:
-            options["data"] = ConvertDictToForm(options.pop("form"))
+            options["data"] = convertDictToForm(options.pop("form"))
             headers["Content-Type"] = "application/x-www-form-urlencoded"
         if isinstance(options.get("data"), dict):
-            options["data"] = ujson.dumps(options["data"])
+            options["data"] = orjson.dumps(options["data"])
 
     return method, options
 
@@ -47,15 +50,15 @@ def _log_response_content(content: bytes) -> None:
     if content.startswith(b"\x78\x9c") or content.startswith(b"\x78\x01"):
         try:
             decompressed = zlib.decompress(content)
-            if IsValidUTF8(decompressed):
-                logger.debug(LogPlainText(decompressed.decode("utf-8")))
+            if isUTF8(decompressed):
+                logger.debug(logText(decompressed.decode("utf-8")))
             else:
                 logger.debug("非文本响应体，不记录")
         except Exception:
             logger.debug("非文本响应体，不记录")
     else:
-        if IsValidUTF8(content):
-            logger.debug(LogPlainText(content.decode("utf-8")))
+        if isUTF8(content):
+            logger.debug(logText(content.decode("utf-8")))
         else:
             logger.debug("非文本响应体，不记录")
 
@@ -69,7 +72,15 @@ class Response:
 
     def json(self):
         try:
-            return ujson.loads(self.content)
+            if self.content.startswith((b"\x78\x9c", b"\x78\x01")):
+                decompressed = zlib.decompress(self.content)
+                return orjson.loads(decompressed)
+            elif len(self.content) > 5 and self.content[5:].startswith(
+                (b"\x78\x9c", b"\x78\x01")
+            ):
+                decompressed = zlib.decompress(self.content[5:])
+                return orjson.loads(decompressed)
+            return orjson.loads(self.content)
         except:
             return {}
 
@@ -88,9 +99,9 @@ async def HttpRequest(url: str, options: dict = {}) -> Response:
         variable.http_client = aiohttp.ClientSession(
             connector=aiohttp.TCPConnector(
                 ssl=False,
-                resolver=aiohttpResolver(DNSResolver()),
+                resolver=aiohttpResolver(DNSResolver(True)),
             ),
-            timeout=aiohttp.ClientTimeout(3.0, connect=5.0),
+            timeout=aiohttp.ClientTimeout(10.0, connect=5.0),
         )
 
     method, options = _prepare_options(options)
@@ -105,9 +116,13 @@ async def HttpRequest(url: str, options: dict = {}) -> Response:
     try:
         resp: aiohttp.ClientResponse = await reqattr(url, **options)
         resp.raise_for_status()
+
         req = await convert_to_requests_response(resp)
         _log_response_content(req.content)
         return req
-    except Exception as e:
-        logger.error(f"URL: {url} 请求时遇到错误: {e}")
+    except aiohttp.ConnectionTimeoutError as e:
+        logger.error(f"URL: {url} 请求超时: {str(e)}")
+        raise e
+    except aiohttp.ClientConnectionError as e:
+        logger.error(f"URL: {url} 请求失败: {str(e)}")
         raise e

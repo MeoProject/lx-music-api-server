@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from time import time
 from typing import TypedDict, cast
 
-import ujson
+from utils import orjson
 from . import http
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import padding
@@ -115,7 +115,7 @@ def random_payload_by_device(device: Device, version: str) -> dict:
         "packageId": "com.tencent.qqmusic",
         "deviceType": "Phone",
         "sdkName": "",
-        "reserved": ujson.dumps(reserved),
+        "reserved": orjson.dumps(reserved),
     }
 
 
@@ -129,12 +129,12 @@ async def get_qimei(version: str) -> QimeiResult:
         ts = int(time())
         key = base64.b64encode(rsa_encrypt(crypt_key.encode())).decode()
         params = base64.b64encode(
-            aes_encrypt(crypt_key.encode(), ujson.dumps(payload).encode())
+            aes_encrypt(crypt_key.encode(), orjson.dumps(payload).encode())
         ).decode()
         extra = '{"appKey":"' + APP_KEY + '"}'
         sign = createMD5(key, params, str(ts * 1000), nonce, SECRET, extra)
         res = await http.HttpRequest(
-            "http://api.tencentmusic.com/tme/trpc/proxy",
+            "https://api.tencentmusic.com/tme/trpc/proxy",
             {
                 "method": "POST",
                 "headers": {
@@ -145,7 +145,7 @@ async def get_qimei(version: str) -> QimeiResult:
                     "sign": createMD5(
                         "qimei_qq_androidpzAuCmaFAaFaHrdakPjLIEqKrGnSOOvH", str(ts)
                     ),
-                    "user-agent": "QQMusic",
+                    "User-Agent": "QQMusic",
                     "timestamp": str(ts),
                 },
                 "data": {
@@ -163,8 +163,8 @@ async def get_qimei(version: str) -> QimeiResult:
             },
         )
         logger.debug("获取 QIMEI 成功: %s", res.json())
-        data = ujson.loads(ujson.loads(res.content)["data"])["data"]
-        device.qimei = data["q36"]
+        data = orjson.loads(orjson.loads(res.content)["data"])["data"]
+        device.qimei = data
         save_device(device)
         return QimeiResult(q16=data["q16"], q36=data["q36"])
     except:

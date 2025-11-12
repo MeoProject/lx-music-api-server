@@ -1,33 +1,27 @@
 from modules.plat.tx.utils import signRequest
-from modules.plat.tx import build_common_params
+from modules.plat.tx import build_comm
 from server.models import SongInfo
 from server.exceptions import getSongInfoFailed
-from modules.plat import formatPlayTime, formatSinger
-from modules.lyric.tx import getLyric
+from modules.plat import formatSinger
 
 
 async def IdGetInfo(songid: int) -> SongInfo:
-    commonParams = await build_common_params()
-    infoReqBody = {
-        "comm": commonParams,
+    comm = await build_comm()
+    reqBody = {
+        "comm": comm,
         "req": {
             "module": "music.trackInfo.UniformRuleCtrl",
             "method": "CgiGetTrackInfo",
             "param": {"types": [1], "ids": [songid], "ctx": 0},
         },
     }
-    infoRequest = await signRequest(infoReqBody)
-    infoBody = infoRequest.json()
+    resp = await signRequest(reqBody)
+    respBody = resp.json()
 
-    if infoBody["code"] != 0 or infoBody["req"]["code"] != 0:
+    if respBody["code"] != 0 or respBody["req"]["code"] != 0:
         raise getSongInfoFailed("获取音乐信息失败")
 
-    info = infoBody["req"]["data"]["tracks"][0]
-
-    try:
-        lyric = await getLyric(info["id"])
-    except:
-        lyric = None
+    info = respBody["req"]["data"]["tracks"][0]
 
     return SongInfo(
         songId=info.get("id"),
@@ -40,38 +34,29 @@ async def IdGetInfo(songid: int) -> SongInfo:
         ),
         albumId=info.get("album", {}).get("id"),
         albumMid=info.get("album", {}).get("mid"),
-        duration=(
-            formatPlayTime(info.get("interval"))
-            if info.get("interval") is not None
-            else None
-        ),
+        duration=info.get("interval", 0),
         mediaMid=info.get("file", {}).get("media_mid"),
-        lyric=lyric,
     )
 
 
 async def MidGetInfo(mid: str) -> SongInfo:
-    commonParams = await build_common_params()
-    infoReqBody = {
-        "comm": commonParams,
+    comm = await build_comm()
+    reqBody = {
+        "comm": comm,
         "req": {
             "method": "get_song_detail_yqq",
             "param": {"song_type": 0, "song_mid": mid},
             "module": "music.pf_song_detail_svr",
         },
     }
-    infoRequest = await signRequest(infoReqBody)
-    infoBody = infoRequest.json()
 
-    if infoBody["code"] != 0 or infoBody["req"]["code"] != 0:
+    resp = await signRequest(reqBody)
+    respBody = resp.json()
+
+    if respBody["code"] != 0 or respBody["req"]["code"] != 0:
         raise getSongInfoFailed("获取音乐信息失败")
 
-    info = infoBody["req"]["data"]["track_info"]
-
-    try:
-        lyric = await getLyric(info["id"])
-    except:
-        lyric = None
+    info = respBody["req"]["data"]["track_info"]
 
     return SongInfo(
         songId=info.get("id"),
@@ -84,13 +69,8 @@ async def MidGetInfo(mid: str) -> SongInfo:
         ),
         albumId=info.get("album", {}).get("id"),
         albumMid=info.get("album", {}).get("mid"),
-        duration=(
-            formatPlayTime(info.get("interval"))
-            if info.get("interval") is not None
-            else None
-        ),
+        duration=info.get("interval", 0),
         mediaMid=info.get("file", {}).get("media_mid"),
-        lyric=lyric,
     )
 
 

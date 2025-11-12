@@ -38,7 +38,7 @@ default = {
         },
     },
     "security": {"key_verify": {"enable": False, "list": [""]}},
-    "module": {
+    "modules": {
         "doh": ["https://dns.alidns.com/dns-query"],
         "gcsp": {
             "enable": False,
@@ -62,7 +62,7 @@ default = {
                     {
                         "userid": "0",
                         "token": "",
-                        "refresh_login": False,
+                        "refreshLogin": False,
                     },
                 ],
             },
@@ -74,11 +74,12 @@ default = {
                         "refreshKey": "",
                         "openId": "",
                         "accessToken": "",
-                        "vip_type": "normal",
-                        "refresh_login": False,
+                        "vipType": "normal",
+                        "refreshLogin": False,
                     }
                 ],
-                "cdnaddr": "http://wx.music.tc.qq.com/",
+                "cdns": ["http://wx.music.tc.qq.com/"],
+                "sign_server_url": "",
             },
             "wy": {"users": [{"cookie": ""}]},
             "mg": {

@@ -22,7 +22,7 @@ async def getUrl(songId: str, quality: str) -> dict:
         raise getUrlFailed(f"获取音乐信息失败: {e}")
 
     try:
-        user_info = random.choice(config.read("module.platform.kg.users"))
+        user_info = random.choice(config.read("modules.platform.kg.users"))
 
         params = {
             "album_id": album_id,

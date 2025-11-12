@@ -1,7 +1,7 @@
 import os
 import sys
 import redis
-import ujson
+from utils import orjson
 from utils import log
 from . import variable
 from . import default
@@ -28,7 +28,7 @@ class ConfigManager:
     def initConfig(self):
         try:
             with open("./data/config.json", "r", encoding="utf-8") as f:
-                self.config = ujson.load(f)
+                self.config = orjson.load(f)
         except FileNotFoundError:
             self.config = default.default
 
@@ -38,12 +38,9 @@ class ConfigManager:
         if not os.path.exists("./data/config.json"):
             try:
                 with open("./data/config.json", "w", encoding="utf-8") as f:
-                    ujson.dump(
+                    orjson.dump(
                         default.default,
                         f,
-                        indent=2,
-                        ensure_ascii=False,
-                        escape_forward_slashes=False,
                     )
                     f.close()
                     if not os.getenv("build"):
@@ -86,7 +83,7 @@ class ConfigManager:
     def write(self, key: str, value: str | dict | list):
         try:
             with open("./data/config.json", "r", encoding="utf-8") as f:
-                config = ujson.load(f)
+                config = orjson.load(f)
 
             keys = key.split(".")
             current = config
@@ -99,12 +96,9 @@ class ConfigManager:
             self.config = config
 
             with open("./data/config.json", "w", encoding="utf-8") as f:
-                ujson.dump(
+                orjson.dump(
                     config,
                     f,
-                    indent=2,
-                    ensure_ascii=False,
-                    escape_forward_slashes=False,
                 )
                 f.close()
         except BaseException as e:
@@ -147,7 +141,7 @@ class CacheManager:
             key = self.buildKey(module, key)
             result = self.redis.get(key)
             if result:
-                cache_data = ujson.loads(result)
+                cache_data = orjson.loads(result)
                 return cache_data
         except BaseException as e:
             self.logger.error("缓存读取遇到错误…")
@@ -157,7 +151,7 @@ class CacheManager:
         try:
             key = self.buildKey(module, key)
             self.redis.set(
-                key, ujson.dumps(data), ex=expire if expire and expire > 0 else None
+                key, orjson.dumps(data), ex=expire if expire and expire > 0 else None
             )
         except BaseException as e:
             self.logger.error("缓存写入遇到错误…")

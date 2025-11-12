@@ -1,4 +1,4 @@
-import ujson
+from utils import orjson
 from base64 import b64encode
 from binascii import hexlify
 from hashlib import md5
@@ -45,7 +45,7 @@ def MD5(value):
 
 
 def eEncrypt(url: str, data):
-    data = ujson.dumps(data)
+    data = orjson.dumps(data)
     text = str(data)
     digest = MD5("nobody{}use{}md5forencrypt".format(url, text))
     data = "{}-36cd479b6b5-{}-36cd479b6b5-{}".format(url, text, digest)

@@ -6,15 +6,14 @@ license = { text = "MIT" }
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "ujson (>=5.10.0,<6.0.0)",
     "fastapi (>=0.115.12,<0.119.0)",
     "pycryptodome (>=3.22.0,<4.0.0)",
     "xmltodict (>=0.14.2,<0.15.0)",
     "redis (>=5.2.1,<6.0.0)",
     "cryptography (>=44.0.3,<47.0.0)",
     "uvicorn (>=0.34.2,<0.35.0)",
-    "logzero (>=1.7.0,<2.0.0)",
     "dnspython (>=2.8.0,<3.0.0)",
     "aiohttp (>=3.12.15,<4.0.0)",
-    "shared>=0.0.32",
+    "loguru>=0.7.3",
+    "orjson>=3.11.3",
 ]

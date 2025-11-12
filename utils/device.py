@@ -2,14 +2,18 @@ import binascii
 import hashlib
 import random
 import string
-from dataclasses import asdict, dataclass, field
-from pathlib import Path
-from typing import ClassVar
 from uuid import uuid4
+from utils import orjson
+from pathlib import Path
+from typing import ClassVar, TypedDict
+from dataclasses import asdict, dataclass, field
 
-import ujson
 
-device_path = Path("data/cache/device.json")
+class QimeiResult(TypedDict):
+    """获取 QIMEI 结果"""
+
+    q16: str
+    q36: str
 
 
 def random_imei() -> str:
@@ -85,21 +89,27 @@ class Device:
     apn: str = "wifi"
     vendor_name: str = "MIUI"
     vendor_os_name: str = "qmapi"
-    qimei: None | str = None
+    qimei: None | QimeiResult = None
 
 
-def get_cached_device() -> Device:
+def get_cached_device(
+    device_path: Path = Path("data/cache/device.json"),
+) -> Device:
     """获取缓存 Device"""
     if not device_path.exists():
         device = Device()
-        save_device(device)
+        save_device(device, device_path)
         return device
-    device_data = ujson.loads(device_path.read_text())
+
+    device_data = orjson.loads(device_path.read_text())
     device_data["version"] = OSVersion(**device_data["version"])
     return Device(**device_data)
 
 
-def save_device(device: Device):
+def save_device(
+    device: Device,
+    device_path: Path = Path("data/cache/device.json"),
+):
     """缓存 Device"""
     device_path.parent.mkdir(parents=True, exist_ok=True)
-    device_path.write_text(ujson.dumps(asdict(device)))
+    device_path.write_text(orjson.dumps(asdict(device), indent_2=True))

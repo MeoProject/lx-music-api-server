@@ -19,10 +19,10 @@ async def getUrl(songId: str, quality: str) -> Song:
     except:
         raise getUrlFailed("详情获取失败")
 
-    user_info = random.choice(config.read("module.platform.mg.users"))
+    user_info = random.choice(config.read("modules.platform.mg.users"))
 
     req = await HttpRequest(
-        f'http://app.c.nf.migu.cn/MIGUM2.0/strategy/listen-url/v2.4?albumId={info.albumId}&lowerQualityContentId={info.contentId}&netType=01&resourceType=2&songId={info.songId}&toneFlag={tools["qualityMap"][quality]}',
+        f"http://app.c.nf.migu.cn/MIGUM2.0/strategy/listen-url/v2.4?albumId={info.albumId}&lowerQualityContentId={info.contentId}&netType=01&resourceType=2&songId={info.songId}&toneFlag={tools['qualityMap'][quality]}",
         {
             "method": "GET",
             "headers": {

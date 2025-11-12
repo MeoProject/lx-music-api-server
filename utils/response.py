@@ -1,8 +1,8 @@
 from fastapi import Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import ORJSONResponse
 
 
-def handleResponse(request: Request, body: dict) -> JSONResponse:
+def handleResponse(request: Request, body: dict) -> ORJSONResponse:
     status = body.get("code", 200)
 
     if "visiter_info" not in body:
@@ -11,6 +11,6 @@ def handleResponse(request: Request, body: dict) -> JSONResponse:
             "ua": request.headers.get("User-Agent", ""),
         }
 
-    return JSONResponse(
+    return ORJSONResponse(
         body, status_code=status, headers={"Access-Control-Allow-Origin": "*"}
     )

@@ -55,5 +55,5 @@ async def thread_runner():
 
 async def run():
     logger.debug("定时线程启动...")
-    task = asyncio.create_task(thread_runner())
+    asyncio.create_task(thread_runner())
     logger.debug("定时线程停止")

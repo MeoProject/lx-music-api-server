@@ -2,52 +2,64 @@ from . import sign
 from . import utils
 
 from typing import Any
+from pathlib import Path
 from utils import device, qimei
 
-COMMON_DEFAULTS: dict[str, str] = {
-    "ct": "11",
-    "cv": "14080008",
-    "v": "14080008",
-    "chid": "2005000982",
-    "tmeAppID": "qqmusic",
-    "format": "json",
-    "inCharset": "utf-8",
-    "outCharset": "utf-8",
-}
 
-DEVICE = device.get_cached_device()
-
-
-async def build_common_params(
-    user_info: dict[str, str | int | None] | None = None,
+# Build Official Android
+async def build_comm(
+    user_info: dict | None = None,
 ) -> dict[str, Any]:
-    QIMEI = await qimei.get_qimei("11.2.3")
+    if user_info:
+        DEVICE_PATH = Path(f"data/cache/txo_{user_info['uin']}.json")
+    else:
+        DEVICE_PATH = Path("data/cache/device.json")
+
+    if not DEVICE_PATH.exists():
+        DEVICE = device.Device()
+        QIMEI = await qimei.get_qimei("14.9.0.8")
+        DEVICE.qimei = QIMEI
+        device.save_device(DEVICE, DEVICE_PATH)
+    else:
+        DEVICE = device.get_cached_device(DEVICE_PATH)
+        QIMEI = DEVICE.qimei
 
     common = {
-        "QIMEI36": QIMEI["q36"],
+        "v": 14090008,
+        "ct": 11,
+        "cv": 14090008,
+        "chid": "2005000982",
         "QIMEI": QIMEI["q16"],
+        "QIMEI36": QIMEI["q36"],
+        "tmeAppID": "qqmusic",
+        "format": "json",
+        "inCharset": "utf-8",
+        "outCharset": "utf-8",
     }
-    common.update(COMMON_DEFAULTS)
-    if user_info != None and user_info.get("uin") and user_info.get("token"):
+    if user_info is not None and user_info.get("uin") and user_info.get("token"):
+        if str(user_info["token"]).startswith("W_X_"):
+            tmeLoginType = 1
+        else:
+            tmeLoginType = 2
         common.update(
             {
                 "qq": str(user_info["uin"]),
                 "authst": user_info["token"],
-                "tmeLoginType": "2",
+                "tmeLoginType": tmeLoginType,
             }
         )
     common.update(
         {
+            "OpenUDID": "ffffffffbff94f7d000000000033c587",
+            "udid": "ffffffffbff94f7d000000000033c587",
             "os_ver": DEVICE.version.release,
+            "aid": "d2550265db4ce5c4",
             "phonetype": DEVICE.model,
             "devicelevel": DEVICE.version.sdk,
+            "newdevicelevel": DEVICE.version.sdk,
+            "nettype": "1030",
             "rom": DEVICE.fingerprint,
-            "aid": DEVICE.android_id,
-            "nettype": DEVICE.apn,
-            "udid": "ffffffffbff94f7d000000000033c587",
-            "OpenUDID": "ffffffffbff94f7d000000000033c587",
-            "OpenUDID2": "ffffffffbff94f7d000001996c7fddff",
-            "QIMEI36": "0fd8b521df8415e5d25da4ba100012e19915",
+            "OpenUDID2": "ffffffffbff94f7d000001999ff7d5bf",
         }
     )
     return common

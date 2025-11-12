@@ -1,6 +1,6 @@
 import re
 import math
-import ujson
+from utils import orjson
 from modules.plat.wy import eEncrypt
 from utils.http import HttpRequest
 from server.exceptions import getLyricFailed
@@ -102,7 +102,7 @@ class ParseTools:
                 result_lines.append(line)
             else:
                 try:
-                    info = ujson.loads(line)
+                    info = orjson.loads(line)
                     time_tag = self.ms_format(info.get("t", 0))
                     if time_tag:
                         text = "".join(t.get("tx", "") for t in info.get("c", []))

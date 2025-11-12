@@ -1,4 +1,4 @@
-import ujson
+from utils import orjson
 from utils import http as request
 from utils.dict import sortDict
 from utils.md5 import createMD5
@@ -36,7 +36,7 @@ def buildRequestParams(dictionary: dict):
 
 def sign(params, body=""):
     if isinstance(body, dict):
-        body = ujson.dumps(body)
+        body = orjson.dumps(body)
 
     params = sortDict(params)
     params = buildSignatureParams(params, body)

@@ -1,4 +1,4 @@
-import ujson
+from utils import orjson
 from modules.lyric.wy import getLyric
 from modules.plat.wy import eEncrypt
 from server.models import SongInfo
@@ -11,7 +11,7 @@ async def getMusicInfo(songId: str):
     path = "/api/v3/song/detail"
     url = "http://interface.music.163.com/eapi/v3/song/detail"
     params = {
-        "c": [ujson.dumps({"id": songId})],
+        "c": [orjson.dumps({"id": songId})],
         "ids": [songId],
     }
     infoRequest = await HttpRequest(

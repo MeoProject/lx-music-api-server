@@ -1,9 +1,9 @@
 import re
-import ujson
+from utils import orjson
 from .xml import loadXML
 
 
-def IsValidUTF8(text: str | bytes) -> bool:
+def isUTF8(text: str | bytes) -> bool:
     try:
         if isinstance(text, bytes):
             text = text.decode("utf-8")
@@ -18,27 +18,29 @@ def IsValidUTF8(text: str | bytes) -> bool:
         return False
 
 
-def IsPlainText(text: str) -> bool:
+def isText(text: str) -> bool:
     pattern = re.compile(r"[^\x00-\x7F]")
     return not bool(pattern.search(text))
 
 
-def ConvertDictToForm(dic: dict) -> str:
+def convertDictToForm(dic: dict) -> str:
     return "&".join([f"{k}={v}" for k, v in dic.items()])
 
 
-def LogPlainText(text: str) -> str:
+def logText(text: str) -> str | dict:
     if text.startswith("{") and text.endswith("}"):
         try:
-            text = ujson.loads(text)
+            text = orjson.loads(text)
+            return text
         except:
             pass
     elif text.startswith("<xml") and text.endswith(">"):
         try:
             text = f"xml: {loadXML(text)}"
+            return text
         except:
             pass
-    return text
+    return "无法记录"
 
 
 def IsChinese(check_str: str):

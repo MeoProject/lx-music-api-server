@@ -1,7 +1,7 @@
 import time
-import ujson
 import base64
 import hashlib
+from utils import orjson
 from utils.log import createLogger
 from server.config import config
 from modules.plat.kg.utils import signRequest, tools
@@ -35,7 +35,7 @@ def randomString(length: int) -> str:
 
 def cryptoAesEncrypt(data: str | dict, key: str = None, iv: str = None) -> dict | str:
     if isinstance(data, dict):
-        data = ujson.dumps(data, ensure_ascii=False)
+        data = orjson.dumps(data)
 
     if key is None:
         temp_key = randomString(16).lower()
@@ -75,7 +75,7 @@ def cryptoAesDecrypt(data: str, key: str, iv: str = None) -> dict | str:
     try:
         result_str = decrypted.decode("utf-8")
         try:
-            return ujson.loads(result_str)
+            return orjson.loads(result_str)
         except:
             return result_str
     except:
@@ -84,7 +84,7 @@ def cryptoAesDecrypt(data: str, key: str, iv: str = None) -> dict | str:
 
 def cryptoRSAEncrypt(data: dict | str) -> str:
     if isinstance(data, dict):
-        data = ujson.dumps(data, ensure_ascii=False)
+        data = orjson.dumps(data)
 
     data_bytes = data.encode("utf-8")
 
@@ -100,7 +100,7 @@ def cryptoRSAEncrypt(data: dict | str) -> str:
     return encrypted.hex()
 
 
-async def refresh_login(user_info):
+async def refreshLogin(user_info):
     userid = user_info["userid"]
     token = user_info["token"]
 
@@ -168,7 +168,7 @@ async def refresh_login(user_info):
 
     if body["error_code"] != 0:
         logger.warning(
-            f'酷狗音乐账号(UID_{userid})刷新登录失败, code: {body["error_code"]}\n响应体: {body}'
+            f"酷狗音乐账号(UID_{userid})刷新登录失败, code: {body['error_code']}\n响应体: {body}"
         )
         return
     else:
@@ -179,8 +179,8 @@ async def refresh_login(user_info):
             encryptParams["key"],
         )
 
-        user_list = config.read("module.platform.kg.users")
+        user_list = config.read("modules.platform.kg.users")
         user_list[user_list.index(user_info)]["token"] = decrypted_token["token"]
 
-        config.write("module.platform.kg.users", user_list)
+        config.write("modules.platform.kg.users", user_list)
         logger.info(f"为酷狗音乐账号(UID_{userid})数据更新完毕")

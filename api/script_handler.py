@@ -1,5 +1,5 @@
 import re
-import ujson
+from utils import orjson
 from fastapi import APIRouter, Request, Response
 from server.config import config
 from utils.response import handleResponse
@@ -11,7 +11,7 @@ router = APIRouter()
 @router.get("/script")
 async def lx_script(request: Request, key: str | None = None):
     try:
-        with open(f"./static/lx-source.js", "r", encoding="utf-8") as f:
+        with open("./static/lx-source.js", "r", encoding="utf-8") as f:
             script = f.read()
     except:
         return handleResponse(request, {"code": 404, "message": "本地无源脚本"})
@@ -26,7 +26,7 @@ async def lx_script(request: Request, key: str | None = None):
         if line.startswith("const API_URL"):
             newScriptLines.append(f'''const API_URL = "{url}"''')
         elif line.startswith("const API_KEY"):
-            newScriptLines.append(f'''const API_KEY = "{key if key else ''}"''')
+            newScriptLines.append(f'''const API_KEY = "{key if key else ""}"''')
         elif line.startswith("* @name"):
             newScriptLines.append(" * @name " + config.read("script.name"))
         elif line.startswith("* @description"):
@@ -50,7 +50,7 @@ async def lx_script(request: Request, key: str | None = None):
 
     r = re.sub(
         r"const MUSIC_QUALITY = {[^}]+}",
-        f"const MUSIC_QUALITY = JSON.parse('{ujson.dumps(config.read('script.qualitys'))}')",
+        f"const MUSIC_QUALITY = JSON.parse('{orjson.dumps(config.read('script.qualitys'))}')",
         r,
     )
 
@@ -85,10 +85,12 @@ async def lx_script(request: Request, key: str | None = None):
         content=r,
         media_type="text/javascript",
         headers={
-            "Content-Disposition": f"""attachment; filename={(
-                config.read('script.file') 
-                if config.read('script.file').endswith('.js') 
-                else config.read('script.file') + '.js'
-            )}"""
+            "Content-Disposition": f"""attachment; filename={
+                (
+                    config.read("script.file")
+                    if config.read("script.file").endswith(".js")
+                    else config.read("script.file") + ".js"
+                )
+            }"""
         },
     )

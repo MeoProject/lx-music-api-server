@@ -1,10 +1,5 @@
-try:
-    from fastapi import FastAPI
-    from fastapi import Request
-    from shared import Dossier, HOME
-except:
-    raise ImportError("Please run 'uv sync' to install packages.")
-
+from fastapi import FastAPI
+from fastapi import Request
 import asyncio
 from pathlib import Path
 from api import home_handler, gcsp_handler, script_handler, music_handler
@@ -24,16 +19,12 @@ async def clean():
     if variable.http_client:
         await variable.http_client.connector.close()
         await variable.http_client.close()
-
-    path = Path(HOME, "my_dossier")
-    dossier = Dossier(path)
-    dossier.set("registered", {"ok": False})
-
     logger.info("等待部分进程暂停...")
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    log.intercept_print()
     await scheduler.run()
 
     yield
@@ -67,13 +58,13 @@ stopEvent = asyncio.exceptions.CancelledError
 app.include_router(home_handler.router)
 app.include_router(script_handler.router)
 app.include_router(music_handler.router)
-if config.read("module.gcsp.enable"):
+if config.read("modules.gcsp.enable"):
     app.include_router(gcsp_handler.router)
 
 
 @app.exception_handler(Exception)
 async def globalErrorHandler(request: Request, exc: Exception):
-    logger.error(f"未处理的异常")
+    logger.error("未处理的异常")
     return {"code": 500, "message": f"未处理的异常: {exc}"}
 
 

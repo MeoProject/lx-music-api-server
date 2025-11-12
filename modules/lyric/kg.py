@@ -1,6 +1,6 @@
 import re
 import zlib
-import ujson
+from utils import orjson
 from server.exceptions import getLyricFailed
 from modules.info.kg import getMusicInfo
 from utils import http
@@ -23,7 +23,7 @@ class ParseTools:
         if trans:
             string = re.sub(r"\[language:[\w=\\/+]+\]\n", "", string)
             decoded_trans = createBase64Decode(trans.group(1)).decode("utf-8")
-            trans_json = ujson.loads(decoded_trans)
+            trans_json = orjson.loads(decoded_trans)
             for item in trans_json["content"]:
                 if item["type"] == 0:
                     rlyric = item["lyricContent"]
@@ -68,11 +68,11 @@ class ParseTools:
                     nr.append(r.strip())
                 rlyric[i] = " ".join(nr)
         if rlyric:
-            rlyric[i] = f'[{time_string}]{rlyric[i] if rlyric[i] else ""}'.replace(
+            rlyric[i] = f"[{time_string}]{rlyric[i] if rlyric[i] else ''}".replace(
                 "  ", " "
             )
         if tlyric:
-            tlyric[i] = f'[{time_string}]{tlyric[i] if tlyric[i] else ""}'
+            tlyric[i] = f"[{time_string}]{tlyric[i] if tlyric[i] else ''}"
         self.i += 1
         return re.sub(result.group(1), time_string, match.group(0))
 
@@ -100,7 +100,7 @@ async def lyricSearchByHash(hash_):
     timelength = int(musicInfo["audio_info"]["timelength"]) // 1000
     req = await http.HttpRequest(
         encodeURI(
-            f"http://lyrics.kugou.com/search?ver=1&man=yes&client=pc&keyword="
+            "http://lyrics.kugou.com/search?ver=1&man=yes&client=pc&keyword="
             + name
             + "&hash="
             + hash_new

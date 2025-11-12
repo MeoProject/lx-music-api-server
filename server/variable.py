@@ -1,12 +1,12 @@
 import os
 import aiohttp
-import ujson
+from utils import orjson
 
 
 def _ReadConfig_file():
     try:
         with open("./data/config.json", "r", encoding="utf-8") as f:
-            return ujson.load(f)
+            return orjson.load(f)
     except:
         return {}
 

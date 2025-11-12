@@ -1,5 +1,5 @@
 import random
-import ujson
+from utils import orjson
 
 from server.models import UrlResponse
 from modules.plat.wy import eEncrypt, QMap
@@ -12,7 +12,7 @@ async def getUrl(songId: str, quality: str) -> UrlResponse:
     path = "/api/song/enhance/player/url/v1"
     url = "http://interface.music.163.com/eapi/song/enhance/player/url/v1"
     params = {
-        "ids": ujson.dumps([songId]),
+        "ids": orjson.dumps([songId]),
         "level": QMap["qualityMap"][quality],
         "encodeType": "mp3",
     }
@@ -23,7 +23,7 @@ async def getUrl(songId: str, quality: str) -> UrlResponse:
             "method": "POST",
             "headers": {
                 "User-Agent": "NeteaseMusic/9.3.0.250516233250(9003000);Dalvik/2.1.0 (Linux; U; Android 12; ABR-AL80 Build/9b35a01.0)",
-                "Cookie": random.choice(config.read("module.platform.wy.users"))[
+                "Cookie": random.choice(config.read("modules.platform.wy.users"))[
                     "cookie"
                 ],
             },

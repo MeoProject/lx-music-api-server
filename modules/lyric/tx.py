@@ -1,9 +1,10 @@
 import re
 import zlib
 from modules.plat.tx.utils import signRequest
-from modules.plat.tx import build_common_params
+from modules.plat.tx import build_comm
 from server.exceptions import getLyricFailed
 from crypt.des import tripledes_key_setup, tripledes_crypt, DECRYPT
+from utils import convertLxlyricToElyric
 
 
 def qrc_decrypt(encrypted_qrc: str | bytearray | bytes) -> str:
@@ -75,7 +76,7 @@ class ParseTools:
             words = re.sub(self.rxps["lineTime"], "", line)
 
             lrcLines.append(
-                f'{startTimeStr}{re.sub(self.rxps["wordTimeAll"], "", words)}'
+                f"{startTimeStr}{re.sub(self.rxps['wordTimeAll'], '', words)}"
             )
 
             times = re.findall(self.rxps["wordTimeAll"], words)
@@ -118,7 +119,7 @@ class ParseTools:
 
             words = re.sub(self.rxps["lineTime"], "", line)
             lrcLines.append(
-                f'{startTimeStr}{re.sub(self.rxps["wordTimeAll"], "", words)}'
+                f"{startTimeStr}{re.sub(self.rxps['wordTimeAll'], '', words)}"
             )
 
         return "\n".join(lrcLines)
@@ -200,17 +201,13 @@ class ParseTools:
         return "\n".join(newLrc)
 
     def parse(self, lrc, tlrc=None, rlrc=None):
-        info = {
-            "lyric": "",
-            "tlyric": "",
-            "rlyric": "",
-            "lxlyric": "",
-        }
+        info = {"lyric": "", "tlyric": "", "rlyric": "", "lxlyric": "", "elyric": ""}
 
         if lrc:
             parsed_lrc = self.parseLyric(self.removeTag(lrc))
             info["lyric"] = parsed_lrc["lyric"]
             info["lxlyric"] = parsed_lrc["lxlyric"]
+            info["elyric"] = convertLxlyricToElyric(parsed_lrc["lxlyric"])
 
         if rlrc:
             info["rlyric"] = self.fixRlrcTimeTag(
@@ -231,9 +228,10 @@ def parseLyric(l, t="", r=""):
 
 
 async def getLyric(songId):
+    commparams = await build_comm()
     req = await signRequest(
         {
-            "comm": (await build_common_params()),
+            "comm": commparams,
             "req": {
                 "method": "GetPlayLyricInfo",
                 "module": "music.musichallSong.PlayLyricInfo",

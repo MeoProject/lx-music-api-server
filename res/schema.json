@@ -417,7 +417,7 @@
                 "key_verify"
             ]
         },
-        "module": {
+        "modules": {
             "type": "object",
             "title": "功能模块配置",
             "description": "各功能模块的配置",
@@ -538,7 +538,7 @@
                                                 "type": "string",
                                                 "description": "用户Token"
                                             },
-                                            "refresh_login": {
+                                            "refreshLogin": {
                                                 "type": "boolean",
                                                 "description": "是否自动刷新登录",
                                                 "default": true
@@ -589,7 +589,11 @@
                                                 "type": "string",
                                                 "description": "accessToken, 抓包获取"
                                             },
-                                            "vip_type": {
+                                            "refreshToken": {
+                                                "type": "string",
+                                                "description": "refreshToken, 抓包获取"
+                                            },
+                                            "vipType": {
                                                 "type": "string",
                                                 "description": "VIP类型（normal:普通用户 vip:绿钻 svip:SVIP)",
                                                 "enum": [
@@ -599,7 +603,7 @@
                                                 ],
                                                 "default": "normal"
                                             },
-                                            "refresh_login": {
+                                            "refreshLogin": {
                                                 "type": "boolean",
                                                 "description": "是否自动刷新登录",
                                                 "default": true
@@ -613,14 +617,22 @@
                                     },
                                     "default": []
                                 },
-                                "cdnaddr": {
-                                    "type": "string",
-                                    "description": "CDN加速地址",
-                                    "default": "https://wx.music.tc.qq.com/",
+                                "cdns": {
+                                    "type": "array",
+                                    "description": "CDN加速地址列表",
+                                    "default": [
+                                        "https://wx.music.tc.qq.com/"
+                                    ],
                                     "format": "uri-reference",
                                     "examples": [
                                         "https://wx.music.tc.qq.com/"
                                     ]
+                                },
+                                "sign_server_url": {
+                                    "type": "string",
+                                    "description": "签名服务地址, 为空则不使用外部签名服务",
+                                    "default": "",
+                                    "format": "uri-reference"
                                 }
                             },
                             "additionalProperties": false,

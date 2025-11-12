@@ -4,7 +4,7 @@
   "description": "LX Music Api Server",
   "main": "main.py",
   "scripts": {
-    "start": "poetry run python app.py",
+    "start": "poetry run python main.py",
     "clean": "python clean.py",
     "install": "poetry install"
   },
