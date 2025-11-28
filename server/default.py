@@ -74,6 +74,7 @@ default = {
                         "refreshKey": "",
                         "openId": "",
                         "accessToken": "",
+                        "refreshToken": "",
                         "vipType": "normal",
                         "refreshLogin": False,
                     }
